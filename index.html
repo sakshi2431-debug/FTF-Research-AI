@@ -1,0 +1,2168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Assistiv — Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1d2433;
+    --ink-2: #4a5263;
+    --muted: #5d6576;
+    --line: #dfe3ee;
+    --blue: #1f6fe5;
+    --blue-soft: #e4eefc;
+    --card: rgba(255, 255, 255, 0.72);
+    --green-ink: #0d6b3a;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(520px 520px at 12% 38%, rgba(196, 202, 246, 0.55), transparent 70%),
+      radial-gradient(600px 420px at 88% 95%, rgba(205, 210, 252, 0.6), transparent 70%),
+      radial-gradient(500px 400px at 75% 10%, rgba(236, 240, 255, 0.8), transparent 70%),
+      linear-gradient(180deg, #f6f7fd 0%, #f3f4fc 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    height: 100vh; height: 100dvh;
+    overflow: hidden;
+  }
+  /* Fixed design canvas matching the mockup (1654 × 1380), scaled to fit the window */
+  .stage {
+    position: absolute; left: 0; top: 0;
+    width: 1654px; height: 1380px;
+    transform-origin: 0 0;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+
+  /* ---------- Header (from Figma: Assistiv – Instructors, 1376px frame) ----------
+     Values below are Figma px; `zoom` maps the 1376px frame onto this 1654px canvas. */
+  header {
+    zoom: 1.2;
+    height: 88px;
+    padding: 32px 32px 0;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+  }
+  .brand { display: inline-flex; align-items: center; justify-self: start; border-radius: 10px; }
+  .brand svg { display: block; }
+  nav.tabs {
+    height: 56px;
+    display: flex; align-items: center; gap: 18px;
+    padding: 0 8px;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 100px 200px rgba(10, 13, 18, .18);
+  }
+  nav.tabs button {
+    height: 40px; padding: 0 13px; border-radius: 8px;
+    font-size: 16px; font-weight: 400; line-height: 1; color: #757575;
+    transition: background .2s, color .2s;
+  }
+  nav.tabs button:hover { background: #f5f6f8; color: #414651; }
+  nav.tabs button.active { background: #EFF8FF; color: #1570EF; font-weight: 600; }
+  .util { display: flex; justify-content: flex-end; align-items: center; gap: 23px; }
+  .util button {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 36px; padding: 0 2px; border-radius: 8px;
+    font-size: 15px; font-weight: 500; color: #535862;
+    transition: color .2s;
+  }
+  .util button svg { width: 20px; height: 20px; flex: none; }
+  .util button:hover { color: #1570EF; }
+  .util button:hover svg path { stroke: currentColor; }
+  .util .avatar {
+    width: 32px; height: 32px; padding: 0; margin-left: -5px;
+    border-radius: 50%; justify-content: center;
+    background: #EFF8FF; color: #1570EF; font-size: 15px; font-weight: 600;
+  }
+  .util .avatar:hover { box-shadow: 0 0 0 3px rgba(21, 112, 239, .15); }
+
+  /* ---------- Main ---------- */
+  main { width: 842px; margin: 0 auto; padding: 44px 0 0; }
+  h1 { font-size: 36px; font-weight: 500; margin: 0; letter-spacing: -0.3px; line-height: 44px; }
+  .sub { font-size: 18px; color: var(--ink-2); margin: 4px 0 24px; }
+
+  .grid { display: grid; grid-template-columns: 410px 410px; grid-template-rows: 382px 380px; gap: 24px 22px; }
+  .card {
+    position: relative; text-align: left;
+    background: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.82) 100%);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 0 18px 18px;
+    display: flex; flex-direction: column;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s, border-color .25s;
+    outline: none;
+  }
+  .card:hover, .card:focus-visible {
+    transform: translateY(-4px);
+    border-color: #c9d6f3;
+    box-shadow: 0 18px 40px -18px rgba(60, 80, 160, .35);
+  }
+  .card:focus-visible { box-shadow: 0 0 0 3px rgba(31,111,229,.35); }
+  .card:active { transform: translateY(-1px) scale(.995); }
+  .card.selected { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(31,111,229,.18); }
+  .art { height: 282px; flex: none; margin: 0 -18px; display: block; overflow: visible; }
+  .art svg { width: 100%; height: 100%; overflow: visible; }
+  .card h3 { margin: 0 0 6px; font-size: 20px; font-weight: 600; }
+  .card p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--muted); }
+
+  /* illustration motion */
+  .float { transition: transform .5s cubic-bezier(.2,.8,.2,1); transform-box: fill-box; transform-origin: center; }
+  .card:hover .f-up { transform: translateY(-6px); }
+  .card:hover .f-up2 { transform: translateY(-3px) rotate(-2deg); }
+  .card:hover .f-spin { transform: rotate(18deg) scale(1.08); }
+  .card:hover .f-fan1 { transform: translate(6px, -2px) rotate(4deg); }
+  .card:hover .f-fan2 { transform: translate(12px, 2px) rotate(8deg); }
+  .card:hover .f-fan3 { transform: translate(-4px, -4px) rotate(-3deg); }
+  .card:hover .f-front { transform: translate(-6px, -4px) rotate(-3deg); }
+  .card:hover .spark line { animation: spark .9s ease; }
+  @keyframes spark { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+  .bar { transform-box: fill-box; transform-origin: center; }
+  .card:hover .bar, .voice-live .bar { animation: wave 1s ease-in-out infinite; }
+  @keyframes wave { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(.45); } }
+  .mic-pulse { transform-box: fill-box; transform-origin: center; opacity: 0; }
+  .voice-live .mic-pulse { animation: pulse 1.6s ease-out infinite; }
+  @keyframes pulse { 0% { transform: scale(1); opacity: .45; } 100% { transform: scale(1.5); opacity: 0; } }
+  .radio-sel { transition: transform .3s; transform-box: fill-box; }
+  .card:hover .radio-sel { transform: translateY(-24px); }
+
+  /* ---------- Composer ---------- */
+  .dock { margin-top: 66px; }
+  .banner {
+    display: flex; align-items: center; gap: 16px;
+    padding: 12px 22px 18px;
+    margin-bottom: -8px;
+    border-radius: 14px 14px 0 0;
+    background: linear-gradient(180deg, #e9f8ee 0%, #d8f3e2 100%);
+    color: var(--green-ink); font-size: 17px;
+    transition: opacity .25s, transform .25s, max-height .3s, padding .3s, margin .3s;
+    max-height: 70px; overflow: hidden;
+  }
+  .banner b { font-weight: 500; }
+  .banner .close { margin-left: auto; color: #11935a; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 6px; }
+  .banner .close:hover { background: rgba(17,147,90,.12); }
+  .banner.gone { opacity: 0; transform: translateY(8px); max-height: 0; padding-block: 0; margin-bottom: 0; }
+  .composer {
+    position: relative;
+    background: #fff; border: 1px solid #dde2ec; border-radius: 14px;
+    padding: 18px 16px 14px 25px;
+    box-shadow: 0 6px 22px -14px rgba(40, 60, 120, .25);
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .composer:focus-within { border-color: #b7cdf5; box-shadow: 0 0 0 4px rgba(31,111,229,.08), 0 6px 22px -14px rgba(40,60,120,.25); }
+  .composer textarea {
+    width: 100%; border: 0; outline: 0; resize: none;
+    font: inherit; font-size: 19px; color: var(--ink); line-height: 1.4;
+    min-height: 30px; max-height: 180px; padding: 0; background: transparent;
+  }
+  .composer textarea::placeholder { color: #727a8a; }
+  .composer .row { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
+  .lib-toggle {
+    display: flex; align-items: center; gap: 12px; font-size: 16.5px; color: #2b3242;
+    padding: 4px 8px 4px 0; border-radius: 8px;
+  }
+  .lib-toggle .k { font-size: 15px; width: 18px; text-align: center; }
+  .lib-toggle .check { display: none; color: var(--blue); }
+  .lib-toggle[aria-pressed="true"] { color: var(--blue); }
+  .lib-toggle[aria-pressed="true"] .k { display: none; }
+  .lib-toggle[aria-pressed="true"] .check { display: inline; }
+  .send {
+    width: 42px; height: 42px; border-radius: 8px;
+    background: var(--blue); color: #fff; display: grid; place-items: center;
+    transition: background .2s, transform .15s, opacity .2s;
+  }
+  .send:hover { background: #185fd0; }
+  .send:active { transform: scale(.94); }
+  .send:disabled { opacity: .55; cursor: default; }
+  .chips { display: flex; gap: 14px; margin-top: 18px; }
+  .chip {
+    padding: 7px 14px; border-radius: 999px;
+    background: #e6eefb; color: #1757c2; font-size: 16px; font-weight: 500;
+    transition: background .2s, transform .15s;
+  }
+  .chip:hover { background: #d7e5fb; }
+  .chip:active { transform: scale(.96); }
+
+  /* ---------- Chat view ---------- */
+  .chat-top, .thread, .panel, .row.chat, .disclaimer { display: none; }
+  body.chatting { background: #f9fafb; }
+  body.chatting main {
+    width: auto; height: 1274px; margin: 0;
+    padding: 4px 22px 30px 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 540px;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "top panel" "thread panel" "dock panel";
+  }
+  body.chatting main > h1, body.chatting .sub, body.chatting .grid,
+  body.chatting .banner, body.chatting .chips { display: none; }
+  body.chatting .chat-top { display: flex; grid-area: top; width: min(1380px, calc(100% - 96px)); justify-self: center; }
+  body.chatting .thread { display: flex; grid-area: thread; }
+  body.chatting .dock { grid-area: dock; margin-top: 6px; width: min(1380px, calc(100% - 96px)); justify-self: center; position: relative; }
+  body.chatting .panel { display: block; grid-area: panel; align-self: start; }
+  body.chatting .disclaimer { display: block; }
+
+  .back {
+    display: inline-flex; align-items: center; gap: 10px;
+    height: 56px; padding: 0 20px 0 14px; margin-left: -14px;
+    font-size: 21px; font-weight: 500; color: #3a4152;
+    border-radius: 14px; transition: color .2s, background .2s;
+  }
+  .back svg { width: 24px; height: 24px; }
+  .back:hover { color: var(--blue); background: #eef2f9; }
+
+  /* Visible keyboard focus everywhere */
+  button:focus-visible, [role="button"]:focus-visible, a:focus-visible {
+    outline: 3px solid rgba(31, 111, 229, .55); outline-offset: 2px;
+  }
+
+  .thread {
+    flex-direction: column; overflow-y: auto;
+    padding: 36px 48px 80px;
+    scrollbar-width: thin; scrollbar-color: #d5d9e4 transparent;
+  }
+  .thread-inner { width: 100%; max-width: 1380px; margin: 0 auto; display: flex; flex-direction: column; gap: 40px; }
+  .msg { animation: in .35s ease both; }
+
+  /* user message */
+  .msg.me-row { align-self: flex-end; max-width: 72%; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
+  .bubble {
+    background: #e6effc; color: var(--ink);
+    padding: 26px 30px; border-radius: 32px;
+    font-size: 24px; line-height: 1.65; white-space: pre-wrap;
+  }
+  .bubble .files { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; white-space: normal; }
+  .bubble .files span { font-size: 16px; background: #fff; border-radius: 8px; padding: 4px 10px; color: var(--muted); }
+  .me-copy { margin-right: 14px; }
+
+  /* assistant message */
+  .msg.ai { align-self: stretch; color: #1a1f2b; font-size: 24px; line-height: 1.72; }
+  .status { display: inline-flex; align-items: center; gap: 6px; font-size: 22px; color: #5d6576; margin-bottom: 18px; padding: 4px 0; border-radius: 8px; }
+  .status .t { color: #6b7280; }
+  .status .chev { display: none; transition: transform .2s; }
+  .msg.ai.done .status { cursor: pointer; }
+  .msg.ai.done .status:hover { color: var(--ink-2); }
+  .msg.ai.done .status .chev { display: inline-block; }
+  .status[aria-expanded="true"] .chev { transform: rotate(90deg); }
+  .steps { margin: -6px 0 22px; padding: 4px 0 4px 18px; border-left: 2px solid #e3e7ef; font-size: 20px; color: #5d6576; line-height: 1.9; }
+  .shimmer {
+    margin-top: 18px; font-size: 21px; width: fit-content;
+    background: linear-gradient(90deg, #5d6576 0%, #5d6576 35%, #c9ced9 50%, #5d6576 65%, #5d6576 100%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shimmer 1.8s linear infinite;
+  }
+  @keyframes shimmer { from { background-position: 110% 0; } to { background-position: -110% 0; } }
+  @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  .body p { margin: 0 0 22px; }
+  .body p:last-child { margin-bottom: 0; }
+  .body h4 { margin: 30px 0 12px; font-size: 24px; font-weight: 600; }
+  .body ol, .body ul { margin: 0 0 22px; padding-left: 30px; }
+  .body li { margin: 8px 0; padding-left: 4px; }
+  .body strong { font-weight: 600; }
+  .body a.cite { color: var(--blue); text-decoration: none; }
+  .body a.cite:hover { text-decoration: underline; }
+  .body code.inline { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86em; background: #eef1f8; color: #1757c2; padding: 2px 7px; border-radius: 6px; }
+  .body.live > p:last-child::after,
+  .body.live > ol:last-child > li:last-child::after,
+  .body.live > ul:last-child > li:last-child::after {
+    content: ""; display: inline-block; width: 11px; height: 11px; margin-left: 6px; border-radius: 50%;
+    background: var(--blue); vertical-align: middle; animation: caret .7s ease-in-out infinite alternate;
+  }
+  @keyframes caret { from { opacity: .3; transform: scale(.7); } to { opacity: 1; transform: scale(1); } }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .act {
+    height: 56px; min-width: 56px; padding: 0 20px; border-radius: 14px;
+    border: 1px solid #dfe3ec; background: #fff; color: #3a4152;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    font-size: 20px; font-weight: 500;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+  .act svg { width: 24px; height: 24px; flex: none; }
+  .act:hover { background: #f3f7fe; border-color: #b7cdf5; color: var(--blue); }
+  .act.ok { color: #0d7a45; border-color: #bfe6cf; background: #f0faf4; }
+  .act.me-copy { border-color: transparent; background: transparent; padding: 0; }
+  .act.me-copy:hover { background: #eef2f9; }
+
+  /* ---------- Code blocks (light, Assistiv) ---------- */
+  .code { margin: 24px 0 28px; border-radius: 24px; overflow: hidden; background: #f3f5f9; border: 1px solid #e3e7ef; }
+  .code-head { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px 4px 26px; color: var(--ink); font-size: 19px; font-weight: 500; }
+  .code-lang { display: inline-flex; align-items: center; gap: 12px; }
+  .code-lang svg { color: #4a5263; }
+  .code-tools { display: flex; align-items: center; gap: 6px; }
+  .code-btn { width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; color: #4a5263; transition: background .2s, color .2s; }
+  .code-btn:hover { background: #e6eaf2; color: var(--ink); }
+  .code-btn.ok { color: #0d7a45; }
+  .code-run {
+    display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; margin-left: 4px;
+    border-radius: 999px; border: 1px solid #d9dee8; background: #fff; color: var(--ink); font-size: 18px; font-weight: 500;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+  .code-run:hover { background: #f3f7fe; border-color: #b7cdf5; color: var(--blue); }
+  .code-run.running { color: var(--blue); }
+  .code pre { margin: 0; padding: 16px 28px 28px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 20px; line-height: 1.65; color: #1d2433; }
+  .tk-k { color: #1f5fd1; } .tk-s { color: #157f3b; } .tk-c { color: #6b7280; font-style: italic; } .tk-f { color: #6d28d9; } .tk-n { color: #b4410d; } .tk-v { color: #6d28d9; }
+  .code-out { border-top: 1px solid #e3e7ef; background: #fff; padding: 16px 28px 22px; animation: in .3s ease; }
+  .code-out-label { font-size: 16px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5d6576; margin-bottom: 6px; }
+  .code-out pre { padding: 0; font-size: 19px; }
+  .code-out .note { font-size: 18px; color: #5d6576; }
+  .code.expanded {
+    position: fixed; inset: 60px 140px; z-index: 60; margin: 0;
+    display: flex; flex-direction: column; background: #f3f5f9;
+    box-shadow: 0 40px 120px -20px rgba(20, 30, 70, .45);
+  }
+  .code.expanded pre { flex: 1; overflow: auto; font-size: 24px; }
+  .code-backdrop { position: fixed; inset: 0; z-index: 59; background: rgba(20, 26, 40, .35); }
+
+  /* ---------- Voice mode ---------- */
+  .orb-wrap { display: none; flex-direction: column; align-items: center; gap: 12px; padding: 8px 0 6px; }
+  body.voice .orb-wrap { display: flex; order: 0; }
+  .orb {
+    --lvl: 0;
+    position: relative; width: 300px; height: 228px; padding: 0; border: 0; background: none; border-radius: 50%;
+    transform: scale(calc(1 + var(--lvl) * .3));
+    transition: transform .1s linear, filter .6s ease, opacity .6s ease;
+    cursor: default;
+  }
+  .orb[data-state="speaking"], .orb[data-state="thinking"] { cursor: pointer; }
+  .orb-inner { position: absolute; inset: 0; }
+  .orb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; }
+  .orb .o1 { animation: drift1 9s ease-in-out infinite; }
+  .orb .o2 { opacity: .75; animation: drift2 12s ease-in-out infinite; }
+  .orb .o3 { opacity: .5; filter: hue-rotate(28deg) saturate(1.2); animation: drift3 15s ease-in-out infinite; }
+  @keyframes drift1 { 0%, 100% { transform: rotate(0) scale(1) translate(0, 0); } 33% { transform: rotate(14deg) scale(1.06) translate(4%, -3%); } 66% { transform: rotate(-10deg) scale(.95) translate(-4%, 3%); } }
+  @keyframes drift2 { 0%, 100% { transform: scaleX(-1) rotate(0) translate(0, 0); } 50% { transform: scaleX(-1) rotate(-22deg) scale(1.08) translate(-5%, 2%); } }
+  @keyframes drift3 { 0%, 100% { transform: rotate(180deg) scale(.9); } 50% { transform: rotate(150deg) scale(1.05) translate(3%, 4%); } }
+  @keyframes breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+  @keyframes listen { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+  .orb[data-state="listening"] .orb-inner, .orb[data-state="hearing"] .orb-inner { animation: listen 2.6s ease-in-out infinite; }
+  .orb[data-state="speaking"] .orb-inner { animation: breathe 1.1s ease-in-out infinite; }
+  .orb[data-state="speaking"] img { animation-duration: 4s, 5s, 6s; }
+  .orb[data-state="speaking"] .o1 { animation-duration: 4s; }
+  .orb[data-state="speaking"] .o2 { animation-duration: 5s; }
+  .orb[data-state="speaking"] .o3 { animation-duration: 6s; }
+  .orb[data-state="thinking"] { filter: saturate(.55) brightness(1.08); opacity: .8; }
+  .orb[data-state="thinking"] .o1 { animation-duration: 3s; }
+  .orb[data-state="muted"], .orb[data-state="unsupported"], .orb[data-state="denied"] { filter: grayscale(.85); opacity: .55; }
+  .orb[data-state="muted"] img, .orb[data-state="unsupported"] img, .orb[data-state="denied"] img { animation-play-state: paused; }
+  .orb:focus-visible { outline: 3px solid rgba(31, 111, 229, .5); outline-offset: 6px; }
+  .orb-label { font-size: 19px; font-weight: 500; color: #4a5263; min-height: 26px; max-width: 900px; text-align: center; }
+  .interim { color: #6b7a99; }
+
+  body.voice .dock { display: flex; flex-direction: column; }
+  body.voice .disclaimer { order: 1; margin: 2px 0 14px; }
+  body.voice .composer { order: 2; display: flex; align-items: center; gap: 10px; padding: 12px 14px 12px 16px; border-radius: 999px; }
+  body.voice .row.chat, body.voice .right-tools { display: contents; }
+  body.voice #attachBtn { order: -1; }
+  body.voice .composer textarea { order: 0; flex: 1; min-width: 0; font-size: 22px; }
+  body.voice .source-wrap { order: 1; }
+  body.voice #micBtn, body.voice #sendChat, body.voice .attachments { display: none; }
+  .v-btn { display: none; }
+  body.voice .v-btn { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; transition: background .2s, color .2s, transform .15s; }
+  body.voice .v-btn:active { transform: scale(.94); }
+  .v-mute { order: 2; background: #eef0f5; color: #3a4152; }
+  .v-mute:hover { background: #e3e7ef; }
+  .v-mute .i-off { display: none; }
+  .v-mute[aria-pressed="true"] { background: #fdecec; color: #b42318; }
+  .v-mute[aria-pressed="true"] .i-on { display: none; }
+  .v-mute[aria-pressed="true"] .i-off { display: block; }
+  .v-end { order: 3; background: var(--blue); color: #fff; }
+  .v-end:hover { background: #185fd0; }
+
+  /* spoken messages + live transcription */
+  .msg.ai.spoken .spoken-body p { margin: 0; }
+  .w { transition: color .45s ease; }
+  .w.fresh { color: #a3a9b5; }
+  .cut-note { display: inline-block; margin-left: 10px; padding: 2px 10px; border-radius: 999px; background: #f1f3f7; color: #5d6576; font-size: 16px; vertical-align: 3px; }
+  .lesson { margin-top: 26px; }
+  .bubble.live { box-shadow: 0 0 0 2px rgba(31, 111, 229, .25); }
+  .bubble.live::after { content: ""; display: inline-block; width: 8px; height: 8px; margin-left: 8px; border-radius: 50%; background: var(--blue); vertical-align: middle; animation: caret .7s ease-in-out infinite alternate; }
+
+  /* ---------- Interactive widgets: quiz + flashcards ---------- */
+  .widget-slot:empty { display: none; }
+  .widget {
+    margin: 28px 0 30px;
+    background: #fff; border: 1px solid #e3e7ef; border-radius: 28px;
+    box-shadow: 0 10px 30px -24px rgba(30, 40, 80, .35);
+    animation: in .4s ease both;
+  }
+  .w-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .w-head-r { display: flex; align-items: center; gap: 14px; }
+  .w-title { font-size: 27px; font-weight: 600; color: var(--ink); }
+  .pill { display: inline-flex; align-items: center; height: 42px; padding: 0 18px; border-radius: 999px; background: #f1f3f7; font-size: 20px; font-weight: 500; color: var(--ink); }
+  .w-save {
+    display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 18px; border-radius: 14px;
+    border: 1px solid #dfe3ec; background: #fff; color: #3a4152; font-size: 19px; font-weight: 500;
+    transition: background .2s, border-color .2s, color .2s;
+  }
+  .w-save svg { width: 22px; height: 22px; }
+  .w-save:hover { background: #f3f7fe; border-color: #b7cdf5; color: var(--blue); }
+  .w-save.ok { color: #0d7a45; border-color: #bfe6cf; background: #f0faf4; cursor: default; }
+  .w-primary {
+    height: 60px; padding: 0 28px; border-radius: 999px; background: var(--blue); color: #fff;
+    display: inline-flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 600;
+    transition: background .2s, transform .15s;
+  }
+  .w-primary:hover { background: #185fd0; }
+  .w-primary:active { transform: scale(.97); }
+  .w-secondary {
+    height: 60px; padding: 0 26px; border-radius: 999px; border: 1px solid #dfe3ec; background: #fff; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 10px; font-size: 21px; font-weight: 500;
+    transition: background .2s, border-color .2s, color .2s, opacity .2s;
+  }
+  .w-secondary:hover:not(:disabled) { background: #f3f7fe; border-color: #b7cdf5; color: var(--blue); }
+  .w-secondary:disabled { opacity: .45; cursor: default; }
+
+  /* Quiz */
+  .quiz { padding: 34px 40px 30px; }
+  .quiz .w-head { margin-bottom: 6px; }
+  .q { padding: 30px 0; }
+  .q + .q { border-top: 1px solid #eceef3; }
+  .q-label { font-size: 19px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: #5d6576; }
+  .q-text { font-size: 25px; font-weight: 600; line-height: 1.5; color: var(--ink); margin: 12px 0 16px; }
+  .opts { display: flex; flex-direction: column; gap: 4px; }
+  .opt {
+    display: flex; align-items: center; gap: 18px;
+    padding: 12px 16px; margin: 0 -16px; border-radius: 14px;
+    font-size: 23px; color: var(--ink); cursor: pointer; transition: background .2s;
+  }
+  .opt:hover { background: #f6f8fc; }
+  .opt input {
+    appearance: none; -webkit-appearance: none; margin: 0; flex: none;
+    width: 30px; height: 30px; border: 2px solid #c3c9d5; border-radius: 50%; background: #fff;
+    display: grid; place-items: center; cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
+  }
+  .opt input[type="checkbox"] { border-radius: 8px; }
+  .opt input:checked { border-color: var(--blue); background: var(--blue); box-shadow: inset 0 0 0 6px #fff; }
+  .opt input[type="checkbox"]:checked {
+    box-shadow: none;
+    background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center / 20px no-repeat;
+  }
+  .opt input:focus-visible, .ans-input:focus-visible { outline: 3px solid rgba(31, 111, 229, .45); outline-offset: 2px; }
+  .opt .tag { margin-left: auto; font-size: 17px; font-weight: 600; }
+  .opt.correct { background: #edf9f2; }
+  .opt.correct .tag { color: #0d7a45; }
+  .opt.wrong { background: #fdf0f0; }
+  .opt.wrong .tag { color: #b42318; }
+  .quiz.checked .opt { cursor: default; }
+  .ans-input {
+    width: 100%; border: 1px solid #dde2ec; border-radius: 14px; padding: 16px 18px;
+    font: inherit; font-size: 22px; color: var(--ink); background: #fff; resize: vertical;
+    transition: border-color .2s;
+  }
+  .ans-input:focus { border-color: #9ec0f5; outline: none; }
+  .ans-input:disabled { background: #f8f9fb; color: var(--ink-2); }
+  .feedback { margin-top: 16px; padding: 16px 20px; border-radius: 14px; font-size: 20px; line-height: 1.55; }
+  .feedback b { font-weight: 600; }
+  .feedback.ok { background: #edf9f2; color: #0d6b3a; }
+  .feedback.bad { background: #fdf0f0; color: #9b2119; }
+  .feedback.info { background: #eef4fd; color: #1d4f9c; }
+  .feedback ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
+  .feedback li { margin: 4px 0; }
+  .w-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 26px; border-top: 1px solid #eceef3; }
+  .w-status { font-size: 21px; color: #5d6576; }
+  .w-status b { color: var(--ink); font-weight: 600; }
+
+  /* Flashcards */
+  .fc { padding: 28px 30px 30px; }
+  .fc-count { font-size: 21px; color: #5d6576; }
+  .fc-progress { display: grid; gap: 8px; margin: 24px 0 26px; }
+  .seg { height: 9px; border-radius: 5px; background: #eceef3; transition: background .3s; }
+  .seg.on { background: var(--blue); }
+  .fc-stage { position: relative; height: 600px; perspective: 2200px; }
+  .fc-card {
+    position: absolute; inset: 0; transform-style: preserve-3d; cursor: pointer;
+    transition: transform .6s cubic-bezier(.2, .8, .2, 1); border-radius: 28px;
+  }
+  .fc-card.flipped { transform: rotateY(180deg); }
+  .fc-card.enter { animation: cardIn .35s ease; }
+  @keyframes cardIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+  .fc-card:focus-visible { outline: 3px solid rgba(31, 111, 229, .5); outline-offset: 4px; }
+  .fc-face {
+    position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: 28px; background: #f4f5f7;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+    padding: 40px 80px; text-align: center;
+  }
+  .fc-back { transform: rotateY(180deg); background: #eef4fd; }
+  .fc-icon { color: #4a5263; }
+  .fc-kicker { font-size: 20px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: #5d6576; }
+  .fc-q { font-size: 46px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; color: var(--ink); max-width: 1000px; }
+  .fc-a { font-size: 32px; font-weight: 500; line-height: 1.45; color: var(--ink); max-width: 1000px; }
+  .fc-ex { font-size: 22px; line-height: 1.5; color: #4a5263; max-width: 900px; }
+  .fc-hint { display: inline-flex; align-items: center; gap: 10px; font-size: 21px; color: #5d6576; margin-top: 6px; }
+  .fc-done {
+    position: absolute; inset: 0; border-radius: 28px; background: #f4f5f7;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center;
+    animation: in .35s ease;
+  }
+  .fc-done h4 { margin: 0; font-size: 38px; font-weight: 700; color: var(--ink); }
+  .fc-done p { margin: 0; font-size: 22px; color: #4a5263; }
+  .fc-done .row-btns { display: flex; gap: 14px; margin-top: 10px; }
+  .fc-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 26px; }
+  .fc-rev { font-size: 21px; color: #5d6576; }
+
+  /* scroll to bottom */
+  .scroll-down {
+    position: absolute; left: 50%; top: -76px; transform: translate(-50%, 8px);
+    width: 52px; height: 52px; border-radius: 50%;
+    background: #fff; border: 1px solid #e3e7ef; color: var(--ink);
+    display: grid; place-items: center;
+    box-shadow: 0 6px 18px -8px rgba(30, 40, 80, .3);
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .scroll-down.show { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+  .scroll-down:hover { background: #f6f8fc; }
+
+  /* chat composer */
+  body.chatting .row.home { display: none; }
+  body.chatting .row.chat { display: flex; }
+  body.chatting .composer {
+    border-radius: 36px; padding: 30px 24px 20px 34px;
+    border-color: #e6e9f0;
+    box-shadow: 0 14px 40px -18px rgba(30, 40, 80, .22);
+  }
+  body.chatting .composer:focus-within { border-color: #c9d9f3; box-shadow: 0 0 0 4px rgba(31,111,229,.07), 0 14px 40px -18px rgba(30, 40, 80, .22); }
+  body.chatting .composer textarea { font-size: 23px; }
+  .row.chat { margin-top: 24px; align-items: center; justify-content: space-between; margin-left: -12px; }
+  .icon-btn { width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center; color: #3a4152; transition: background .2s, color .2s; }
+  .icon-btn:hover { background: #f1f4fa; }
+  .icon-btn.on { color: var(--blue); background: var(--blue-soft); }
+  .right-tools { display: flex; align-items: center; gap: 10px; }
+  .source-wrap { position: relative; }
+  .source-btn { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 14px; border-radius: 12px; font-size: 21px; color: #1d2433; }
+  .source-btn .dim { color: #8a91a0; }
+  .source-btn:hover { background: #f1f4fa; }
+  .send-circle { width: 62px; height: 62px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; transition: background .2s, transform .15s; }
+  .send-circle:hover { background: #185fd0; }
+  .send-circle:active { transform: scale(.94); }
+  .send-circle .i-stop { display: none; }
+  .send-circle.busy .i-send { display: none; }
+  .send-circle.busy .i-stop { display: block; }
+  .menu {
+    position: absolute; bottom: calc(100% + 10px); right: 0; min-width: 290px; z-index: 5;
+    background: #fff; border: 1px solid #e3e7ef; border-radius: 18px; padding: 6px;
+    box-shadow: 0 20px 44px -18px rgba(40, 60, 120, .35);
+  }
+  .menu button { width: 100%; text-align: left; display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-radius: 12px; font-size: 19px; color: var(--ink); }
+  .menu button:hover { background: #f3f6fc; }
+  .menu button[aria-checked="true"] { color: var(--blue); font-weight: 500; }
+  .menu button[aria-checked="true"]::after { content: "✓"; }
+  .attachments { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .attachments:empty { display: none; }
+  .att { display: inline-flex; align-items: center; gap: 8px; padding: 6px 8px 6px 12px; background: #f1f4fa; border-radius: 10px; font-size: 16px; color: var(--ink-2); }
+  .att button { color: #7a8296; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; }
+  .att button:hover { background: #e2e7f2; }
+  .disclaimer { text-align: center; font-size: 18px; color: #5d6576; margin: 14px 0 0; }
+  .disclaimer a { color: var(--ink-2); text-underline-offset: 3px; }
+
+  /* right panel: Sources */
+  .panel {
+    margin-top: 14px;
+    background: #fff; border: 1px solid #e7e9ef; border-radius: 28px;
+    box-shadow: 0 10px 30px -22px rgba(30, 40, 80, .3);
+    padding: 30px 36px 32px;
+  }
+  .p-head { display: flex; align-items: center; justify-content: space-between; font-size: 22px; color: #4b5260; }
+  .p-plus { width: 38px; height: 38px; margin-right: -9px; border-radius: 10px; display: grid; place-items: center; color: #6b7280; transition: background .2s, color .2s; }
+  .p-plus:hover { background: #f1f4fa; color: var(--ink); }
+  .p-count { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; margin-left: 10px; border-radius: 13px; background: var(--blue-soft); color: var(--blue); font-size: 15px; font-weight: 600; vertical-align: 3px; }
+  .p-body { margin-top: 16px; font-size: 20px; color: #5d6576; line-height: 1.5; }
+  .src { width: calc(100% + 20px); text-align: left; display: flex; align-items: center; gap: 14px; padding: 10px 10px; margin: 0 -10px; border-radius: 14px; animation: in .3s ease both; transition: background .3s; }
+  .src:hover { background: #f5f7fb; }
+  .src-open { color: #a0a6b2; flex: none; opacity: 0; transition: opacity .2s; }
+  .src:hover .src-open { opacity: 1; }
+  .src.flash { background: #eaf2fe; }
+  .src-ic { width: 34px; height: 34px; border-radius: 9px; background: #f1f4fa; color: #5d6576; display: grid; place-items: center; flex: none; font-size: 13px; font-weight: 600; }
+  .src-txt { flex: 1; min-width: 0; }
+  .src b { display: block; color: #2b3242; font-weight: 400; font-size: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .src-txt { display: block; }
+  .src-txt > span { display: block; font-size: 18px; color: #5d6576; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
+    background: #1d2433; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px;
+    opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
+  }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG defs -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#5b6fb8" flood-opacity=".22"/>
+    </filter>
+    <filter id="softSm" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#5b6fb8" flood-opacity=".2"/>
+    </filter>
+    <filter id="blueGlow" x="-40%" y="-40%" width="180%" height="190%">
+      <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#1f6fe5" flood-opacity=".35"/>
+    </filter>
+    <linearGradient id="glassBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1f7ff"/>
+      <stop offset=".45" stop-color="#cfe3fb"/>
+      <stop offset="1" stop-color="#9ec6f2"/>
+    </linearGradient>
+    <linearGradient id="glassWhite" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e4e9f4"/>
+    </linearGradient>
+    <linearGradient id="star" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3d8bff"/>
+      <stop offset="1" stop-color="#6b4dff"/>
+    </linearGradient>
+    <linearGradient id="dashGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#7c5cff"/>
+      <stop offset="1" stop-color="#2f74ff"/>
+    </linearGradient>
+    <linearGradient id="paperBack" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#dbe8fb"/>
+      <stop offset="1" stop-color="#a9c7f1"/>
+    </linearGradient>
+    <linearGradient id="greenCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e4f8ea"/>
+      <stop offset="1" stop-color="#a8e1bd"/>
+    </linearGradient>
+    <linearGradient id="blueCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d9ecff"/>
+      <stop offset="1" stop-color="#8fc2f2"/>
+    </linearGradient>
+    <linearGradient id="violetCard" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e3e3ff"/>
+      <stop offset="1" stop-color="#a9adf2"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#c3cdf3"/>
+      <stop offset=".5" stop-color="#8c9fe6"/>
+      <stop offset="1" stop-color="#c3cdf3"/>
+    </linearGradient>
+    <radialGradient id="micBlue" cx=".4" cy=".3" r=".8">
+      <stop offset="0" stop-color="#3a95ff"/>
+      <stop offset="1" stop-color="#0d5fe0"/>
+    </radialGradient>
+    <linearGradient id="capGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b8cff"/>
+      <stop offset="1" stop-color="#1557d4"/>
+    </linearGradient>
+    <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1.1" fill="#9aa8d8"/>
+    </pattern>
+    <radialGradient id="fade"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+    <mask id="dotMask1"><circle cx="70" cy="70" r="60" fill="url(#fade)"/></mask>
+  </defs>
+</svg>
+
+<div class="stage" id="stage">
+<header>
+  <a class="brand" href="#" aria-label="Assistiv home">
+    <svg width="161" height="40" viewBox="0 39.6 161 40" fill="none" aria-hidden="true">
+      <defs>
+        <mask id="lg-mask" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="40" width="40" height="39">
+          <path d="M39.1002 59.658C39.1002 48.9933 30.3473 40.3479 19.5501 40.3479C8.75287 40.3479 0 48.9933 0 59.658C0 70.3226 8.75287 78.968 19.5501 78.968C30.3473 78.968 39.1002 70.3226 39.1002 59.658Z" fill="white"/>
+        </mask>
+        <filter id="lg-f0" x="-20.2624" y="21.5723" width="81.0409" height="80.3996" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="7.1959"/>
+        </filter>
+        <filter id="lg-f1" x="-34.6957" y="-2.83051" width="77.9808" height="77.589" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feGaussianBlur stdDeviation="11.5134"/>
+        </filter>
+        <filter id="lg-f2" x="6.52959" y="46.6902" width="26.6376" height="23.6701" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feDropShadow dx="0.287836" dy="0.287836" stdDeviation="1.15134" flood-color="#000" flood-opacity="0.6"/>
+        </filter>
+        <linearGradient id="lg-grad" x1="18.7907" y1="61.7721" x2="32.994" y2="92.9106" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#0077FF"/>
+          <stop offset="1" stop-color="#00FF54"/>
+        </linearGradient>
+      </defs>
+      <g mask="url(#lg-mask)">
+        <path d="M19.5501 78.968C30.3473 78.968 39.1002 70.3226 39.1002 59.658C39.1002 48.9933 30.3473 40.3479 19.5501 40.3479C8.75287 40.3479 0 48.9933 0 59.658C0 70.3226 8.75287 78.968 19.5501 78.968Z" fill="white"/>
+        <path filter="url(#lg-f0)" d="M20.2582 87.5801C34.6887 87.5801 46.387 76.0255 46.387 61.7721C46.387 47.5187 34.6887 35.9641 20.2582 35.9641C5.82765 35.9641 -5.87061 47.5187 -5.87061 61.7721C-5.87061 76.0255 5.82765 87.5801 20.2582 87.5801Z" fill="url(#lg-grad)"/>
+        <path filter="url(#lg-f1)" d="M4.29473 51.7317C13.1112 51.7317 20.2584 44.6722 20.2584 35.964C20.2584 27.2557 13.1112 20.1963 4.29473 20.1963C-4.52176 20.1963 -11.6689 27.2557 -11.6689 35.964C-11.6689 44.6722 -4.52176 51.7317 4.29473 51.7317Z" fill="#99CAFF"/>
+        <g filter="url(#lg-f2)">
+          <path d="M18.838 49.117C19.159 48.5678 19.9617 48.5678 20.2828 49.117C20.2828 49.117 21.9134 51.9066 23.2221 54.1455C24.3173 56.0194 20.2556 67.7697 9.37978 67.7697C8.73769 67.7697 8.33638 67.0832 8.65743 66.5339L18.838 49.117Z" fill="white"/>
+          <path d="M30.4634 66.5338C30.7845 67.0831 30.3832 67.7696 29.7411 67.7696H20.3689C20.0608 67.7696 19.8289 67.4916 19.898 67.195C20.6996 63.7581 22.5079 60.7021 24.9992 58.347C25.2238 58.1347 25.5876 58.1924 25.7429 58.4582L30.4634 66.5338Z" fill="white"/>
+        </g>
+      </g>
+      <path fill="#2C2C2C" d="M56.7436 48.058H60.3129L70.3007 70.9578H65.5851L63.4239 65.718H53.3707L51.2749 70.9578H46.6577L56.7436 48.058ZM61.983 62.2247L58.4137 52.9096L54.7789 62.2247H61.983ZM81.0104 59.5725C80.6611 59.1197 80.1808 58.7316 79.5696 58.4081C78.9583 58.0631 78.2925 57.8906 77.5721 57.8906C76.939 57.8906 76.3605 58.02 75.8365 58.2788C75.3126 58.5375 75.0506 58.9688 75.0506 59.5725C75.0506 60.1763 75.3344 60.6076 75.9021 60.8663C76.4915 61.1035 77.3428 61.3515 78.4562 61.6102C79.0457 61.7396 79.6351 61.9121 80.2245 62.1278C80.8358 62.3433 81.3816 62.6345 81.8619 63.001C82.364 63.3461 82.7679 63.7881 83.0735 64.3272C83.3792 64.8446 83.532 65.4808 83.532 66.2355C83.532 67.1842 83.3463 67.9929 82.9753 68.6613C82.626 69.3082 82.1457 69.8364 81.5344 70.2462C80.945 70.6558 80.2464 70.947 79.4386 71.1194C78.6527 71.3135 77.8341 71.4106 76.9826 71.4106C75.7601 71.4106 74.5704 71.1949 73.4133 70.7637C72.2563 70.3108 71.2957 69.6747 70.5316 68.8553L73.1186 66.4619C73.5552 67.0225 74.1228 67.4862 74.8214 67.8527C75.5199 68.2193 76.295 68.4025 77.1464 68.4025C77.4302 68.4025 77.714 68.3702 77.9978 68.3056C78.3034 68.2408 78.5763 68.1438 78.8165 68.0144C79.0784 67.8635 79.2858 67.6694 79.4386 67.4322C79.5914 67.195 79.6678 66.9039 79.6678 66.5589C79.6678 65.912 79.3622 65.4485 78.751 65.1681C78.1616 64.8878 77.2664 64.6074 76.0658 64.3272C75.4764 64.1978 74.8978 64.0361 74.3302 63.842C73.7844 63.6263 73.2933 63.3568 72.8566 63.0334C72.42 62.6884 72.0707 62.2679 71.8087 61.772C71.5468 61.276 71.4157 60.6614 71.4157 59.9283C71.4157 59.0658 71.5904 58.3218 71.9397 57.6965C72.3109 57.0712 72.7912 56.5645 73.3806 56.1763C73.97 55.7667 74.6359 55.4648 75.3781 55.2708C76.1203 55.0767 76.8844 54.9796 77.6703 54.9796C78.8055 54.9796 79.908 55.1737 80.9777 55.5618C82.0693 55.95 82.9316 56.543 83.5647 57.3408L81.0104 59.5725ZM95.5609 59.5725C95.2116 59.1197 94.7313 58.7316 94.12 58.4081C93.5088 58.0631 92.8429 57.8906 92.1225 57.8906C91.4894 57.8906 90.9109 58.02 90.3869 58.2788C89.863 58.5375 89.601 58.9688 89.601 59.5725C89.601 60.1763 89.8849 60.6076 90.4524 60.8663C91.0418 61.1035 91.8933 61.3515 93.0067 61.6102C93.5961 61.7396 94.1855 61.9121 94.775 62.1278C95.3862 62.3433 95.932 62.6345 96.4122 63.001C96.9144 63.3461 97.3182 63.7881 97.6239 64.3272C97.9295 64.8446 98.0823 65.4808 98.0823 66.2355C98.0823 67.1842 97.8968 67.9929 97.5256 68.6613C97.1763 69.3082 96.696 69.8364 96.0848 70.2462C95.4954 70.6558 94.7967 70.947 93.9891 71.1194C93.2032 71.3135 92.3844 71.4106 91.5331 71.4106C90.3105 71.4106 89.1207 71.1949 87.9637 70.7637C86.8067 70.3108 85.8461 69.6747 85.082 68.8553L87.669 66.4619C88.1056 67.0225 88.6732 67.4862 89.3718 67.8527C90.0704 68.2193 90.8453 68.4025 91.6968 68.4025C91.9806 68.4025 92.2643 68.3702 92.5482 68.3056C92.8539 68.2408 93.1268 68.1438 93.3669 68.0144C93.6288 67.8635 93.8363 67.6694 93.9891 67.4322C94.1419 67.195 94.2183 66.9039 94.2183 66.5589C94.2183 65.912 93.9127 65.4485 93.3013 65.1681C92.7119 64.8878 91.8169 64.6074 90.6161 64.3272C90.0267 64.1978 89.4482 64.0361 88.8806 63.842C88.3348 63.6263 87.8436 63.3568 87.407 63.0334C86.9703 62.6884 86.6211 62.2679 86.3591 61.772C86.0972 61.276 85.9662 60.6614 85.9662 59.9283C85.9662 59.0658 86.1408 58.3218 86.4902 57.6965C86.8612 57.0712 87.3415 56.5645 87.9309 56.1763C88.5204 55.7667 89.1862 55.4648 89.9285 55.2708C90.6708 55.0767 91.4348 54.9796 92.2208 54.9796C93.356 54.9796 94.4584 55.1737 95.5281 55.5618C96.6196 55.95 97.4819 56.543 98.115 57.3408L95.5609 59.5725ZM101.564 55.4324H105.494V70.9578H101.564V55.4324ZM101.008 50.1603C101.008 49.535 101.237 48.9959 101.696 48.5431C102.176 48.0687 102.776 47.8315 103.496 47.8315C104.216 47.8315 104.817 48.058 105.298 48.5108C105.799 48.942 106.051 49.4919 106.051 50.1603C106.051 50.8287 105.799 51.3894 105.298 51.8423C104.817 52.2735 104.216 52.4891 103.496 52.4891C102.776 52.4891 102.176 52.2627 101.696 51.8099C101.237 51.3356 101.008 50.7857 101.008 50.1603ZM118.873 59.5725C118.524 59.1197 118.044 58.7316 117.433 58.4081C116.822 58.0631 116.155 57.8906 115.435 57.8906C114.802 57.8906 114.223 58.02 113.7 58.2788C113.176 58.5375 112.914 58.9688 112.914 59.5725C112.914 60.1763 113.198 60.6076 113.765 60.8663C114.355 61.1035 115.206 61.3515 116.319 61.6102C116.908 61.7396 117.498 61.9121 118.087 62.1278C118.699 62.3433 119.245 62.6345 119.725 63.001C120.227 63.3461 120.631 63.7881 120.936 64.3272C121.242 64.8446 121.395 65.4808 121.395 66.2355C121.395 67.1842 121.21 67.9929 120.838 68.6613C120.489 69.3082 120.009 69.8364 119.397 70.2462C118.808 70.6558 118.109 70.947 117.301 71.1194C116.515 71.3135 115.697 71.4106 114.846 71.4106C113.623 71.4106 112.434 71.1949 111.277 70.7637C110.12 70.3108 109.159 69.6747 108.395 68.8553L110.981 66.4619C111.418 67.0225 111.986 67.4862 112.684 67.8527C113.383 68.2193 114.158 68.4025 115.009 68.4025C115.294 68.4025 115.577 68.3702 115.861 68.3056C116.166 68.2408 116.44 68.1438 116.679 68.0144C116.941 67.8635 117.149 67.6694 117.301 67.4322C117.454 67.195 117.531 66.9039 117.531 66.5589C117.531 65.912 117.226 65.4485 116.614 65.1681C116.025 64.8878 115.13 64.6074 113.929 64.3272C113.339 64.1978 112.761 64.0361 112.193 63.842C111.648 63.6263 111.156 63.3568 110.72 63.0334C110.283 62.6884 109.934 62.2679 109.672 61.772C109.409 61.276 109.279 60.6614 109.279 59.9283C109.279 59.0658 109.453 58.3218 109.802 57.6965C110.173 57.0712 110.654 56.5645 111.244 56.1763C111.833 55.7667 112.499 55.4648 113.241 55.2708C113.984 55.0767 114.748 54.9796 115.533 54.9796C116.669 54.9796 117.771 55.1737 118.841 55.5618C119.933 55.95 120.795 56.543 121.428 57.3408L118.873 59.5725ZM122.552 58.5375V55.4324H125.303V50.9366H129.166V55.4324H133.097V58.5375H129.166V65.7503C129.166 66.4403 129.287 67.0118 129.527 67.4646C129.789 67.9173 130.356 68.1438 131.23 68.1438C131.492 68.1438 131.776 68.1222 132.081 68.0791C132.387 68.0144 132.66 67.9281 132.9 67.8203L133.031 70.8607C132.682 70.9901 132.267 71.0871 131.787 71.1519C131.306 71.238 130.848 71.2812 130.411 71.2812C129.363 71.2812 128.512 71.141 127.857 70.8607C127.202 70.5589 126.678 70.1599 126.285 69.664C125.914 69.1465 125.652 68.5643 125.499 67.9173C125.368 67.249 125.303 66.5374 125.303 65.7826V58.5375H122.552ZM136.006 55.4324H139.935V70.9578H136.006V55.4324ZM135.449 50.1603C135.449 49.535 135.678 48.9959 136.137 48.5431C136.617 48.0687 137.217 47.8315 137.938 47.8315C138.658 47.8315 139.259 48.058 139.739 48.5108C140.241 48.942 140.492 49.4919 140.492 50.1603C140.492 50.8287 140.241 51.3894 139.739 51.8423C139.259 52.2735 138.658 52.4891 137.938 52.4891C137.217 52.4891 136.617 52.2627 136.137 51.8099C135.678 51.3356 135.449 50.7857 135.449 50.1603ZM142.345 55.4324H146.634L150.761 66.753H150.826L154.985 55.4324H159.143L152.889 70.9578H148.698L142.345 55.4324Z"/>
+    </svg>
+  </a>
+
+  <nav class="tabs" role="tablist" aria-label="Primary">
+    <button role="tab" aria-selected="false">Dashboard</button>
+    <button role="tab" aria-selected="false">Courses</button>
+    <button role="tab" class="active" aria-selected="true">Study</button>
+    <button role="tab" aria-selected="false">Spaces</button>
+    <button role="tab" aria-selected="false">Grades &amp; Insights</button>
+  </nav>
+
+  <div class="util">
+    <button type="button" data-toast="Support center coming soon">
+      <svg viewBox="1150 50 20 20" fill="none" aria-hidden="true">
+        <path d="M1154.11 54.1084L1157.64 57.6417M1162.36 62.3584L1165.89 65.8917M1165.89 54.1084L1162.36 57.6417L1165.3 54.7001M1154.11 65.8917L1157.64 62.3584M1168.33 60.0001C1168.33 64.6025 1164.6 68.3334 1160 68.3334C1155.4 68.3334 1151.67 64.6025 1151.67 60.0001C1151.67 55.3977 1155.4 51.6667 1160 51.6667C1164.6 51.6667 1168.33 55.3977 1168.33 60.0001ZM1163.33 60.0001C1163.33 61.841 1161.84 63.3334 1160 63.3334C1158.16 63.3334 1156.67 61.841 1156.67 60.0001C1156.67 58.1591 1158.16 56.6667 1160 56.6667C1161.84 56.6667 1163.33 58.1591 1163.33 60.0001Z" stroke="#535862" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Support
+    </button>
+    <button type="button" data-toast="System settings coming soon">
+      <svg viewBox="1249 50 20 20" fill="none" aria-hidden="true">
+        <path d="M1261.5 59.9999C1261.5 61.3806 1260.38 62.4999 1259 62.4999C1257.62 62.4999 1256.5 61.3806 1256.5 59.9999C1256.5 58.6192 1257.62 57.4999 1259 57.4999C1260.38 57.4999 1261.5 58.6192 1261.5 59.9999ZM1265.17 62.4999C1265.06 62.7513 1265.02 63.0301 1265.07 63.3004C1265.12 63.5707 1265.25 63.8202 1265.44 64.0166L1265.49 64.0666C1265.65 64.2214 1265.77 64.4052 1265.85 64.6075C1265.94 64.8098 1265.98 65.0267 1265.98 65.2458C1265.98 65.4648 1265.94 65.6817 1265.85 65.884C1265.77 66.0863 1265.65 66.2701 1265.49 66.4249C1265.34 66.5799 1265.15 66.7028 1264.95 66.7867C1264.75 66.8706 1264.53 66.9137 1264.31 66.9137C1264.09 66.9137 1263.88 66.8706 1263.67 66.7867C1263.47 66.7028 1263.29 66.5799 1263.13 66.4249L1263.08 66.3749C1262.89 66.1828 1262.64 66.0539 1262.37 66.0049C1262.1 65.9559 1261.82 65.989 1261.57 66.0999C1261.32 66.2056 1261.11 66.381 1260.96 66.6045C1260.81 66.8281 1260.73 67.0901 1260.73 67.3583V67.4999C1260.73 67.9419 1260.56 68.3659 1260.25 68.6784C1259.93 68.991 1259.51 69.1666 1259.07 69.1666C1258.62 69.1666 1258.2 68.991 1257.89 68.6784C1257.58 68.3659 1257.4 67.9419 1257.4 67.4999V67.4249C1257.39 67.1491 1257.3 66.8816 1257.14 66.6572C1256.98 66.4328 1256.76 66.2618 1256.5 66.1666C1256.25 66.0557 1255.97 66.0226 1255.7 66.0716C1255.43 66.1206 1255.18 66.2495 1254.98 66.4416L1254.93 66.4916C1254.78 66.6465 1254.59 66.7695 1254.39 66.8534C1254.19 66.9372 1253.97 66.9804 1253.75 66.9804C1253.54 66.9804 1253.32 66.9372 1253.12 66.8534C1252.91 66.7695 1252.73 66.6465 1252.58 66.4916C1252.42 66.3368 1252.3 66.153 1252.21 65.9507C1252.13 65.7483 1252.09 65.5314 1252.09 65.3124C1252.09 65.0934 1252.13 64.8765 1252.21 64.6742C1252.3 64.4719 1252.42 64.288 1252.58 64.1333L1252.63 64.0833C1252.82 63.8869 1252.95 63.6374 1253 63.3671C1253.04 63.0967 1253.01 62.8179 1252.9 62.5666C1252.79 62.3201 1252.62 62.1099 1252.4 61.9618C1252.17 61.8138 1251.91 61.7343 1251.64 61.7333H1251.5C1251.06 61.7333 1250.63 61.5577 1250.32 61.2451C1250.01 60.9325 1249.83 60.5086 1249.83 60.0666C1249.83 59.6246 1250.01 59.2006 1250.32 58.8881C1250.63 58.5755 1251.06 58.3999 1251.5 58.3999H1251.58C1251.85 58.3935 1252.12 58.3042 1252.34 58.1437C1252.57 57.9832 1252.74 57.7589 1252.83 57.4999C1252.94 57.2486 1252.98 56.9698 1252.93 56.6994C1252.88 56.4291 1252.75 56.1797 1252.56 55.9833L1252.51 55.9333C1252.35 55.7785 1252.23 55.5946 1252.15 55.3923C1252.06 55.19 1252.02 54.9731 1252.02 54.7541C1252.02 54.5351 1252.06 54.3182 1252.15 54.1159C1252.23 53.9135 1252.35 53.7297 1252.51 53.5749C1252.66 53.42 1252.85 53.297 1253.05 53.2132C1253.25 53.1293 1253.47 53.0861 1253.69 53.0861C1253.91 53.0861 1254.12 53.1293 1254.33 53.2132C1254.53 53.297 1254.71 53.42 1254.87 53.5749L1254.92 53.6249C1255.11 53.817 1255.36 53.9459 1255.63 53.9949C1255.9 54.0439 1256.18 54.0108 1256.43 53.8999H1256.5C1256.75 53.7943 1256.96 53.6189 1257.1 53.3953C1257.25 53.1717 1257.33 52.9097 1257.33 52.6416V52.4999C1257.33 52.0579 1257.51 51.634 1257.82 51.3214C1258.13 51.0088 1258.56 50.8333 1259 50.8333C1259.44 50.8333 1259.87 51.0088 1260.18 51.3214C1260.49 51.634 1260.67 52.0579 1260.67 52.4999V52.5749C1260.67 52.8431 1260.75 53.1051 1260.9 53.3286C1261.04 53.5522 1261.25 53.7276 1261.5 53.8333C1261.75 53.9442 1262.03 53.9773 1262.3 53.9283C1262.57 53.8792 1262.82 53.7504 1263.02 53.5583L1263.07 53.5083C1263.22 53.3533 1263.41 53.2304 1263.61 53.1465C1263.81 53.0626 1264.03 53.0194 1264.25 53.0194C1264.47 53.0194 1264.68 53.0626 1264.88 53.1465C1265.09 53.2304 1265.27 53.3533 1265.43 53.5083C1265.58 53.663 1265.7 53.8469 1265.79 54.0492C1265.87 54.2515 1265.91 54.4684 1265.91 54.6874C1265.91 54.9064 1265.87 55.1233 1265.79 55.3257C1265.7 55.528 1265.58 55.7118 1265.43 55.8666L1265.38 55.9166C1265.18 56.113 1265.05 56.3624 1265.01 56.6328C1264.96 56.9031 1264.99 57.1819 1265.1 57.4333V57.4999C1265.21 57.7464 1265.38 57.9566 1265.6 58.1047C1265.83 58.2527 1266.09 58.3322 1266.36 58.3333H1266.5C1266.94 58.3333 1267.37 58.5088 1267.68 58.8214C1267.99 59.134 1268.17 59.5579 1268.17 59.9999C1268.17 60.4419 1267.99 60.8659 1267.68 61.1784C1267.37 61.491 1266.94 61.6666 1266.5 61.6666H1266.43C1266.16 61.6677 1265.9 61.7471 1265.67 61.8952C1265.45 62.0432 1265.27 62.2534 1265.17 62.4999Z" stroke="#535862" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      System
+    </button>
+    <button type="button" class="avatar" aria-label="Account" data-toast="Signed in as SR">SR</button>
+  </div>
+</header>
+
+<main>
+  <h1>Start offloop from here</h1>
+  <p class="sub">How can Aurora help you study today?</p>
+
+  <section class="grid" id="modes">
+    <!-- Ask Aurora -->
+    <button class="card" data-mode="ask">
+      <span class="art">
+        <svg viewBox="0 0 410 282" aria-hidden="true">
+          <g mask="url(#dotMask1)" transform="translate(40 60)"><rect width="140" height="140" fill="url(#dots)"/></g>
+          <g transform="translate(265 160)"><g mask="url(#dotMask1)"><rect width="140" height="140" fill="url(#dots)" transform="scale(.75)"/></g></g>
+          <g class="float f-up2">
+            <rect x="80" y="136" width="124" height="84" rx="28" fill="url(#glassWhite)" stroke="#fff" stroke-width="2" filter="url(#soft)"/>
+            <circle cx="117" cy="177" r="5" fill="#8b9bd6"/>
+            <circle cx="133" cy="177" r="5" fill="#8b9bd6"/>
+            <circle cx="149" cy="177" r="5" fill="#8b9bd6"/>
+          </g>
+          <g class="float f-up">
+            <path d="M189 83 H276 Q307 83 307 114 V156 Q307 182 288 187 L284 210 Q282 218 276 212 L254 189 H189 Q158 189 158 158 V114 Q158 83 189 83 Z"
+                  fill="url(#glassBlue)" stroke="#fff" stroke-width="2.5" filter="url(#soft)"/>
+            <path d="M189 90 H270 Q296 90 298 108" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/>
+            <path class="float f-spin" d="M237 106 C240 128 245 133 267 136 C245 139 240 144 237 166 C234 144 229 139 207 136 C229 133 234 128 237 106 Z" fill="url(#star)"/>
+          </g>
+          <g class="spark" stroke="url(#dashGrad)" stroke-width="5" stroke-linecap="round">
+            <line x1="287" y1="52" x2="290" y2="64"/>
+            <line x1="300" y1="72" x2="308" y2="80"/>
+            <line x1="310" y1="90" x2="322" y2="94"/>
+          </g>
+        </svg>
+      </span>
+      <h3>Ask Aurora</h3>
+      <p>Get study help, explanations, and step-by-step guidance.</p>
+    </button>
+
+    <!-- Create a quiz -->
+    <button class="card" data-mode="quiz">
+      <span class="art">
+        <svg viewBox="0 0 410 282" aria-hidden="true">
+          <g class="float f-fan3">
+            <rect x="72" y="98" width="150" height="128" rx="14" fill="url(#paperBack)" stroke="#fff" stroke-width="2" transform="rotate(-9 147 162)" filter="url(#softSm)"/>
+          </g>
+          <g class="float f-up" transform-origin="215 150">
+            <g transform="rotate(4 215 150)">
+              <rect x="110" y="72" width="212" height="152" rx="14" fill="url(#glassWhite)" stroke="#fff" stroke-width="2" filter="url(#soft)"/>
+              <rect x="138" y="86" width="40" height="40" rx="8" fill="#d6e6fb"/>
+              <text x="158" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-weight="700" font-size="30" fill="#1f6fe5">?</text>
+              <rect x="192" y="96" width="102" height="8" rx="4" fill="#a9c5ef"/>
+              <rect x="192" y="112" width="64" height="8" rx="4" fill="#a9c5ef"/>
+              <rect class="radio-sel" x="130" y="157" width="168" height="24" rx="6" fill="#bcd5f6"/>
+              <circle cx="142" cy="145" r="7" fill="#fff" stroke="#8fa0c8" stroke-width="2"/>
+              <rect x="160" y="141" width="54" height="7" rx="3.5" fill="#a9c5ef"/>
+              <circle cx="142" cy="169" r="7" fill="#fff" stroke="#1f6fe5" stroke-width="2"/>
+              <circle cx="142" cy="169" r="3.5" fill="#1f6fe5"/>
+              <circle cx="142" cy="193" r="7" fill="#fff" stroke="#8fa0c8" stroke-width="2"/>
+              <rect x="160" y="190" width="56" height="7" rx="3.5" fill="#a9c5ef"/>
+            </g>
+          </g>
+          <g class="spark" stroke="#3b82f6" stroke-width="5" stroke-linecap="round">
+            <line x1="315" y1="56" x2="318" y2="67"/>
+            <line x1="327" y1="74" x2="334" y2="82"/>
+            <line x1="335" y1="92" x2="346" y2="96"/>
+          </g>
+        </svg>
+      </span>
+      <h3>Create a quiz</h3>
+      <p>Turn your notes or topics into practice quizzes.</p>
+    </button>
+
+    <!-- Build flashcards -->
+    <button class="card" data-mode="flash">
+      <span class="art">
+        <svg viewBox="0 0 410 282" aria-hidden="true">
+          <g class="float f-fan2"><rect x="272" y="110" width="84" height="118" rx="14" fill="url(#violetCard)" stroke="#fff" stroke-width="2" transform="rotate(14 314 169)" filter="url(#softSm)"/></g>
+          <g class="float f-fan1"><rect x="236" y="88" width="88" height="126" rx="14" fill="url(#blueCard)" stroke="#fff" stroke-width="2" transform="rotate(6 280 151)" filter="url(#softSm)"/></g>
+          <g class="float f-fan3"><rect x="146" y="70" width="126" height="128" rx="14" fill="url(#greenCard)" stroke="#fff" stroke-width="2" transform="rotate(-2 209 134)" filter="url(#softSm)"/></g>
+          <g class="float f-front">
+            <g transform="rotate(-6 172 160)">
+              <rect x="88" y="98" width="172" height="130" rx="16" fill="url(#glassWhite)" stroke="#fff" stroke-width="2.5" filter="url(#soft)"/>
+              <!-- graduation cap -->
+              <path d="M172 130 L200 142 L172 154 L144 142 Z" fill="url(#capGrad)"/>
+              <path d="M156 148 V160 Q172 170 188 160 V148 L172 155 Z" fill="#1757d4"/>
+              <path d="M196 144 V160" stroke="#1757d4" stroke-width="2.5"/>
+              <circle cx="196" cy="162" r="3" fill="#1757d4"/>
+              <rect x="128" y="182" width="90" height="8" rx="4" fill="#a9c5ef"/>
+              <rect x="128" y="198" width="70" height="8" rx="4" fill="#a9c5ef"/>
+            </g>
+          </g>
+          <g class="spark" stroke="url(#dashGrad)" stroke-width="5" stroke-linecap="round">
+            <line x1="60" y1="108" x2="72" y2="112"/>
+            <line x1="68" y1="92" x2="76" y2="99"/>
+            <line x1="86" y1="78" x2="88" y2="90"/>
+          </g>
+        </svg>
+      </span>
+      <h3>Build flashcards</h3>
+      <p>Create smart flashcards from your notes or study materials.</p>
+    </button>
+
+    <!-- Voice study -->
+    <button class="card" data-mode="voice" id="voiceCard">
+      <span class="art">
+        <svg viewBox="0 0 410 282" aria-hidden="true" id="voiceArt">
+          <g id="barsL"></g>
+          <g id="barsR"></g>
+          <circle class="mic-pulse" cx="202" cy="144" r="62" fill="#1f6fe5"/>
+          <circle cx="202" cy="144" r="62" fill="#fff" filter="url(#softSm)"/>
+          <circle cx="202" cy="144" r="56" fill="url(#micBlue)" filter="url(#blueGlow)"/>
+          <ellipse cx="190" cy="118" rx="26" ry="12" fill="#fff" opacity=".18"/>
+          <rect x="190" y="112" width="24" height="42" rx="12" fill="#fff"/>
+          <path d="M178 140 Q178 166 202 166 Q226 166 226 140" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+          <path d="M202 166 V180" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <h3>Voice study</h3>
+      <p>Talk through concepts, get explanations, and study hands-free.</p>
+    </button>
+  </section>
+
+  <div class="chat-top">
+    <button class="back" id="back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      Back to study modes
+    </button>
+  </div>
+  <section class="thread" id="thread" aria-live="polite"><div class="thread-inner" id="threadInner"></div></section>
+
+  <div class="dock">
+    <button type="button" class="scroll-down" id="scrollDown" aria-label="Scroll to latest">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+    </button>
+    <div class="banner" id="banner">
+      <b>New</b>
+      <span>Save notes, sessions, quizzes, and flashcards to your Library.</span>
+      <button class="close" id="closeBanner" aria-label="Dismiss">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <form class="composer" id="composer">
+      <textarea id="prompt" rows="1" placeholder="Ask Aurora anything..." aria-label="Ask Aurora anything"></textarea>
+      <div class="attachments" id="attachments"></div>
+      <div class="row home">
+        <button type="button" class="lib-toggle" id="libToggle" aria-pressed="false">
+          <span class="k">⌘</span>
+          <svg class="check" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+          <span id="libLabel">Save your learning to Library</span>
+        </button>
+        <button type="submit" class="send" id="send" aria-label="Send">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4 18-7z"/></svg>
+        </button>
+      </div>
+      <div class="row chat">
+        <button type="button" class="icon-btn" id="attachBtn" aria-label="Attach files">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+        <input type="file" id="fileInput" multiple hidden />
+        <div class="right-tools">
+          <div class="source-wrap">
+            <button type="button" class="source-btn" id="sourceBtn" aria-haspopup="menu" aria-expanded="false">
+              <span>Search</span><span class="dim" id="sourceLabel">All sources</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a91a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="menu" id="sourceMenu" role="menu" hidden>
+              <button type="button" role="menuitemradio" aria-checked="true">All sources</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Course materials</button>
+              <button type="button" role="menuitemradio" aria-checked="false">My notes</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Library</button>
+            </div>
+          </div>
+          <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" aria-pressed="false">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          </button>
+          <button type="submit" class="send-circle" id="sendChat" aria-label="Send">
+            <svg class="i-send" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            <svg class="i-stop" width="20" height="20" viewBox="0 0 18 18"><rect x="2" y="2" width="14" height="14" rx="3" fill="#fff"/></svg>
+          </button>
+          <button type="button" class="v-btn v-mute" id="muteBtn" aria-pressed="false" aria-label="Mute microphone">
+            <svg class="i-on" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            <svg class="i-off" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M3 3l18 18"/><path d="M9 9v2a3 3 0 0 0 5.1 2.1M15 9.3V6a3 3 0 0 0-5.7-1.3"/><path d="M5 11a7 7 0 0 0 11.3 5.5M19 11a7 7 0 0 1-.6 2.8M12 18v3"/></svg>
+          </button>
+          <button type="button" class="v-btn v-end" id="endVoice" aria-label="End voice session">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+          </button>
+        </div>
+      </div>
+    </form>
+    <div class="chips">
+      <button class="chip" data-fill="Explain a course topic: ">Explain a course topic</button>
+      <button class="chip" data-fill="Make flashcards from ">Make flashcards</button>
+      <button class="chip" data-fill="Quiz me on ">Quiz me</button>
+    </div>
+    <div class="orb-wrap" aria-live="polite">
+      <button type="button" class="orb" id="orb" data-state="idle" aria-label="Aurora voice">
+        <span class="orb-inner" aria-hidden="true">
+          <img class="o1" src="assets/aurora-orb.png" alt="">
+          <img class="o2" src="assets/aurora-orb.png" alt="">
+          <img class="o3" src="assets/aurora-orb.png" alt="">
+        </span>
+      </button>
+      <div class="orb-label" id="orbLabel"></div>
+    </div>
+    <p class="disclaimer">Aurora can make mistakes, so please double-check important info. <a href="#">Your privacy &amp; Assistiv AI</a></p>
+  </div>
+
+  <aside class="panel" id="panel" aria-label="Sources">
+    <div class="p-head">
+      <span>Sources<span class="p-count" id="srcCount" hidden></span></span>
+    </div>
+    <div class="p-body">
+      <div id="sourcesBody">Where Aurora's answers come from will appear here.</div>
+    </div>
+  </aside>
+</main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const prompt = $('#prompt');
+  const thread = $('#thread');
+  const toastEl = $('#toast');
+  let saveToLibrary = false;
+  let toastTimer;
+
+  // Scale the 1380px-tall design to fit the window height (no scroll) and
+  // stretch the canvas to the full window width, so there are no side bands.
+  const stage = $('#stage');
+  const fit = () => {
+    const w = window.innerWidth, h = window.innerHeight;
+    const s = Math.min(h / 1380, w / 1100); // keep the content column visible on narrow windows
+    const stageW = Math.max(w / s, 1100);
+    stage.style.width = stageW + 'px';
+    stage.style.left = Math.max(0, (w - stageW * s) / 2) + 'px';
+    stage.style.top = Math.max(0, (h - 1380 * s) / 2) + 'px';
+    stage.style.transform = `scale(${s})`;
+  };
+  window.addEventListener('resize', fit);
+  fit();
+
+  const toast = (msg) => {
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2200);
+  };
+
+  // Waveform bars
+  const NS = 'http://www.w3.org/2000/svg';
+  const hL = [18, 36, 64, 96, 118, 92, 66, 38];
+  const hR = [42, 70, 96, 118, 96, 64, 36, 18];
+  const drawBars = (g, heights, x0) => heights.forEach((h, i) => {
+    const r = document.createElementNS(NS, 'rect');
+    r.setAttribute('class', 'bar');
+    r.setAttribute('x', x0 + i * 13.5);
+    r.setAttribute('y', 144 - h / 2);
+    r.setAttribute('width', 6);
+    r.setAttribute('height', h);
+    r.setAttribute('rx', 3);
+    r.setAttribute('fill', 'url(#bar)');
+    r.style.animationDelay = `${(i % 4) * 0.12}s`;
+    g.appendChild(r);
+  });
+  drawBars($('#barsL'), hL, 28);
+  drawBars($('#barsR'), hR, 274);
+
+  // Tabs
+  $$('nav.tabs button').forEach(btn => btn.addEventListener('click', () => {
+    $$('nav.tabs button').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
+    btn.classList.add('active'); btn.setAttribute('aria-selected', 'true');
+    if (btn.textContent.trim() === 'Study') exitChat();
+    else toast(`${btn.textContent.trim()} — coming soon`);
+  }));
+
+  $$('[data-toast]').forEach(b => b.addEventListener('click', () => toast(b.dataset.toast)));
+
+  // Textarea autosize
+  const autosize = () => { prompt.style.height = 'auto'; prompt.style.height = prompt.scrollHeight + 'px'; };
+  prompt.addEventListener('input', autosize);
+
+  const fill = (text, placeholder) => {
+    prompt.value = text;
+    if (placeholder) prompt.placeholder = placeholder;
+    autosize();
+    prompt.focus();
+    prompt.setSelectionRange(text.length, text.length);
+  };
+
+  // Mode cards
+  const modes = {
+    ask:   { text: '', ph: 'Ask Aurora anything...' },
+    quiz:  { text: 'Create a quiz on ', ph: 'What topic should the quiz cover?' },
+    flash: { text: 'Build flashcards for ', ph: 'Paste notes or name a topic...' },
+  };
+  let voiceOn = false;
+  $$('.card').forEach(card => card.addEventListener('click', () => {
+    const mode = card.dataset.mode;
+    $$('.card').forEach(c => c.classList.toggle('selected', c === card && mode !== 'ask'));
+    if (mode === 'voice') { startVoice(); return; }
+    const m = modes[mode];
+    fill(m.text, m.ph);
+  }));
+
+  // Chips
+  $$('.chip').forEach(c => c.addEventListener('click', () => fill(c.dataset.fill)));
+
+  // Banner
+  $('#closeBanner').addEventListener('click', () => $('#banner').classList.add('gone'));
+
+  // Library toggle
+  $('#libToggle').addEventListener('click', (e) => {
+    saveToLibrary = !saveToLibrary;
+    e.currentTarget.setAttribute('aria-pressed', saveToLibrary);
+    $('#libLabel').textContent = saveToLibrary ? 'Saving to Library' : 'Save your learning to Library';
+  });
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') { e.preventDefault(); $('#libToggle').click(); }
+  });
+
+  // ---------- Chat ----------
+  const inner = $('#threadInner');
+  const esc = (s) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const ICON = {
+    copy: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+    check: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>',
+    regen: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></svg>',
+    note: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 14h6M12 11v6"/></svg>',
+    expand: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
+    collapse: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>',
+    codeTag: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>',
+    play: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5z"/></svg>',
+    chev: '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>',
+  };
+
+  // Python-ish syntax highlighting
+  const KW = 'from|import|as|def|return|for|in|if|elif|else|while|with|class|try|except|lambda|and|or|not|None|True|False';
+  const TOKEN = new RegExp(`(#[^\\n]*)|([fr]?"[^"\\n]*"?|[fr]?'[^'\\n]*'?)|\\b(${KW})\\b|\\b([A-Za-z_]\\w*)(?=\\()|\\b(\\d+(?:\\.\\d+)?)\\b|\\b([A-Za-z_]\\w*)\\b`, 'g');
+  const highlight = (code) => {
+    let out = '', last = 0, m;
+    TOKEN.lastIndex = 0;
+    while ((m = TOKEN.exec(code))) {
+      out += esc(code.slice(last, m.index));
+      const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'k' : m[4] ? 'f' : m[5] ? 'n' : 'v';
+      out += `<span class="tk-${cls}">${esc(m[0])}</span>`;
+      last = TOKEN.lastIndex;
+    }
+    return out + esc(code.slice(last));
+  };
+
+  // Tiny markdown renderer: paragraphs, ### headings, lists, **bold**, `code`, [cite](src:N), ``` fences
+  const inline = (s) => esc(s)
+    .replace(/`([^`]+)`/g, '<code class="inline">$1</code>')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\[([^\]]+)\]\(src:(\d+)\)/g, '<a href="#" class="cite" data-src="$2">$1</a>');
+  const codeBlock = (code, lang) => {
+    const l = (lang || '').toLowerCase();
+    const isPy = l === 'python' || l === 'py';
+    const label = isPy ? 'Python' : (!l || l === 'text' || l === 'output') ? 'Plain text' : l[0].toUpperCase() + l.slice(1);
+    return `<div class="code" data-lang="${esc(l)}"><div class="code-head"><span class="code-lang">${ICON.codeTag}${esc(label)}</span><span class="code-tools">` +
+      `<button type="button" class="code-btn code-expand" aria-label="Expand code" title="Expand">${ICON.expand}</button>` +
+      `<button type="button" class="code-btn copy" aria-label="Copy code" title="Copy">${ICON.copy}</button>` +
+      (isPy ? `<button type="button" class="code-run">${ICON.play}<span>Run</span></button>` : '') +
+      `</span></div><pre><code>${isPy ? highlight(code) : esc(code)}</code></pre></div>`;
+  };
+  const render = (md) => {
+    const lines = md.split('\n');
+    let html = '', para = [], list = null, i = 0;
+    const flushP = () => { if (para.length) { html += `<p>${inline(para.join(' '))}</p>`; para = []; } };
+    const flushL = () => { if (list) { html += `<${list.t}>${list.items.map(x => `<li>${inline(x)}</li>`).join('')}</${list.t}>`; list = null; } };
+    while (i < lines.length) {
+      const line = lines[i];
+      const fence = line.match(/^```(\w*)/);
+      if (fence) {
+        flushP(); flushL();
+        const lang = fence[1] ? fence[1][0].toUpperCase() + fence[1].slice(1) : 'Code';
+        const buf = []; i++;
+        while (i < lines.length && !lines[i].startsWith('```')) buf.push(lines[i++]);
+        i++;
+        html += codeBlock(buf.join('\n'), fence[1]);
+        continue;
+      }
+      const h = line.match(/^###\s+(.*)/);
+      if (h) { flushP(); flushL(); html += `<h4>${inline(h[1])}</h4>`; i++; continue; }
+      const ol = line.match(/^\s*\d+\.\s+(.*)/), ul = line.match(/^\s*[-*]\s+(.*)/);
+      if (ol || ul) {
+        flushP();
+        const t = ol ? 'ol' : 'ul';
+        if (!list || list.t !== t) { flushL(); list = { t, items: [] }; }
+        list.items.push((ol || ul)[1]); i++; continue;
+      }
+      if (!line.trim()) { flushP(); flushL(); i++; continue; }
+      flushL(); para.push(line); i++;
+    }
+    flushP(); flushL();
+    return html;
+  };
+
+  // ---------- Interactive widgets: quiz + flashcards ----------
+  let widgetUid = 0;
+  const W_ICON = {
+    brain: '<svg class="fc-icon" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5a3 3 0 1 0-5.997.125 4 4 0 0 0-2.526 5.77 4 4 0 0 0 .556 6.588A4 4 0 1 0 12 18Z"/><path d="M12 5a3 3 0 1 1 5.997.125 4 4 0 0 1 2.526 5.77 4 4 0 0 1-.556 6.588A4 4 0 1 1 12 18Z"/><path d="M15 13a4.5 4.5 0 0 1-3-4 4.5 4.5 0 0 1-3 4"/><path d="M17.599 6.5a3 3 0 0 0 .399-1.375"/><path d="M6.003 5.125A3 3 0 0 0 6.401 6.5"/><path d="M3.477 10.896a4 4 0 0 1 .585-.396"/><path d="M19.938 10.5a4 4 0 0 1 .585.396"/><path d="M6 18a4 4 0 0 1-1.967-.516"/><path d="M19.967 17.484A4 4 0 0 1 18 18"/></svg>',
+    flip: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>',
+    prev: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>',
+    next: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>',
+  };
+  const saveButton = (label, savedLabel, toastMsg) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'w-save';
+    b.innerHTML = `${ICON.note}<span>${esc(label)}</span>`;
+    b.addEventListener('click', () => {
+      if (b.classList.contains('ok')) return;
+      b.classList.add('ok');
+      b.innerHTML = `${ICON.check}<span>${esc(savedLabel)}</span>`;
+      toast(toastMsg);
+    });
+    return b;
+  };
+
+  // Question banks (demo content — no model is connected)
+  const isUX = (topic) => !topic || /\bux\b|product design|user experience|usability/i.test(topic);
+  const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const quizFor = (topic) => isUX(topic) ? {
+    title: 'UX & Product Design Quiz',
+    questions: [
+      { type: 'mc', q: 'Which UX principle helps reduce cognitive load by showing users only the information they need at each stage?',
+        options: ['Progressive disclosure', 'Recognition over recall', 'Visual hierarchy', 'Error prevention'], answer: [0],
+        why: 'Progressive disclosure reveals information and features gradually, only when users need them.' },
+      { type: 'multi', q: 'Which of the following are effective ways to evaluate a new onboarding flow? Select all that apply.',
+        options: ['Measure task completion time', 'Conduct usability testing', 'Track drop-off rates', 'Add more onboarding steps'], answer: [0, 1, 2],
+        why: 'Time on task, usability testing and drop-off rates all measure how well onboarding works. Adding steps is a design change, not a way to evaluate.' },
+      { type: 'mc', q: 'In a usability test, what does the think-aloud protocol ask participants to do?',
+        options: ['Say what they are thinking while completing tasks', 'Rate the design after the session', 'Sketch their ideal layout', 'Compare two prototypes silently'], answer: [0],
+        why: 'Thinking aloud exposes expectations and confusion in the moment, which you cannot see from clicks alone.' },
+      { type: 'short', q: 'Which of Nielsen’s heuristics says an interface should use words and concepts that are familiar to the user?',
+        keywords: ['match', 'real world'], model: 'Match between system and the real world' },
+      { type: 'long', q: 'A checkout flow has a high abandonment rate. Describe how you would investigate the problem and redesign it.',
+        rubric: [
+          { label: 'Names a research method', kw: ['interview', 'usability', 'test', 'analytics', 'survey', 'session', 'heatmap', 'funnel'] },
+          { label: 'Identifies a metric to track', kw: ['conversion', 'abandon', 'drop', 'completion', 'rate', 'time'] },
+          { label: 'Proposes a concrete design change', kw: ['remove', 'reduce', 'simplif', 'guest', 'progress', 'autofill', 'field', 'step'] },
+          { label: 'Plans to validate or iterate', kw: ['iterate', 'a/b', 'ab test', 'retest', 'validate', 'measure', 'experiment'] },
+        ] },
+    ],
+  } : {
+    title: `${titleCase(topic)} Quiz`,
+    questions: [
+      { type: 'mc', q: `When studying ${topic}, which approach builds the most durable understanding?`,
+        options: ['Explaining it in your own words', 'Re-reading the slides several times', 'Highlighting key terms', 'Memorizing definitions word for word'], answer: [0],
+        why: 'Putting ideas in your own words forces you to connect them, which is what makes them stick.' },
+      { type: 'multi', q: `Which of these are good ways to check your understanding of ${topic}? Select all that apply.`,
+        options: ['Teach it to a classmate', 'Do practice problems without notes', 'Connect it to an earlier unit', 'Skim the summary once'], answer: [0, 1, 2],
+        why: 'Teaching, retrieval practice and making connections all test real understanding. Skimming only feels productive.' },
+      { type: 'mc', q: `You get a ${topic} question wrong on a practice quiz. What is the most useful next step?`,
+        options: ['Work out why, then retry it later', 'Move on to the next topic', 'Memorize the correct answer', 'Skip similar questions'], answer: [0],
+        why: 'Understanding the mistake and retrying after a gap turns an error into learning.' },
+      { type: 'short', q: `In one sentence, what problem or question does ${topic} address?`,
+        keywords: [], model: 'Compare your sentence with the opening slide of Lecture 4.' },
+      { type: 'long', q: `Explain ${topic} to a classmate who missed the lecture. Include an example.`,
+        rubric: [
+          { label: 'Defines the core idea', kw: ['is', 'means', 'refers', 'defined'] },
+          { label: 'Gives an example', kw: ['example', 'for instance', 'such as', 'like'] },
+          { label: 'Explains why it matters', kw: ['because', 'matters', 'important', 'so that', 'helps'] },
+          { label: 'Connects to something else you know', kw: ['similar', 'unlike', 'compared', 'related', 'connect'] },
+        ] },
+    ],
+  };
+  const flashFor = (topic) => isUX(topic) ? {
+    title: 'UX Flashcards',
+    cards: [
+      { q: 'What is progressive disclosure in UX design?', a: 'Revealing information and features gradually, only when users need them, to reduce cognitive load.', ex: 'An “Advanced settings” section that stays collapsed until opened.' },
+      { q: 'What does “recognition over recall” mean?', a: 'Make options and information visible so users can recognize them instead of having to remember them.', ex: 'Showing recent searches in a search box.' },
+      { q: 'What is a usability heuristic?', a: 'A broad rule of thumb for interface design, used to spot usability problems quickly.', ex: 'Nielsen’s 10 heuristics, such as “visibility of system status”.' },
+      { q: 'How is UX different from UI?', a: 'UX is the whole experience and flow of using a product; UI is the visual and interactive surface people touch.', ex: 'A beautiful checkout page (UI) can still have a confusing flow (UX).' },
+      { q: 'Why test with only about five users per round?', a: 'Five users usually uncover most major usability issues, so it is better to fix them and test again in rounds.', ex: 'Three rounds of five users beat one round of fifteen.' },
+    ],
+  } : {
+    title: `${titleCase(topic)} Flashcards`,
+    cards: [
+      { q: `What is ${topic}?`, a: 'Write a one-line definition in your own words, then compare it with Lecture 4, slide 12.', ex: '' },
+      { q: `Why does ${topic} matter?`, a: 'Name the problem it solves or the question it answers.', ex: '' },
+      { q: `What are the key terms in ${topic}?`, a: 'List the 3–4 terms your lecture uses most, and define each.', ex: '' },
+      { q: `Give an example of ${topic}.`, a: 'Use the worked example from the Unit 2 study guide, then invent one of your own.', ex: '' },
+      { q: `What is a common mistake with ${topic}?`, a: 'Describe the misconception and explain why it is wrong.', ex: '' },
+    ],
+  };
+
+  // Quiz widget
+  const buildQuiz = (quiz) => {
+    const uid = ++widgetUid;
+    const n = quiz.questions.length;
+    const LABEL = { mc: 'Multiple choice', multi: 'Select all that apply', short: 'Short answer', long: 'Long answer' };
+    const el = document.createElement('div');
+    el.className = 'widget quiz';
+    el.innerHTML = `
+      <div class="w-head"><div class="w-title">${esc(quiz.title)}</div><div class="w-head-r"><span class="pill">${n} questions</span></div></div>
+      ${quiz.questions.map((q, i) => {
+        const qid = `q${uid}-${i}`;
+        let body = '';
+        if (q.type === 'mc' || q.type === 'multi') {
+          body = `<div class="opts" role="${q.type === 'mc' ? 'radiogroup' : 'group'}" aria-labelledby="${qid}">` +
+            q.options.map((o, j) => `<label class="opt"><input type="${q.type === 'mc' ? 'radio' : 'checkbox'}" name="${qid}" value="${j}"><span>${esc(o)}</span><span class="tag"></span></label>`).join('') +
+            '</div>';
+        } else if (q.type === 'short') {
+          body = `<input class="ans-input" type="text" placeholder="Type your answer" aria-labelledby="${qid}">`;
+        } else {
+          body = `<textarea class="ans-input" rows="5" placeholder="Write your answer…" aria-labelledby="${qid}"></textarea>`;
+        }
+        return `<section class="q" data-i="${i}"><div class="q-label">Question ${i + 1} · ${LABEL[q.type]}</div><p class="q-text" id="${qid}">${esc(q.q)}</p>${body}<div class="feedback" hidden></div></section>`;
+      }).join('')}
+      <div class="w-foot"><span class="w-status">0 of ${n} answered</span><button type="button" class="w-primary">Check answers</button></div>`;
+    $('.w-head-r', el).appendChild(saveButton('Save quiz', 'Saved to notes', `Saved “${quiz.title}” to Notes`));
+
+    const sections = $$('.q', el);
+    const status = $('.w-status', el);
+    const primary = $('.w-primary', el);
+    const answered = (sec) => $$('input:checked', sec).length > 0 || $$('.ans-input', sec).some(t => t.value.trim());
+    const updateCount = () => {
+      if (el.classList.contains('checked')) return;
+      status.textContent = `${sections.filter(answered).length} of ${n} answered`;
+    };
+    el.addEventListener('input', updateCount);
+    el.addEventListener('change', updateCount);
+
+    const check = () => {
+      let score = 0;
+      quiz.questions.forEach((q, i) => {
+        const sec = sections[i], fb = $('.feedback', sec);
+        let ok = false, html = '';
+        if (q.type === 'mc' || q.type === 'multi') {
+          const picked = $$('input', sec).filter(x => x.checked).map(x => +x.value);
+          ok = picked.length === q.answer.length && picked.every(v => q.answer.includes(v));
+          $$('.opt', sec).forEach((lab, j) => {
+            const isAns = q.answer.includes(j), isPicked = picked.includes(j);
+            if (isAns) { lab.classList.add('correct'); $('.tag', lab).textContent = isPicked ? '✓ Correct' : 'Correct answer'; }
+            else if (isPicked) { lab.classList.add('wrong'); $('.tag', lab).textContent = '✕ Your answer'; }
+          });
+          html = `<b>${ok ? 'Correct.' : picked.length ? 'Not quite.' : 'Not answered.'}</b> ${esc(q.why)}`;
+        } else if (q.type === 'short') {
+          const v = $('.ans-input', sec).value.trim().toLowerCase();
+          if (q.keywords.length) {
+            ok = !!v && q.keywords.every(k => v.includes(k));
+            html = ok ? `<b>Correct.</b> ${esc(q.model)}.` : `<b>${v ? 'Not quite.' : 'Not answered.'}</b> The answer is “${esc(q.model)}”.`;
+          } else {
+            ok = !!v;
+            html = ok ? `<b>Submitted.</b> ${esc(q.model)}` : `<b>Not answered.</b> ${esc(q.model)}`;
+            fb.className = 'feedback info';
+          }
+        } else {
+          const v = $('.ans-input', sec).value.toLowerCase();
+          const hits = q.rubric.map(r => r.kw.some(k => v.includes(k)));
+          const count = hits.filter(Boolean).length;
+          ok = count >= 3;
+          html = `<b>${v.trim() ? `Rubric: ${count} of ${q.rubric.length}` : 'Not answered.'}</b>` +
+            `<ul>${q.rubric.map((r, k) => `<li>${hits[k] ? '✓' : '○'} ${esc(r.label)}</li>`).join('')}</ul>`;
+        }
+        if (ok) score++;
+        if (!fb.className.includes('info')) fb.className = `feedback ${ok ? 'ok' : 'bad'}`;
+        fb.innerHTML = html;
+        fb.hidden = false;
+      });
+      $$('input, textarea', el).forEach(x => { x.disabled = true; });
+      el.classList.add('checked');
+      status.innerHTML = `Score: <b>${score} / ${n}</b>`;
+      primary.textContent = 'Retake quiz';
+      toast(`You scored ${score} out of ${n}`);
+    };
+    const retake = () => {
+      $$('input, textarea', el).forEach(x => { x.disabled = false; if (x.type === 'radio' || x.type === 'checkbox') x.checked = false; else x.value = ''; });
+      $$('.opt', el).forEach(l => { l.classList.remove('correct', 'wrong'); $('.tag', l).textContent = ''; });
+      $$('.feedback', el).forEach(f => { f.hidden = true; f.className = 'feedback'; f.innerHTML = ''; });
+      el.classList.remove('checked');
+      primary.textContent = 'Check answers';
+      updateCount();
+      sections[0].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    };
+    primary.addEventListener('click', () => (el.classList.contains('checked') ? retake() : check()));
+    return el;
+  };
+
+  // Flashcards widget
+  const buildFlash = (set, topic) => {
+    const n = set.cards.length;
+    let i = 0;
+    const revealed = new Set();
+    const el = document.createElement('div');
+    el.className = 'widget fc';
+    el.innerHTML = `
+      <div class="w-head"><span class="pill">${esc(set.title)}</span><div class="w-head-r"><span class="fc-count" aria-live="polite"></span></div></div>
+      <div class="fc-progress" style="grid-template-columns: repeat(${n}, 1fr)">${set.cards.map(() => '<span class="seg"></span>').join('')}</div>
+      <div class="fc-stage">
+        <div class="fc-card" role="button" tabindex="0">
+          <div class="fc-face fc-front"></div>
+          <div class="fc-face fc-back"></div>
+        </div>
+        <div class="fc-done" hidden></div>
+      </div>
+      <div class="fc-foot">
+        <button type="button" class="w-secondary fc-prev">${W_ICON.prev}Previous</button>
+        <span class="fc-rev"></span>
+        <button type="button" class="w-primary fc-next"><span>Next</span>${W_ICON.next}</button>
+      </div>`;
+    $('.w-head-r', el).appendChild(saveButton('Save flashcards', 'Saved to notes', `Saved “${set.title}” to Notes`));
+    const card = $('.fc-card', el), front = $('.fc-front', el), back = $('.fc-back', el), done = $('.fc-done', el);
+    const prev = $('.fc-prev', el), next = $('.fc-next', el);
+
+    const counts = () => {
+      $('.fc-rev', el).textContent = `${revealed.size} / ${n} revealed`;
+    };
+    const show = (animate) => {
+      done.hidden = true; card.hidden = false;
+      card.style.transition = 'none';
+      card.classList.remove('flipped');
+      void card.offsetWidth;
+      card.style.transition = '';
+      const c = set.cards[i];
+      front.innerHTML = `${W_ICON.brain}<div class="fc-kicker">Question</div><div class="fc-q">${esc(c.q)}</div><div class="fc-hint">${W_ICON.flip}Tap to flip</div>`;
+      back.innerHTML = `<div class="fc-kicker">Answer</div><div class="fc-a">${esc(c.a)}</div>${c.ex ? `<div class="fc-ex">Example: ${esc(c.ex)}</div>` : ''}<div class="fc-hint">${W_ICON.flip}Tap to flip back</div>`;
+      front.setAttribute('aria-hidden', 'false'); back.setAttribute('aria-hidden', 'true');
+      card.setAttribute('aria-label', `Card ${i + 1} of ${n}. Question: ${c.q}. Press Enter to flip.`);
+      $('.fc-count', el).textContent = `${i + 1} of ${n}`;
+      $$('.seg', el).forEach((s, j) => s.classList.toggle('on', j <= i));
+      prev.disabled = i === 0;
+      $('span', next).textContent = i === n - 1 ? 'Finish' : 'Next';
+      counts();
+      if (animate) { card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter'); }
+    };
+    const flip = () => {
+      const on = card.classList.toggle('flipped');
+      front.setAttribute('aria-hidden', String(on)); back.setAttribute('aria-hidden', String(!on));
+      card.setAttribute('aria-label', on ? `Answer: ${set.cards[i].a}. Press Enter to flip back.` : `Question: ${set.cards[i].q}. Press Enter to flip.`);
+      if (on) { revealed.add(i); counts(); }
+    };
+    const finish = () => {
+      card.hidden = true; done.hidden = false;
+      $('.fc-count', el).textContent = `${n} of ${n}`;
+      $('span', next).textContent = 'Finish';
+      done.innerHTML = `<h4>Nice work!</h4><p>You reviewed all ${n} cards and revealed ${revealed.size}.</p>
+        <div class="row-btns"><button type="button" class="w-secondary fc-again">${W_ICON.flip}Review again</button><button type="button" class="w-primary fc-quiz">Quiz me on these</button></div>`;
+      $('.fc-again', done).addEventListener('click', () => { i = 0; revealed.clear(); show(true); card.focus(); });
+      $('.fc-quiz', done).addEventListener('click', () => fill(`Quiz me on ${isUX(topic) ? 'UX & Product Design' : topic}`));
+    };
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
+    prev.addEventListener('click', () => { if (!done.hidden) { show(true); return; } if (i > 0) { i--; show(true); } });
+    next.addEventListener('click', () => { if (!done.hidden) return; if (i < n - 1) { i++; show(true); } else finish(); });
+    el.addEventListener('keydown', (e) => {
+      if (e.target.closest('input, textarea')) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); prev.click(); }
+    });
+    show(false);
+    return el;
+  };
+
+  // Canned answers (demo only — no model is connected)
+  const COURSE_SOURCES = [
+    { ic: 'L4', t: 'Lecture 4 — Slides', s: 'Course materials · slides 12–15' },
+    { ic: 'SG', t: 'Unit 2 study guide', s: 'Course materials · p. 3' },
+    { ic: 'N', t: 'Your notes: Week 3', s: 'Library · your notes' },
+  ];
+  const replyFor = (q) => {
+    const t = q.toLowerCase();
+    const m = q.match(/\b(?:on|about|for|from|of|topic:)\s+(.+)/i);
+    const topic = (m ? m[1] : '').replace(/[?.!\s]+$/, '').trim() || 'your current unit';
+    if (t.includes('flashcard')) {
+      const set = flashFor(m ? topic : '');
+      return { sources: COURSE_SOURCES,
+        md: `Here are **${set.cards.length} ${set.title.replace(/ Flashcards$/, '')} flashcards**. Think of your answer first, then flip each card to reveal the explanation. [Lecture 4 — Slides](src:0)`,
+        widget: () => buildFlash(set, m ? topic : ''),
+        widgetLabel: 'Building flashcards',
+        outro: `Try answering each one out loud before flipping, as if you were explaining it to a classmate. Use **Save flashcards** to keep this set in your Notes. [Your notes: Week 3](src:2)` };
+    }
+    if (/\bquiz/.test(t)) {
+      const quiz = quizFor(m ? topic : '');
+      return { sources: COURSE_SOURCES,
+        md: `Here's a ${quiz.questions.length}-question practice quiz on **${quiz.title.replace(/ Quiz$/, '')}**, covering multiple choice, select-all-that-apply, short answer and long answer. [Lecture 4 — Slides](src:0) · [Unit 2 study guide](src:1)`,
+        widget: () => buildQuiz(quiz),
+        widgetLabel: 'Building quiz',
+        outro: `Answer from memory first, then use **Check answers** to see explanations. Use **Save quiz** to keep it in your Notes and retake it later.` };
+    }
+    if (/salesforce|python|code|script|program|function|api/.test(t)) {
+      const sf = t.includes('salesforce');
+      return { sources: [{ ic: 'Py', t: sf ? 'simple-salesforce docs' : 'Python docs: csv module', s: 'Reference documentation' }, COURSE_SOURCES[2]], md:
+`With ${sf ? 'the `simple-salesforce` library, connecting to Salesforce and retrieving all contacts is straightforward' : 'just the standard library you can get this working quickly'}. Here's a quick Python script to get you started. [${sf ? 'simple-salesforce docs' : 'Python docs'}](src:0)
+
+\`\`\`python
+${sf ? `from simple_salesforce import Salesforce
+
+# Connect to Salesforce
+sf = Salesforce(username='your_username', password='your_password', security_token='your_token')
+
+# Fetch all contacts
+contact_query = "SELECT Id, FirstName, LastName, Email FROM Contact"
+contacts = sf.query_all(contact_query)['records']
+
+# Display contacts
+for contact in contacts:
+    print(f"{contact['FirstName']} {contact['LastName']} - {contact['Email']}")` : `import csv
+
+# Load scores from a CSV file
+with open('scores.csv') as f:
+    rows = list(csv.DictReader(f))
+
+# Compute each student's average
+for row in rows:
+    scores = [float(row[k]) for k in row if k != 'name']
+    print(f"{row['name']}: {sum(scores) / len(scores):.1f}")`}
+\`\`\`
+
+### How it works
+
+1. ${sf ? 'We authenticate with Salesforce using `simple-salesforce`.' : 'We read the file with `csv.DictReader`, so each row becomes a dictionary.'}
+2. ${sf ? 'We retrieve all contacts using a SOQL query.' : 'We collect every score column except the name.'}
+3. ${sf ? 'We iterate over the contacts and print their first name, last name, and email.' : 'We print each average, rounded to one decimal place.'}
+
+This is a basic script to get you going. Want me to walk through any line, or turn it into a short practice quiz? [Your notes: Week 3](src:1)` };
+    }
+    return { sources: COURSE_SOURCES, md:
+`Let's break down **${topic}** step by step. Your Lecture 4 slides frame it around one central question, and the study guide has a good comparison table to anchor the details. [Lecture 4 — Slides](src:0)
+
+### Three steps to understand it
+
+1. **Start with the big idea.** Before details, name the one question this topic answers.
+2. **Connect it to what you already know.** Link each new term to something from earlier units. [Unit 2 study guide](src:1)
+3. **Check your understanding.** Explain it out loud in two sentences, as if teaching a friend.
+
+Your Week 3 notes already cover part of this, so start there. [Your notes: Week 3](src:2)
+
+Want me to quiz you on this or turn it into flashcards?` };
+  };
+
+  // ---------- Sources panel: where the answer's information comes from ----------
+  const SOURCES_EMPTY = "Where Aurora's answers come from will appear here.";
+  const setSources = (list) => {
+    const body = $('#sourcesBody');
+    body.innerHTML = list.map((s, i) => `<button type="button" class="src" data-i="${i}" style="animation-delay:${i * 70}ms" title="Open ${esc(s.t)}">
+        <span class="src-ic">${esc(s.ic)}</span>
+        <span class="src-txt"><b>${esc(s.t)}</b><span>${esc(s.s)}</span></span>
+        <svg class="src-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
+      </button>`).join('');
+    const c = $('#srcCount'); c.textContent = list.length; c.hidden = false;
+  };
+  function resetSources() {
+    $('#sourcesBody').textContent = SOURCES_EMPTY;
+    $('#srcCount').hidden = true;
+  }
+  $('#sourcesBody').addEventListener('click', (e) => {
+    const row = e.target.closest('.src');
+    if (row) toast(`Opening ${row.querySelector('b').textContent}`);
+  });
+  const flashSource = (i) => {
+    const row = $(`#sourcesBody .src[data-i="${i}"]`);
+    if (!row) return;
+    row.classList.add('flash');
+    setTimeout(() => row.classList.remove('flash'), 1200);
+  };
+
+  // Source menu
+  const sourceBtn = $('#sourceBtn'), sourceMenu = $('#sourceMenu');
+  const closeMenu = () => { sourceMenu.hidden = true; sourceBtn.setAttribute('aria-expanded', 'false'); };
+  sourceBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sourceMenu.hidden = !sourceMenu.hidden;
+    sourceBtn.setAttribute('aria-expanded', String(!sourceMenu.hidden));
+  });
+  $$('button', sourceMenu).forEach(b => b.addEventListener('click', () => {
+    $$('button', sourceMenu).forEach(x => x.setAttribute('aria-checked', String(x === b)));
+    $('#sourceLabel').textContent = b.textContent;
+    closeMenu();
+  }));
+  document.addEventListener('click', (e) => { if (!sourceMenu.hidden && !e.target.closest('.source-wrap')) closeMenu(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
+
+  // Attachments
+  let files = [];
+  const renderFiles = () => {
+    $('#attachments').innerHTML = files.map((f, i) =>
+      `<span class="att">📎 ${esc(f.name)}<button type="button" data-i="${i}" aria-label="Remove ${esc(f.name)}">×</button></span>`).join('');
+  };
+  $('#attachBtn').addEventListener('click', () => $('#fileInput').click());
+  $('#fileInput').addEventListener('change', (e) => { files = files.concat([...e.target.files]); e.target.value = ''; renderFiles(); prompt.focus(); });
+  $('#attachments').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-i]');
+    if (b) { files.splice(+b.dataset.i, 1); renderFiles(); }
+  });
+
+  // Thread + scrolling
+  const scrollDown = $('#scrollDown');
+  const nearBottom = () => thread.scrollHeight - thread.scrollTop - thread.clientHeight < 140;
+  const updateScrollBtn = () => scrollDown.classList.toggle('show', !nearBottom());
+  thread.addEventListener('scroll', updateScrollBtn);
+  scrollDown.addEventListener('click', () => thread.scrollTo({ top: thread.scrollHeight, behavior: 'smooth' }));
+  const addMsg = (cls, html) => {
+    const d = document.createElement('div');
+    d.className = `msg ${cls}`;
+    d.innerHTML = html;
+    inner.appendChild(d);
+    thread.scrollTop = thread.scrollHeight;
+    return d;
+  };
+
+  let busy = false, stopFlag = false;
+  const sendChat = $('#sendChat');
+  const setBusy = (b) => {
+    busy = b;
+    sendChat.classList.toggle('busy', b);
+    sendChat.setAttribute('aria-label', b ? 'Stop' : 'Send');
+  };
+  const stream = (el, md) => new Promise(res => {
+    let n = 0;
+    el.classList.add('live');
+    const tick = () => {
+      if (stopFlag) { el.classList.remove('live'); return res(false); }
+      n = Math.min(md.length, n + 3 + Math.floor(Math.random() * 6));
+      const stick = nearBottom();
+      el.innerHTML = render(md.slice(0, n).replace(/`{1,2}$/, ''));
+      if (stick) thread.scrollTop = thread.scrollHeight;
+      updateScrollBtn();
+      if (n < md.length) setTimeout(tick, 16); else { el.classList.remove('live'); res(true); }
+    };
+    tick();
+  });
+
+  const respond = async (ai) => {
+    const q = ai.dataset.q;
+    const { md, sources, widget, widgetLabel, outro } = replyFor(q);
+    ai.classList.remove('done');
+    ai.innerHTML = `<button type="button" class="status" aria-expanded="false"><span class="label">Working</span><span class="t">0s</span>${ICON.chev}</button><div class="steps" hidden></div><div class="body"></div><div class="widget-slot"></div><div class="body body2"></div><div class="shimmer"></div>`;
+    const tEl = ai.querySelector('.t'), sh = ai.querySelector('.shimmer'), body = ai.querySelector('.body');
+    const start = Date.now();
+    const timer = setInterval(() => { tEl.textContent = Math.floor((Date.now() - start) / 1000) + 's'; }, 250);
+    setBusy(true); stopFlag = false;
+    const src = $('#sourceLabel').textContent.toLowerCase();
+    const steps = [];
+    const searchStep = `Searched ${src === 'all sources' ? 'your courses and Library' : src}`;
+    sh.textContent = searchStep.replace('Searched', 'Searching');
+    await wait(1100);
+    if (!stopFlag) { steps.push(searchStep); sh.textContent = `Reading ${sources.length} sources`; setSources(sources); await wait(900); }
+    if (!stopFlag) { steps.push(`Read ${sources.length} sources`); sh.textContent = 'Writing answer'; ai.classList.add('streaming'); await stream(body, md); }
+    if (!stopFlag && widget) {
+      sh.textContent = widgetLabel || 'Building';
+      await wait(500);
+      if (!stopFlag) {
+        const stick = nearBottom();
+        ai.querySelector('.widget-slot').appendChild(widget());
+        steps.push(widgetLabel === 'Building quiz' ? 'Built an interactive quiz' : 'Built a flashcard set');
+        if (stick) thread.scrollTop = thread.scrollHeight;
+        if (outro) { await wait(250); await stream(ai.querySelector('.body2'), outro); }
+      }
+    }
+    if (!stopFlag) steps.push('Wrote answer');
+    clearInterval(timer);
+    ai.classList.remove('streaming');
+    ai.classList.add('done');
+    sh.remove();
+    const secs = Math.max(1, Math.round((Date.now() - start) / 1000));
+    ai.querySelector('.label').textContent = stopFlag ? 'Stopped after' : 'Worked for';
+    tEl.textContent = ` ${secs}s`;
+    ai.querySelector('.steps').innerHTML = steps.map(s => `<div>${esc(s)}</div>`).join('') || '<div>Stopped</div>';
+    if (!body.innerHTML) body.innerHTML = '<p style="color:var(--muted)">Response stopped.</p>';
+    ai.insertAdjacentHTML('beforeend', `<div class="actions">
+      <button type="button" class="act" data-act="save">${ICON.note}<span>Save to notes</span></button>
+      <button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button>
+      <button type="button" class="act" data-act="regen">${ICON.regen}<span>Regenerate</span></button></div>`);
+    ai.dataset.md = outro ? `${md}\n\n${outro}` : md;
+    if (saveToLibrary && !stopFlag) toast('Saved to your Library');
+    setBusy(false);
+    updateScrollBtn();
+  };
+
+  const copyText = async (text) => {
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = document.createElement('textarea'); ta.value = text; document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy'); ta.remove();
+    }
+  };
+  thread.addEventListener('click', async (e) => {
+    const cite = e.target.closest('.cite');
+    if (cite) { e.preventDefault(); flashSource(cite.dataset.src); return; }
+    const status = e.target.closest('.msg.ai.done .status');
+    if (status) {
+      const steps = status.nextElementSibling;
+      steps.hidden = !steps.hidden;
+      status.setAttribute('aria-expanded', String(!steps.hidden));
+      return;
+    }
+    const copy = e.target.closest('.copy');
+    if (copy) {
+      await copyText(copy.closest('.code').querySelector('pre code').textContent);
+      copy.innerHTML = ICON.check; copy.classList.add('ok'); copy.setAttribute('aria-label', 'Copied');
+      setTimeout(() => { copy.innerHTML = ICON.copy; copy.classList.remove('ok'); copy.setAttribute('aria-label', 'Copy code'); }, 1600);
+      return;
+    }
+    const act = e.target.closest('.act');
+    if (!act) return;
+    if (act.dataset.act === 'copy-me') {
+      await copyText(act.closest('.me-row').querySelector('.bubble').dataset.q || '');
+      act.innerHTML = ICON.check; setTimeout(() => { act.innerHTML = ICON.copy; }, 1400);
+      return;
+    }
+    const ai = act.closest('.msg.ai');
+    if (act.dataset.act === 'copy') {
+      await copyText(ai.dataset.md || '');
+      act.classList.add('ok'); act.innerHTML = `${ICON.check}<span>Copied</span>`;
+      setTimeout(() => { act.classList.remove('ok'); act.innerHTML = `${ICON.copy}<span>Copy</span>`; }, 1600);
+    }
+    if (act.dataset.act === 'regen' && !busy) respond(ai);
+    if (act.dataset.act === 'save' && !act.classList.contains('ok')) {
+      act.classList.add('ok'); act.innerHTML = `${ICON.check}<span>Saved to notes</span>`;
+      toast('Saved answer to Notes');
+    }
+  });
+
+  // ---------- Code blocks: expand / run ----------
+  const miniPy = (src) => {
+    // Tiny interpreter for beginner lessons: assignments, + on numbers/strings, print(...)
+    const vars = {};
+    const out = [];
+    const split = (s, sep) => {
+      const parts = []; let cur = '', q = null;
+      for (const ch of s) {
+        if (q) { cur += ch; if (ch === q) q = null; continue; }
+        if (ch === '"' || ch === "'") { q = ch; cur += ch; continue; }
+        if (ch === sep) { parts.push(cur); cur = ''; continue; }
+        cur += ch;
+      }
+      parts.push(cur);
+      return parts;
+    };
+    const evalExpr = (e) => {
+      const vals = split(e, '+').map(p => {
+        p = p.trim(); let m;
+        if ((m = p.match(/^(["'])(.*)\1$/))) return m[2];
+        if (/^-?\d+(\.\d+)?$/.test(p)) return Number(p);
+        if (/^[A-Za-z_]\w*$/.test(p) && p in vars) return vars[p];
+        throw new Error('unsupported');
+      });
+      return vals.reduce((a, b) => {
+        if (typeof a !== typeof b) throw new Error('TypeError');
+        return a + b;
+      });
+    };
+    try {
+      for (const raw of src.split('\n')) {
+        const line = raw.trim();
+        if (!line || line.startsWith('#')) continue;
+        let m;
+        if ((m = line.match(/^print\((.*)\)$/))) { out.push(m[1].trim() ? split(m[1], ',').map(evalExpr).map(String).join(' ') : ''); continue; }
+        if ((m = line.match(/^([A-Za-z_]\w*)\s*=\s*(.+)$/))) { vars[m[1]] = evalExpr(m[2]); continue; }
+        return null;
+      }
+      return out;
+    } catch { return null; }
+  };
+  let expandedCode = null;
+  const collapseCode = () => {
+    if (!expandedCode) return;
+    expandedCode.classList.remove('expanded');
+    const b = $('.code-expand', expandedCode);
+    if (b) { b.innerHTML = ICON.expand; b.setAttribute('aria-label', 'Expand code'); b.focus(); }
+    $('.code-backdrop')?.remove();
+    expandedCode = null;
+  };
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') collapseCode(); });
+  document.addEventListener('click', (e) => { if (e.target.classList?.contains('code-backdrop')) collapseCode(); });
+  thread.addEventListener('click', async (e) => {
+    const exp = e.target.closest('.code-expand');
+    if (exp) {
+      const block = exp.closest('.code');
+      if (block === expandedCode) { collapseCode(); return; }
+      collapseCode();
+      const bd = document.createElement('div'); bd.className = 'code-backdrop';
+      $('#stage').appendChild(bd);
+      block.classList.add('expanded');
+      exp.innerHTML = ICON.collapse; exp.setAttribute('aria-label', 'Collapse code');
+      expandedCode = block;
+      return;
+    }
+    const run = e.target.closest('.code-run');
+    if (run) {
+      const block = run.closest('.code');
+      run.classList.add('running'); $('span', run).textContent = 'Running…';
+      await wait(450);
+      const result = miniPy($('pre code', block).textContent);
+      $('.code-out', block)?.remove();
+      const outEl = document.createElement('div');
+      outEl.className = 'code-out';
+      outEl.innerHTML = result
+        ? `<div class="code-out-label">Output</div><pre><code>${esc(result.join('\n'))}</code></pre>`
+        : '<div class="note">This example needs a real Python setup. Run it in VS Code to see the output.</div>';
+      block.appendChild(outEl);
+      run.classList.remove('running'); $('span', run).textContent = 'Run again';
+    }
+  });
+
+  // ---------- Voice mode (real microphone + spoken replies) ----------
+  // Speech-to-text: the browser's Web Speech API (Chrome/Edge/Safari). Text-to-speech: speechSynthesis.
+  // Replies are still canned (no model is connected), but the conversation is live and driven by what you say.
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const canSpeak = 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
+  let vActive = false, vMuted = false, vState = 'idle', vTurn = 0;
+  let recog = null, recogRunning = false, recogBlocked = false;
+  let liveRow = null, finalText = '', silenceTimer = null;
+  const orb = $('#orb'), orbLabel = $('#orbLabel'), muteBtn = $('#muteBtn');
+  const ORB_LABEL = {
+    listening: 'Listening — go ahead and talk',
+    hearing: 'Listening…',
+    thinking: 'Thinking · tap the orb to stop',
+    speaking: 'Aurora is speaking · tap the orb to interrupt',
+    muted: 'Microphone is off',
+    unsupported: "Voice input isn't available in this browser. Use Chrome, Edge or Safari, or type below and Aurora will answer out loud.",
+    denied: 'Microphone access is blocked. Allow it from the address bar, or type below.',
+    idle: '',
+  };
+  const setOrb = (s) => {
+    vState = s;
+    orb.dataset.state = s;
+    orbLabel.textContent = ORB_LABEL[s] ?? '';
+    orb.setAttribute('aria-label', s === 'speaking' || s === 'thinking' ? 'Interrupt Aurora' : 'Aurora voice');
+  };
+  const hush = () => { if (canSpeak) try { window.speechSynthesis.cancel(); } catch { /* ignore */ } };
+  const keepBottom = () => { if (nearBottom()) thread.scrollTop = thread.scrollHeight; updateScrollBtn(); };
+
+  // Live mic level drives the orb size while you talk
+  let audioCtx = null, micStream = null, levelRaf = 0;
+  const startLevel = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) return true;
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      audioCtx.createMediaStreamSource(micStream).connect(analyser);
+      const buf = new Uint8Array(analyser.fftSize);
+      let smooth = 0;
+      const tick = () => {
+        analyser.getByteTimeDomainData(buf);
+        let sum = 0;
+        for (const v of buf) { const d = (v - 128) / 128; sum += d * d; }
+        const live = (vState === 'listening' || vState === 'hearing') && !vMuted;
+        const target = live ? Math.min(1, Math.sqrt(sum / buf.length) * 7) : 0;
+        smooth += (target - smooth) * 0.25;
+        orb.style.setProperty('--lvl', smooth.toFixed(3));
+        levelRaf = requestAnimationFrame(tick);
+      };
+      tick();
+      return true;
+    } catch (err) {
+      return err && (err.name === 'NotAllowedError' || err.name === 'SecurityError') ? 'denied' : true;
+    }
+  };
+  const stopLevel = () => {
+    cancelAnimationFrame(levelRaf);
+    micStream?.getTracks().forEach(t => t.stop());
+    audioCtx?.close().catch(() => {});
+    micStream = audioCtx = null;
+    orb.style.setProperty('--lvl', '0');
+  };
+
+  // Speech recognition
+  const ensureRecog = () => {
+    if (!SR) return null;
+    if (recog) return recog;
+    recog = new SR();
+    recog.lang = navigator.language || 'en-US';
+    recog.continuous = true;
+    recog.interimResults = true;
+    recog.onresult = (e) => {
+      if (vState === 'speaking' || vState === 'thinking') return;
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const r = e.results[i];
+        if (r.isFinal) finalText += r[0].transcript; else interim += r[0].transcript;
+      }
+      showLive(finalText, interim);
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(commitTurn, interim ? 1500 : 900);
+    };
+    recog.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') { recogBlocked = true; setOrb('denied'); }
+      else if (e.error !== 'no-speech' && e.error !== 'aborted') toast(`Voice input error: ${e.error}`);
+    };
+    recog.onend = () => {
+      recogRunning = false;
+      // Chrome ends recognition after silence; keep listening while it's our turn to listen
+      if (vActive && !vMuted && !recogBlocked && (vState === 'listening' || vState === 'hearing')) startRecog();
+    };
+    return recog;
+  };
+  const startRecog = () => {
+    if (!ensureRecog() || recogRunning || vMuted || recogBlocked) return;
+    try { recog.start(); recogRunning = true; } catch { /* already started */ }
+  };
+  const stopRecog = () => {
+    clearTimeout(silenceTimer);
+    if (recog && recogRunning) { try { recog.abort(); } catch { /* ignore */ } }
+    recogRunning = false;
+  };
+
+  // Live transcription bubble
+  const showLive = (fin, interim) => {
+    const f = fin.trim(), i = interim.trim();
+    if (!f && !i) return;
+    if (!liveRow) { liveRow = addMsg('me-row', '<div class="bubble live"></div>'); setOrb('hearing'); }
+    $('.bubble', liveRow).innerHTML = esc(f) + (i ? `${f ? ' ' : ''}<span class="interim">${esc(i)}</span>` : '');
+    keepBottom();
+  };
+  const sealUserRow = (row, q) => {
+    const b = $('.bubble', row);
+    b.classList.remove('live');
+    b.textContent = q;
+    b.dataset.q = q;
+    row.insertAdjacentHTML('beforeend', `<button type="button" class="act me-copy" data-act="copy-me" aria-label="Copy message" title="Copy">${ICON.copy}</button>`);
+  };
+  const commitTurn = () => {
+    clearTimeout(silenceTimer);
+    if (!liveRow) return;
+    const row = liveRow, q = $('.bubble', row).textContent.trim();
+    liveRow = null; finalText = '';
+    if (!q) { row.remove(); return; }
+    sealUserRow(row, q);
+    stopRecog();
+    voiceAnswer(q);
+  };
+
+  // What Aurora says (spoken) and shows (formatted) for a turn
+  const LESSON_MD = [
+    "Imagine you've just opened **VS Code**. Here's exactly what you'd type for your first Python program.",
+    "",
+    "First, create a new file and name it `lesson1.py`. The `.py` extension tells VS Code it's a Python file.",
+    "",
+    "Now type this:",
+    "",
+    "```python",
+    'name = "Ava"',
+    "age = 25",
+    'city = "New York"',
+    "",
+    "print(name)",
+    "print(age)",
+    "print(city)",
+    "```",
+    "",
+    "Here's what's happening. `name`, `age` and `city` are **variables**. The equals sign assigns a value to each one. Text goes inside quotation marks, but numbers don't need them. [Python docs: variables](src:0)",
+    "",
+    "The `print()` function tells Python to show something in the terminal. When you run this program, you'll see:",
+    "",
+    "```text",
+    "Ava",
+    "25",
+    "New York",
+    "```",
+    "",
+    "Now let's make it slightly more interesting:",
+    "",
+    "```python",
+    'name = "Ava"',
+    "age = 25",
+    "",
+    'print("Hello, my name is", name)',
+    'print("I am", age, "years old")',
+    "",
+    "age = age + 1",
+    "",
+    'print("Next year, I will be", age)',
+    "```",
+    "",
+    "Notice that `age = age + 1` updates the variable from 25 to 26. Python runs these instructions from top to bottom.",
+    "",
+    "**How to run this in VS Code:** install Python and the Python extension, open `lesson1.py`, then click **Run Python File** (the play button in the top-right corner). The output appears in the terminal at the bottom. You can also press **Run** on any example here to try it.",
+    "",
+    "One important thing: Python is **case-sensitive**, so `name` and `Name` are two different variables.",
+    "",
+    "Before we move on to Lesson 2, a quick question: why did we put `\"Ava\"` in quotation marks but not `25`? [Your notes: Week 3](src:1)",
+  ].join('\n');
+  const LESSON_SOURCES = [
+    { ic: 'Py', t: 'Python docs: variables', s: 'Reference documentation' },
+    { ic: 'N', t: 'Your notes: Week 3', s: 'Library · your notes' },
+  ];
+  const plain = (md) => md
+    .replace(/\[([^\]]+)\]\(src:\d+\)/g, '')
+    .replace(/\*\*([^*]+)\*\*/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\s+·\s*$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+  const voicePlan = (q) => {
+    const t = q.toLowerCase().replace(/[^\w\s']/g, ' ').replace(/\s+/g, ' ').trim();
+    const words = t.split(' ').length;
+    if (/^(hi|hey|hello|hiya|good (morning|afternoon|evening))\b/.test(t) && words <= 4)
+      return { say: 'Hey! What would you like to study today?' };
+    if (/\b(thanks|thank you|cheers)\b/.test(t))
+      return { say: "You're welcome. Want to keep going, or try a quick quiz on what we covered?" };
+    if (/\bflashcards?\b/.test(t) || /\bquiz\b/.test(t)) {
+      const r = replyFor(q);
+      return { say: plain(r.md), widget: r.widget, widgetLabel: r.widgetLabel, after: r.outro, sources: r.sources };
+    }
+    if (/\b(vs ?code|show me|how (it|that|this) (looks|would look)|example|examples|what it looks like)\b/.test(t))
+      return { say: "Right. I'll walk you through it. Imagine you've opened VS Code.", md: LESSON_MD, sources: LESSON_SOURCES };
+    if (/\b(teach|python 101|basics|theory|variables?|start)\b/.test(t) && /\b(python|teach|101|theory|variables?|basics|coding|programming)\b/.test(t))
+      return { say: "Okay, let's do it. Think of Python as a set of instructions you give the computer. The first concept is variables. They're just names you give to values, like name equals Ava, or age equals 25. Want me to show you how that looks in VS Code?" };
+    if (/\b(learn|study|get into)\b/.test(t) && /\b(python|coding|programming|development|code)\b/.test(t))
+      return { say: 'Nice. Do you want to start with the theory, or with something you can build right away?' };
+    const r = replyFor(q);
+    const paras = r.md.split(/\n\s*\n/);
+    return { say: plain(paras[0]), md: paras.slice(1).join('\n\n'), sources: r.sources };
+  };
+
+  // Speak a line and reveal its words in sync (word boundaries when the voice reports them)
+  const sayInto = (p, text, turn) => new Promise((resolve) => {
+    const words = text.split(/\s+/).filter(Boolean);
+    let shown = 0, boundaries = false, settled = false, timer = 0;
+    const showUpTo = (n) => {
+      while (shown < Math.min(n, words.length)) {
+        const s = document.createElement('span');
+        s.className = 'w fresh';
+        s.textContent = (shown ? ' ' : '') + words[shown];
+        p.appendChild(s);
+        setTimeout(() => s.classList.remove('fresh'), 380);
+        shown++;
+      }
+      keepBottom();
+    };
+    const finish = (completed) => {
+      if (settled) return;
+      settled = true;
+      clearInterval(timer);
+      if (completed) showUpTo(words.length);
+      resolve(completed);
+    };
+    if (canSpeak) {
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.03;
+      u.lang = navigator.language || 'en-US';
+      u.onboundary = (ev) => {
+        if (ev.name && ev.name !== 'word') return;
+        boundaries = true;
+        showUpTo(text.slice(0, ev.charIndex).split(/\s+/).filter(Boolean).length + 1);
+      };
+      u.onend = () => finish(turn === vTurn);
+      u.onerror = () => finish(turn === vTurn);
+      hush();
+      window.speechSynthesis.speak(u);
+      let started = false;
+      timer = setInterval(() => {
+        if (turn !== vTurn) { finish(false); return; }
+        const busySpeaking = window.speechSynthesis.speaking || window.speechSynthesis.pending;
+        if (busySpeaking) started = true;
+        if (!boundaries) showUpTo(shown + 1);
+        if (shown >= words.length && (started || !busySpeaking) && !busySpeaking) finish(true);
+      }, 300);
+    } else {
+      timer = setInterval(() => {
+        if (turn !== vTurn) { finish(false); return; }
+        showUpTo(shown + 1);
+        if (shown >= words.length) finish(true);
+      }, 260);
+    }
+  });
+
+  const resumeListening = () => {
+    if (!vActive) return;
+    if (!SR) { setOrb('unsupported'); return; }
+    if (recogBlocked) { setOrb('denied'); return; }
+    if (vMuted) { setOrb('muted'); return; }
+    setOrb('listening');
+    startRecog();
+  };
+
+  const voiceAnswer = async (q) => {
+    const turn = ++vTurn;
+    stopFlag = false;
+    setOrb('thinking');
+    const plan = voicePlan(q);
+    const ai = addMsg('ai spoken', '<div class="shimmer">Thinking</div><div class="body spoken-body"><p></p></div>');
+    ai.dataset.q = q;
+    keepBottom();
+    await wait(plan.md || plan.widget ? 900 : 500);
+    if (turn !== vTurn) return;
+    $('.shimmer', ai)?.remove();
+    setOrb('speaking');
+    const completed = await sayInto($('.spoken-body p', ai), plan.say, turn);
+    if (!completed || turn !== vTurn) return;
+    if (plan.sources) setSources(plan.sources);
+    let mdAll = plan.say;
+    if (plan.md && plan.md.trim()) {
+      const d = document.createElement('div');
+      d.className = 'body lesson';
+      ai.appendChild(d);
+      await stream(d, plan.md);
+      mdAll += `\n\n${plan.md}`;
+    }
+    if (turn !== vTurn) return;
+    if (plan.widget) {
+      const slot = document.createElement('div');
+      slot.className = 'widget-slot';
+      slot.appendChild(plan.widget());
+      ai.appendChild(slot);
+      if (plan.after) {
+        const d = document.createElement('div');
+        d.className = 'body body2';
+        d.innerHTML = render(plan.after);
+        ai.appendChild(d);
+        mdAll += `\n\n${plan.after}`;
+      }
+    }
+    ai.dataset.md = mdAll;
+    if (plan.md || plan.widget) {
+      ai.insertAdjacentHTML('beforeend', `<div class="actions">
+        <button type="button" class="act" data-act="save">${ICON.note}<span>Save to notes</span></button>
+        <button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button></div>`);
+    }
+    keepBottom();
+    resumeListening();
+  };
+
+  // Tap the orb to interrupt Aurora (barge-in)
+  const interrupt = () => {
+    if (vState !== 'speaking' && vState !== 'thinking') return;
+    vTurn++;
+    hush();
+    stopFlag = true;
+    const last = [...$$('.msg.ai.spoken', inner)].pop();
+    if (last) {
+      $('.shimmer', last)?.remove();
+      $$('.w.fresh', last).forEach(w => w.classList.remove('fresh'));
+      const p = $('.spoken-body p', last);
+      if (p && !$('.cut-note', last)) p.insertAdjacentHTML('beforeend', '<span class="cut-note">Interrupted</span>');
+    }
+    resumeListening();
+  };
+  orb.addEventListener('click', interrupt);
+
+  const startVoice = async () => {
+    if (busy) stopFlag = true;
+    $$('.card').forEach(c => c.classList.remove('selected'));
+    enterChat();
+    document.body.classList.add('voice');
+    vActive = true;
+    vMuted = false;
+    recogBlocked = false;
+    muteBtn.setAttribute('aria-pressed', 'false');
+    prompt.placeholder = 'Type';
+    if (!SR) { setOrb('unsupported'); return; }
+    setOrb('listening');
+    const level = await startLevel();          // asks for microphone permission
+    if (!vActive) { stopLevel(); return; }
+    if (level === 'denied') { recogBlocked = true; setOrb('denied'); return; }
+    resumeListening();
+  };
+  const endVoice = (silent) => {
+    vActive = false;
+    vTurn++;
+    hush();
+    stopRecog();
+    stopLevel();
+    if (liveRow) {
+      const row = liveRow, q = $('.bubble', row).textContent.trim();
+      liveRow = null; finalText = '';
+      if (q) sealUserRow(row, q); else row.remove();
+    }
+    $$('.body.live').forEach(b => b.classList.remove('live'));
+    vMuted = false;
+    muteBtn.setAttribute('aria-pressed', 'false');
+    muteBtn.setAttribute('aria-label', 'Mute microphone');
+    document.body.classList.remove('voice');
+    setOrb('idle');
+    prompt.placeholder = 'Ask a follow-up...';
+    if (!silent) toast('Voice session ended');
+  };
+  // Typing while in voice mode: Aurora still answers out loud
+  const typedVoiceTurn = (q) => {
+    if (vState === 'speaking' || vState === 'thinking') interrupt();
+    stopRecog();
+    if (liveRow) { liveRow.remove(); liveRow = null; finalText = ''; }
+    const row = addMsg('me-row', '<div class="bubble"></div>');
+    sealUserRow(row, q);
+    prompt.value = ''; autosize();
+    voiceAnswer(q);
+  };
+  muteBtn.addEventListener('click', () => {
+    vMuted = !vMuted;
+    muteBtn.setAttribute('aria-pressed', String(vMuted));
+    muteBtn.setAttribute('aria-label', vMuted ? 'Unmute microphone' : 'Mute microphone');
+    if (vMuted) {
+      stopRecog();
+      if (liveRow) commitTurn();
+      if (vState === 'listening' || vState === 'hearing') setOrb('muted');
+    } else if (vState === 'muted') {
+      resumeListening();
+    }
+    toast(vMuted ? 'Microphone off' : 'Microphone on');
+  });
+  $('#endVoice').addEventListener('click', () => endVoice(false));
+  $('#micBtn').addEventListener('click', startVoice);
+
+  const enterChat = () => document.body.classList.add('chatting');
+  function exitChat() {
+    if (vActive) endVoice(true);
+    collapseCode();
+    stopFlag = true;
+    document.body.classList.remove('chatting');
+    inner.innerHTML = '';
+    resetSources();
+    prompt.placeholder = 'Ask Aurora anything...';
+    setBusy(false);
+    scrollDown.classList.remove('show');
+  }
+  $('#back').addEventListener('click', exitChat);
+
+  const send = async (e) => {
+    e && e.preventDefault();
+    if (busy) { stopFlag = true; return; }
+    const q = prompt.value.trim();
+    if (!q) { prompt.focus(); return; }
+    if (vActive) { typedVoiceTurn(q); return; }
+    enterChat();
+    const fileHtml = files.length ? `<div class="files">${files.map(f => `<span>📎 ${esc(f.name)}</span>`).join('')}</div>` : '';
+    const row = addMsg('me-row', `<div class="bubble">${esc(q)}${fileHtml}</div><button type="button" class="act me-copy" data-act="copy-me" aria-label="Copy message" title="Copy">${ICON.copy}</button>`);
+    row.querySelector('.bubble').dataset.q = q;
+    files = []; renderFiles();
+    prompt.value = ''; autosize();
+    prompt.placeholder = 'Ask a follow-up...';
+    const ai = addMsg('ai', '');
+    ai.dataset.q = q;
+    await respond(ai);
+    prompt.focus();
+  };
+  $('#composer').addEventListener('submit', send);
+  prompt.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) send(e);
+  });
+})();
+</script>
+</body>
+</html>
