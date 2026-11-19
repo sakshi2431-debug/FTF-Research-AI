@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Assistiv — Study</title>
+<title>Assistiv - Study</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,8 +13,8 @@
     --ink-2: #4a5263;
     --muted: #5d6576;
     --line: #dfe3ee;
-    --blue: #1f6fe5;
-    --blue-soft: #e4eefc;
+    --blue: #1570EF;
+    --blue-soft: #EFF8FF;
     --card: rgba(255, 255, 255, 0.72);
     --green-ink: #0d6b3a;
   }
@@ -423,59 +423,109 @@
   .w-secondary:hover:not(:disabled) { background: #f3f7fe; border-color: #b7cdf5; color: var(--blue); }
   .w-secondary:disabled { opacity: .45; cursor: default; }
 
-  /* Quiz */
-  .quiz { padding: 34px 40px 30px; }
-  .quiz .w-head { margin-bottom: 6px; }
-  .q { padding: 30px 0; }
-  .q + .q { border-top: 1px solid #eceef3; }
-  .q-label { font-size: 19px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; color: #5d6576; }
-  .q-text { font-size: 25px; font-weight: 600; line-height: 1.5; color: var(--ink); margin: 12px 0 16px; }
-  .opts { display: flex; flex-direction: column; gap: 4px; }
+  /* Quiz — one question at a time */
+  .quiz { padding: 32px 40px 34px; }
+  .qz-count, .fc-count { font-size: 20px; color: #5d6576; }
+  .quiz .fc-progress { margin: 22px 0 32px; }
+  .q-label { font-size: 17px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: #5d6576; }
+  .q-text { margin: 10px 0 8px; font-size: 28px; font-weight: 700; line-height: 1.42; letter-spacing: -.01em; color: #111827; }
+  .q-hint { margin: 0 0 24px; font-size: 19px; color: #4a5263; }
+
+  .q-code { margin: 0 0 28px; border-radius: 12px; background: #1b1f2b; overflow: hidden; box-shadow: 0 14px 32px -22px rgba(15, 20, 40, .7); }
+  .q-code-head { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-bottom: 1px solid rgba(255, 255, 255, .07); font-size: 16px; color: #aab1c2; }
+  .dots { display: inline-flex; gap: 8px; }
+  .dots i { width: 13px; height: 13px; border-radius: 50%; background: #e5533d; }
+  .dots i:nth-child(2) { background: #e9a23b; }
+  .dots i:nth-child(3) { background: #2dbb68; }
+  .q-lang { margin-left: auto; }
+  .q-code pre { margin: 0; padding: 22px 26px 26px; overflow-x: auto; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 19px; line-height: 1.7; color: #e8eaf0; }
+  .q-code .tk-k { color: #ff7ab2; } .q-code .tk-s { color: #a5e3b0; } .q-code .tk-c { color: #7d8597; font-style: italic; }
+  .q-code .tk-f { color: #7cb7ff; } .q-code .tk-n { color: #ffb86b; } .q-code .tk-v { color: #e8eaf0; }
+
+  .opts { display: flex; flex-direction: column; gap: 14px; }
   .opt {
-    display: flex; align-items: center; gap: 18px;
-    padding: 12px 16px; margin: 0 -16px; border-radius: 14px;
-    font-size: 23px; color: var(--ink); cursor: pointer; transition: background .2s;
+    display: flex; align-items: flex-start; gap: 18px;
+    padding: 20px 22px; border: 1px solid #dfe3ec; border-radius: 12px; background: #fff;
+    cursor: pointer; transition: border-color .15s, background .15s;
   }
-  .opt:hover { background: #f6f8fc; }
+  .opt:hover { border-color: #b9c6dc; background: #fafbfd; }
   .opt input {
-    appearance: none; -webkit-appearance: none; margin: 0; flex: none;
-    width: 30px; height: 30px; border: 2px solid #c3c9d5; border-radius: 50%; background: #fff;
-    display: grid; place-items: center; cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
+    appearance: none; -webkit-appearance: none; margin: 1px 0 0; flex: none;
+    width: 26px; height: 26px; border: 2px solid #c3c9d5; border-radius: 50%; background: #fff;
+    cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s;
   }
-  .opt input[type="checkbox"] { border-radius: 8px; }
-  .opt input:checked { border-color: var(--blue); background: var(--blue); box-shadow: inset 0 0 0 6px #fff; }
+  .opt input[type="checkbox"] { border-radius: 7px; }
+  .opt input:checked { border-color: #16a34a; background: #16a34a; box-shadow: inset 0 0 0 5px #fff; }
   .opt input[type="checkbox"]:checked {
     box-shadow: none;
-    background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center / 20px no-repeat;
+    background: #16a34a url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center / 18px no-repeat;
   }
   .opt input:focus-visible, .ans-input:focus-visible { outline: 3px solid rgba(31, 111, 229, .45); outline-offset: 2px; }
-  .opt .tag { margin-left: auto; font-size: 17px; font-weight: 600; }
-  .opt.correct { background: #edf9f2; }
-  .opt.correct .tag { color: #0d7a45; }
-  .opt.wrong { background: #fdf0f0; }
-  .opt.wrong .tag { color: #b42318; }
+  .opt-body { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+  .opt-name { font-size: 20px; font-weight: 700; color: #111827; }
+  .opt-sel { display: none; }
+  .opt.sel .opt-sel { display: inline; }
+  .opt-text { font-size: 20px; line-height: 1.5; color: #374151; }
+  .opt .tag { margin-left: auto; align-self: center; font-size: 17px; font-weight: 600; white-space: nowrap; }
+  .opt.sel { background: #ecfbf2; border-color: #2fb36b; }
+  .opt.sel .opt-name { color: #138a48; }
+  .opt.correct { background: #ecfbf2; border-color: #2fb36b; }
+  .opt.correct .opt-name, .opt.correct .tag { color: #0d7a45; }
+  .opt.wrong { background: #fdf0f0; border-color: #e5484d; }
+  .opt.wrong .opt-name, .opt.wrong .tag { color: #b42318; }
   .quiz.checked .opt { cursor: default; }
   .ans-input {
-    width: 100%; border: 1px solid #dde2ec; border-radius: 14px; padding: 16px 18px;
-    font: inherit; font-size: 22px; color: var(--ink); background: #fff; resize: vertical;
+    width: 100%; border: 1px solid #dfe3ec; border-radius: 12px; padding: 18px 20px;
+    font: inherit; font-size: 21px; color: var(--ink); background: #fff; resize: vertical;
     transition: border-color .2s;
   }
   .ans-input:focus { border-color: #9ec0f5; outline: none; }
   .ans-input:disabled { background: #f8f9fb; color: var(--ink-2); }
-  .feedback { margin-top: 16px; padding: 16px 20px; border-radius: 14px; font-size: 20px; line-height: 1.55; }
+  .feedback { margin-top: 18px; padding: 16px 20px; border-radius: 12px; font-size: 20px; line-height: 1.55; }
   .feedback b { font-weight: 600; }
-  .feedback.ok { background: #edf9f2; color: #0d6b3a; }
+  .feedback.ok { background: #ecfbf2; color: #0d6b3a; }
   .feedback.bad { background: #fdf0f0; color: #9b2119; }
   .feedback.info { background: #eef4fd; color: #1d4f9c; }
   .feedback ul { margin: 8px 0 0; padding-left: 0; list-style: none; }
   .feedback li { margin: 4px 0; }
-  .w-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 26px; border-top: 1px solid #eceef3; }
-  .w-status { font-size: 21px; color: #5d6576; }
+
+  /* Shared quiz/flashcard navigation */
+  .qz-foot, .fc-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 34px; }
+  .w-status, .fc-rev { font-size: 20px; color: #5d6576; }
   .w-status b { color: var(--ink); font-weight: 600; }
+  .nav-btn {
+    display: inline-flex; align-items: center; gap: 12px; height: 56px; padding: 0 22px;
+    border-radius: 10px; border: 1px solid #d5dae4; background: #fff; color: #1f2937;
+    font-size: 20px; font-weight: 600; white-space: nowrap;
+    transition: background .2s, border-color .2s, color .2s, opacity .2s;
+  }
+  .nav-btn svg { width: 22px; height: 22px; flex: none; }
+  .nav-btn:hover:not(:disabled) { background: #f6f8fc; border-color: #b9c6dc; }
+  .nav-btn:disabled { opacity: .45; cursor: default; }
+  .nav-btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .nav-btn.primary:hover:not(:disabled) { background: #185fd0; border-color: #185fd0; }
+
+  /* Quiz results */
+  .qz-score { display: flex; align-items: baseline; gap: 20px; flex-wrap: wrap; }
+  .qz-big { font-size: 64px; font-weight: 800; letter-spacing: -.02em; color: #111827; }
+  .qz-big span { margin-left: 6px; font-size: 30px; font-weight: 600; color: #5d6576; }
+  .qz-score p { margin: 0; font-size: 22px; color: #374151; }
+  .qz-list { list-style: none; padding: 0; margin: 26px 0 30px; display: flex; flex-direction: column; gap: 12px; }
+  .qz-item {
+    width: 100%; text-align: left; display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px; border: 1px solid #dfe3ec; border-radius: 12px; background: #fff; font-size: 19px;
+    transition: border-color .2s, background .2s;
+  }
+  .qz-item:hover { border-color: #b9c6dc; background: #fafbfd; }
+  .qz-mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; flex: none; }
+  .qz-mark.ok { background: #e6f6ed; color: #0d7a45; }
+  .qz-mark.bad { background: #fdecec; color: #b42318; }
+  .qz-item .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1f2937; }
+  .qz-item small { font-size: 16px; color: #5d6576; white-space: nowrap; }
+  .qz-results .row-btns { display: flex; justify-content: flex-end; gap: 14px; }
 
   /* Flashcards */
   .fc { padding: 28px 30px 30px; }
-  .fc-count { font-size: 21px; color: #5d6576; }
   .fc-progress { display: grid; gap: 8px; margin: 24px 0 26px; }
   .seg { height: 9px; border-radius: 5px; background: #eceef3; transition: background .3s; }
   .seg.on { background: var(--blue); }
@@ -490,11 +540,11 @@
   .fc-card:focus-visible { outline: 3px solid rgba(31, 111, 229, .5); outline-offset: 4px; }
   .fc-face {
     position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    border-radius: 28px; background: #f4f5f7;
+    border-radius: 20px; background: #f6f7f9; border: 1px solid #e3e7ef;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
     padding: 40px 80px; text-align: center;
   }
-  .fc-back { transform: rotateY(180deg); background: #eef4fd; }
+  .fc-back { transform: rotateY(180deg); background: #eef4fd; border-color: #cfe0f8; }
   .fc-icon { color: #4a5263; }
   .fc-kicker { font-size: 20px; font-weight: 500; letter-spacing: .07em; text-transform: uppercase; color: #5d6576; }
   .fc-q { font-size: 46px; font-weight: 700; line-height: 1.25; letter-spacing: -.01em; color: var(--ink); max-width: 1000px; }
@@ -509,8 +559,6 @@
   .fc-done h4 { margin: 0; font-size: 38px; font-weight: 700; color: var(--ink); }
   .fc-done p { margin: 0; font-size: 22px; color: #4a5263; }
   .fc-done .row-btns { display: flex; gap: 14px; margin-top: 10px; }
-  .fc-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 26px; }
-  .fc-rev { font-size: 21px; color: #5d6576; }
 
   /* scroll to bottom */
   .scroll-down {
@@ -1150,7 +1198,35 @@
   // Question banks (demo content — no model is connected)
   const isUX = (topic) => !topic || /\bux\b|product design|user experience|usability/i.test(topic);
   const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  const quizFor = (topic) => isUX(topic) ? {
+  const isPy = (topic) => /\b(python|coding|programming|code|variables?)\b/i.test(topic || '');
+  const PY_QUIZ = {
+    title: 'Python Basics Quiz',
+    questions: [
+      { type: 'mc', q: 'What does this program print when you run it?',
+        hint: 'Read the code from top to bottom, then select the output.',
+        code: { file: 'lesson1.py', lang: 'Python 3', src: 'name = "Ava"\nage = 25\n\nage = age + 1\n\nprint("Next year, I will be", age)' },
+        options: ['Next year, I will be 26', 'Next year, I will be 25', 'Next year, I will be age', 'It raises an error'], answer: [0],
+        why: '`age = age + 1` replaces 25 with 26 before the print line runs, and print separates its arguments with a space.' },
+      { type: 'mc', q: 'What happens when you run this code?',
+        hint: 'Look closely at the capital letters.',
+        code: { file: 'names.py', lang: 'Python 3', src: 'Name = "Ava"\nprint(name)' },
+        options: ['It prints Ava', 'It raises a NameError because name is not defined', 'It prints Name', 'It prints nothing'], answer: [1],
+        why: 'Python is case-sensitive: Name and name are different variables, and name was never assigned.' },
+      { type: 'multi', q: 'Which of these lines correctly store text in a variable?',
+        options: ['city = "New York"', "city = 'New York'", 'city = New York', '"city" = New York'], answer: [0, 1],
+        why: 'Text must be inside matching quotes (single or double), and the variable name goes on the left without quotes.' },
+      { type: 'short', q: 'Which built-in function displays output in the terminal?',
+        keywords: ['print'], model: 'print()' },
+      { type: 'long', q: 'Explain why "Ava" needs quotation marks in Python but 25 does not.',
+        rubric: [
+          { label: 'Says "Ava" is text (a string)', kw: ['text', 'string', 'str'] },
+          { label: 'Says 25 is a number', kw: ['number', 'int', 'integer', 'numeric'] },
+          { label: 'Explains what the quotes tell Python', kw: ['quote', 'quotation', 'literal', 'not a variable', 'treat'] },
+          { label: 'Mentions what happens without quotes', kw: ['error', 'variable name', 'nameerror', 'look for', 'undefined'] },
+        ] },
+    ],
+  };
+  const quizFor = (topic) => isPy(topic) ? PY_QUIZ : isUX(topic) ? {
     title: 'UX & Product Design Quiz',
     questions: [
       { type: 'mc', q: 'Which UX principle helps reduce cognitive load by showing users only the information they need at each stage?',
@@ -1215,48 +1291,70 @@
     ],
   };
 
-  // Quiz widget
+  // Quiz widget — one question at a time, with a results screen
   const buildQuiz = (quiz) => {
     const uid = ++widgetUid;
     const n = quiz.questions.length;
     const LABEL = { mc: 'Multiple choice', multi: 'Select all that apply', short: 'Short answer', long: 'Long answer' };
+    const HINT = { mc: 'Select one answer.', multi: 'Select every answer that applies.', short: 'Type a short answer.', long: 'Write a few sentences in your own words.' };
+    const LETTERS = 'ABCDEFGH';
+    let cur = 0, checked = false, results = [];
     const el = document.createElement('div');
     el.className = 'widget quiz';
     el.innerHTML = `
-      <div class="w-head"><div class="w-title">${esc(quiz.title)}</div><div class="w-head-r"><span class="pill">${n} questions</span></div></div>
+      <div class="w-head"><div class="w-title">${esc(quiz.title)}</div><div class="w-head-r"><span class="qz-count" aria-live="polite"></span></div></div>
+      <div class="fc-progress" style="grid-template-columns: repeat(${n}, 1fr)">${quiz.questions.map(() => '<span class="seg"></span>').join('')}</div>
       ${quiz.questions.map((q, i) => {
         const qid = `q${uid}-${i}`;
         let body = '';
         if (q.type === 'mc' || q.type === 'multi') {
           body = `<div class="opts" role="${q.type === 'mc' ? 'radiogroup' : 'group'}" aria-labelledby="${qid}">` +
-            q.options.map((o, j) => `<label class="opt"><input type="${q.type === 'mc' ? 'radio' : 'checkbox'}" name="${qid}" value="${j}"><span>${esc(o)}</span><span class="tag"></span></label>`).join('') +
+            q.options.map((o, j) => `<label class="opt"><input type="${q.type === 'mc' ? 'radio' : 'checkbox'}" name="${qid}" value="${j}">` +
+              `<span class="opt-body"><span class="opt-name">Option ${LETTERS[j]}<span class="opt-sel"> (Selected)</span></span><span class="opt-text">${esc(o)}</span></span><span class="tag"></span></label>`).join('') +
             '</div>';
         } else if (q.type === 'short') {
           body = `<input class="ans-input" type="text" placeholder="Type your answer" aria-labelledby="${qid}">`;
         } else {
           body = `<textarea class="ans-input" rows="5" placeholder="Write your answer…" aria-labelledby="${qid}"></textarea>`;
         }
-        return `<section class="q" data-i="${i}"><div class="q-label">Question ${i + 1} · ${LABEL[q.type]}</div><p class="q-text" id="${qid}">${esc(q.q)}</p>${body}<div class="feedback" hidden></div></section>`;
+        const code = q.code ? `<div class="q-code"><div class="q-code-head"><span class="dots" aria-hidden="true"><i></i><i></i><i></i></span><span>${esc(q.code.file)}</span><span class="q-lang">${esc(q.code.lang)}</span></div><pre><code>${highlight(q.code.src)}</code></pre></div>` : '';
+        return `<section class="q" data-i="${i}"${i ? ' hidden' : ''}><div class="q-label">Question ${i + 1} · ${LABEL[q.type]}</div><h4 class="q-text" id="${qid}">${esc(q.q)}</h4><p class="q-hint">${esc(q.hint || HINT[q.type])}</p>${code}${body}<div class="feedback" hidden></div></section>`;
       }).join('')}
-      <div class="w-foot"><span class="w-status">0 of ${n} answered</span><button type="button" class="w-primary">Check answers</button></div>`;
+      <section class="qz-results" hidden></section>
+      <div class="qz-foot">
+        <button type="button" class="nav-btn qz-prev">${W_ICON.prev}<span>Previous Question</span></button>
+        <span class="w-status"></span>
+        <button type="button" class="nav-btn primary qz-next"><span>Next Question</span>${W_ICON.next}</button>
+      </div>`;
     $('.w-head-r', el).appendChild(saveButton('Save quiz', 'Saved to notes', `Saved “${quiz.title}” to Notes`));
 
-    const sections = $$('.q', el);
-    const status = $('.w-status', el);
-    const primary = $('.w-primary', el);
+    const sections = $$('.q', el), resultsEl = $('.qz-results', el), foot = $('.qz-foot', el);
+    const prev = $('.qz-prev', el), next = $('.qz-next', el), status = $('.w-status', el);
     const answered = (sec) => $$('input:checked', sec).length > 0 || $$('.ans-input', sec).some(t => t.value.trim());
-    const updateCount = () => {
-      if (el.classList.contains('checked')) return;
-      status.textContent = `${sections.filter(answered).length} of ${n} answered`;
+    const score = () => results.filter(Boolean).length;
+    const refresh = () => {
+      $$('.opt', el).forEach(l => l.classList.toggle('sel', $('input', l).checked));
+      status.innerHTML = checked ? `Score: <b>${score()} / ${n}</b>` : `${sections.filter(answered).length} of ${n} answered`;
     };
-    el.addEventListener('input', updateCount);
-    el.addEventListener('change', updateCount);
+    const show = (i, focus) => {
+      cur = i;
+      resultsEl.hidden = true; foot.hidden = false;
+      sections.forEach((s, j) => { s.hidden = j !== i; });
+      $$('.seg', el).forEach((s, j) => s.classList.toggle('on', j <= i));
+      $('.qz-count', el).textContent = `Question ${i + 1} of ${n}`;
+      prev.disabled = i === 0;
+      $('span', next).textContent = i < n - 1 ? 'Next Question' : checked ? 'See results' : 'Check answers';
+      refresh();
+      if (focus) $('.q-text', sections[i]).setAttribute('tabindex', '-1'), $('.q-text', sections[i]).focus({ preventScroll: true });
+      sections[i].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    };
+    el.addEventListener('input', refresh);
+    el.addEventListener('change', refresh);
 
-    const check = () => {
-      let score = 0;
-      quiz.questions.forEach((q, i) => {
+    const grade = () => {
+      results = quiz.questions.map((q, i) => {
         const sec = sections[i], fb = $('.feedback', sec);
-        let ok = false, html = '';
+        let ok = false, html = '', info = false;
         if (q.type === 'mc' || q.type === 'multi') {
           const picked = $$('input', sec).filter(x => x.checked).map(x => +x.value);
           ok = picked.length === q.answer.length && picked.every(v => q.answer.includes(v));
@@ -1265,16 +1363,15 @@
             if (isAns) { lab.classList.add('correct'); $('.tag', lab).textContent = isPicked ? '✓ Correct' : 'Correct answer'; }
             else if (isPicked) { lab.classList.add('wrong'); $('.tag', lab).textContent = '✕ Your answer'; }
           });
-          html = `<b>${ok ? 'Correct.' : picked.length ? 'Not quite.' : 'Not answered.'}</b> ${esc(q.why)}`;
+          html = `<b>${ok ? 'Correct.' : picked.length ? 'Not quite.' : 'Not answered.'}</b> ${inline(q.why)}`;
         } else if (q.type === 'short') {
           const v = $('.ans-input', sec).value.trim().toLowerCase();
           if (q.keywords.length) {
             ok = !!v && q.keywords.every(k => v.includes(k));
             html = ok ? `<b>Correct.</b> ${esc(q.model)}.` : `<b>${v ? 'Not quite.' : 'Not answered.'}</b> The answer is “${esc(q.model)}”.`;
           } else {
-            ok = !!v;
+            ok = !!v; info = true;
             html = ok ? `<b>Submitted.</b> ${esc(q.model)}` : `<b>Not answered.</b> ${esc(q.model)}`;
-            fb.className = 'feedback info';
           }
         } else {
           const v = $('.ans-input', sec).value.toLowerCase();
@@ -1284,27 +1381,53 @@
           html = `<b>${v.trim() ? `Rubric: ${count} of ${q.rubric.length}` : 'Not answered.'}</b>` +
             `<ul>${q.rubric.map((r, k) => `<li>${hits[k] ? '✓' : '○'} ${esc(r.label)}</li>`).join('')}</ul>`;
         }
-        if (ok) score++;
-        if (!fb.className.includes('info')) fb.className = `feedback ${ok ? 'ok' : 'bad'}`;
+        fb.className = `feedback ${info ? 'info' : ok ? 'ok' : 'bad'}`;
         fb.innerHTML = html;
         fb.hidden = false;
+        return ok;
       });
       $$('input, textarea', el).forEach(x => { x.disabled = true; });
+      checked = true;
       el.classList.add('checked');
-      status.innerHTML = `Score: <b>${score} / ${n}</b>`;
-      primary.textContent = 'Retake quiz';
-      toast(`You scored ${score} out of ${n}`);
+      toast(`You scored ${score()} out of ${n}`);
+    };
+    const showResults = () => {
+      sections.forEach(s => { s.hidden = true; });
+      foot.hidden = true;
+      $$('.seg', el).forEach(s => s.classList.add('on'));
+      $('.qz-count', el).textContent = 'Results';
+      const s = score();
+      const msg = s === n ? 'Perfect score. Nice work!' : s >= n - 1 ? 'Great job. Review the one you missed.' : s >= n / 2 ? 'Good start. Review the ones you missed, then retake.' : 'Keep going. Review each answer, then try again.';
+      resultsEl.innerHTML = `
+        <div class="qz-score"><div class="qz-big">${s}<span>/ ${n}</span></div><p>${msg}</p></div>
+        <ol class="qz-list">${quiz.questions.map((q, i) => `<li><button type="button" class="qz-item" data-i="${i}">
+          <span class="qz-mark ${results[i] ? 'ok' : 'bad'}" aria-hidden="true">${results[i] ? '✓' : '✕'}</span>
+          <span class="t">${esc(q.q)}</span><small>${results[i] ? 'Correct' : 'Review'} · Q${i + 1}</small></button></li>`).join('')}</ol>
+        <div class="row-btns"><button type="button" class="nav-btn qz-review">Review answers</button><button type="button" class="nav-btn primary qz-retake">Retake quiz</button></div>`;
+      resultsEl.hidden = false;
+      resultsEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     };
     const retake = () => {
       $$('input, textarea', el).forEach(x => { x.disabled = false; if (x.type === 'radio' || x.type === 'checkbox') x.checked = false; else x.value = ''; });
-      $$('.opt', el).forEach(l => { l.classList.remove('correct', 'wrong'); $('.tag', l).textContent = ''; });
+      $$('.opt', el).forEach(l => { l.classList.remove('correct', 'wrong', 'sel'); $('.tag', l).textContent = ''; });
       $$('.feedback', el).forEach(f => { f.hidden = true; f.className = 'feedback'; f.innerHTML = ''; });
+      checked = false; results = [];
       el.classList.remove('checked');
-      primary.textContent = 'Check answers';
-      updateCount();
-      sections[0].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      show(0, true);
     };
-    primary.addEventListener('click', () => (el.classList.contains('checked') ? retake() : check()));
+    prev.addEventListener('click', () => { if (cur > 0) show(cur - 1, true); });
+    next.addEventListener('click', () => {
+      if (cur < n - 1) { show(cur + 1, true); return; }
+      if (!checked) grade();
+      showResults();
+    });
+    resultsEl.addEventListener('click', (e) => {
+      const item = e.target.closest('.qz-item');
+      if (item) { show(+item.dataset.i, true); return; }
+      if (e.target.closest('.qz-review')) { show(0, true); return; }
+      if (e.target.closest('.qz-retake')) retake();
+    });
+    show(0, false);
     return el;
   };
 
@@ -1316,7 +1439,7 @@
     const el = document.createElement('div');
     el.className = 'widget fc';
     el.innerHTML = `
-      <div class="w-head"><span class="pill">${esc(set.title)}</span><div class="w-head-r"><span class="fc-count" aria-live="polite"></span></div></div>
+      <div class="w-head"><div class="w-title">${esc(set.title)}</div><div class="w-head-r"><span class="fc-count" aria-live="polite"></span></div></div>
       <div class="fc-progress" style="grid-template-columns: repeat(${n}, 1fr)">${set.cards.map(() => '<span class="seg"></span>').join('')}</div>
       <div class="fc-stage">
         <div class="fc-card" role="button" tabindex="0">
@@ -1326,9 +1449,9 @@
         <div class="fc-done" hidden></div>
       </div>
       <div class="fc-foot">
-        <button type="button" class="w-secondary fc-prev">${W_ICON.prev}Previous</button>
+        <button type="button" class="nav-btn fc-prev">${W_ICON.prev}<span>Previous Card</span></button>
         <span class="fc-rev"></span>
-        <button type="button" class="w-primary fc-next"><span>Next</span>${W_ICON.next}</button>
+        <button type="button" class="nav-btn primary fc-next"><span>Next Card</span>${W_ICON.next}</button>
       </div>`;
     $('.w-head-r', el).appendChild(saveButton('Save flashcards', 'Saved to notes', `Saved “${set.title}” to Notes`));
     const card = $('.fc-card', el), front = $('.fc-front', el), back = $('.fc-back', el), done = $('.fc-done', el);
@@ -1351,7 +1474,7 @@
       $('.fc-count', el).textContent = `${i + 1} of ${n}`;
       $$('.seg', el).forEach((s, j) => s.classList.toggle('on', j <= i));
       prev.disabled = i === 0;
-      $('span', next).textContent = i === n - 1 ? 'Finish' : 'Next';
+      $('span', next).textContent = i === n - 1 ? 'Finish' : 'Next Card';
       counts();
       if (animate) { card.classList.remove('enter'); void card.offsetWidth; card.classList.add('enter'); }
     };
@@ -1366,7 +1489,7 @@
       $('.fc-count', el).textContent = `${n} of ${n}`;
       $('span', next).textContent = 'Finish';
       done.innerHTML = `<h4>Nice work!</h4><p>You reviewed all ${n} cards and revealed ${revealed.size}.</p>
-        <div class="row-btns"><button type="button" class="w-secondary fc-again">${W_ICON.flip}Review again</button><button type="button" class="w-primary fc-quiz">Quiz me on these</button></div>`;
+        <div class="row-btns"><button type="button" class="nav-btn fc-again">${W_ICON.flip}<span>Review again</span></button><button type="button" class="nav-btn primary fc-quiz"><span>Quiz me on these</span></button></div>`;
       $('.fc-again', done).addEventListener('click', () => { i = 0; revealed.clear(); show(true); card.focus(); });
       $('.fc-quiz', done).addEventListener('click', () => fill(`Quiz me on ${isUX(topic) ? 'UX & Product Design' : topic}`));
     };
