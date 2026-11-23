@@ -36,10 +36,9 @@
     color: var(--ink);
     background: #f8f9fb;
     -webkit-font-smoothing: antialiased;
-    height: 100vh; height: 100dvh;
-    overflow: hidden;
+    position: relative; overflow: auto;
   }
-  /* Fixed design canvas matching the mockup (1654 × 1380), scaled to fit the window */
+  /* Design canvas drawn at a steady scale (so browser zoom enlarges it); its size follows the window. */
   .stage {
     z-index: 1;
     position: absolute; left: 0; top: 0;
@@ -47,6 +46,13 @@
     transform-origin: 0 0;
   }
   button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; }
+  /* Study (home + chat) never shows a page scrollbar */
+  html.no-scroll, html.no-scroll body { overflow: hidden; }
+  .skip-link {
+    position: absolute; z-index: 600; left: 24px; top: -120px; padding: 14px 22px; border-radius: 12px;
+    background: #111827; color: #fff; font-size: var(--fs-14); font-weight: 600; text-decoration: none;
+  }
+  .skip-link:focus { top: 16px; outline: 3px solid rgba(21, 112, 239, .6); outline-offset: 2px; }
 
   /* ---------- Header (from Figma: Assistiv – Instructors, 1376px frame) ----------
      Values below are Figma px; `zoom` maps the 1376px frame onto this 1654px canvas. */
@@ -74,7 +80,7 @@
     transition: background .2s, color .2s;
   }
   nav.tabs button:hover { background: #f5f6f8; color: #414651; }
-  nav.tabs button.active { background: #EFF8FF; color: #1570EF; font-weight: 600; }
+  nav.tabs button.active { background: #EFF8FF; color: #175CD3; font-weight: 600; }
   .util { display: flex; justify-content: flex-end; align-items: center; gap: 23px; }
   .util button {
     display: inline-flex; align-items: center; gap: 8px;
@@ -100,8 +106,22 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
   }
   .sub { font-size: var(--fs-14); color: #4a5470; margin: 6px 0 24px; }
+  /* Home: heading on the left, a quiet Library shortcut on the right */
+  .home-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20px; }
+  .lib-pill {
+    flex: none; display: inline-flex; align-items: center; gap: 10px; height: 48px; margin-top: 4px; padding: 0 14px 0 16px;
+    border: 1px solid #dfe4ee; border-radius: 999px; background: rgba(255, 255, 255, .85);
+    font-size: var(--fs-14); font-weight: 600; color: #1f2937;
+    box-shadow: 0 6px 16px -12px rgba(30, 40, 90, .35); transition: border-color .2s, color .2s, background .2s;
+  }
+  .lib-pill svg { width: 20px; height: 20px; color: var(--blue); }
+  .lib-pill .chev { width: 18px; height: 18px; color: #8a91a0; transition: transform .2s, color .2s; }
+  .lib-pill .n { min-width: 26px; height: 24px; padding: 0 8px; border-radius: 999px; display: inline-grid; place-items: center; background: var(--blue-soft); color: var(--blue); font-size: var(--fs-12); font-weight: 600; }
+  .lib-pill .n:empty { display: none; }
+  .lib-pill:hover { border-color: #b7cdf5; background: #fff; color: var(--blue); }
+  .lib-pill:hover .chev { transform: translateX(2px); color: var(--blue); }
 
-  .grid { display: grid; grid-template-columns: 410px 410px; grid-template-rows: 382px 380px; gap: 24px 22px; }
+  .grid { display: grid; grid-template-columns: 410px 410px; grid-template-rows: var(--card-h, 382px) var(--card-h, 380px); gap: 24px 22px; }
   .card {
     --tint: rgba(120, 156, 255, .30);
     --ring: linear-gradient(135deg, #7aa2ff, #a78bfa);
@@ -132,7 +152,7 @@
   .card:focus-visible { box-shadow: 0 0 0 4px rgba(21, 112, 239, .28), 0 28px 50px -28px rgba(60, 80, 180, .55); }
   .card:active { transform: translateY(-2px) scale(.995); }
   .card.selected { background: linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,255,255,.95)) padding-box, var(--ring) border-box; }
-  .art { position: relative; height: 282px; flex: none; margin: 0 -22px; display: block; overflow: visible; }
+  .art { position: relative; height: calc(var(--card-h, 382px) - 100px); flex: none; margin: 0 -22px; display: block; overflow: visible; }
   .art::before {
     content: ""; position: absolute; inset: 22px 40px 12px; z-index: -1; border-radius: 50%;
     background: radial-gradient(closest-side, var(--tint), transparent);
@@ -157,8 +177,6 @@
   .card:hover .f-fan2 { transform: translate(12px, 2px) rotate(8deg); }
   .card:hover .f-fan3 { transform: translate(-4px, -4px) rotate(-3deg); }
   .card:hover .f-front { transform: translate(-6px, -4px) rotate(-3deg); }
-  .card:hover .spark line { animation: spark .9s ease; }
-  @keyframes spark { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
   .bar { transform-box: fill-box; transform-origin: center; }
   .card:hover .bar, .voice-live .bar { animation: wave 1s ease-in-out infinite; }
   @keyframes wave { 0%,100% { transform: scaleY(1); } 50% { transform: scaleY(.45); } }
@@ -202,7 +220,7 @@
     font: inherit; font-size: var(--fs-14); color: var(--ink); line-height: 1.4;
     min-height: 30px; max-height: 180px; padding: 0; background: transparent;
   }
-  .composer textarea::placeholder { color: #727a8a; }
+  .composer textarea::placeholder { color: #6b7280; }
   .composer .row { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
   .send {
     width: 44px; height: 44px; border-radius: 12px;
@@ -213,32 +231,20 @@
   .send:hover { filter: brightness(1.06); box-shadow: 0 10px 22px -8px rgba(21, 112, 239, .8); }
   .send:active { transform: scale(.94); }
   .send:disabled { opacity: .55; cursor: default; }
-  .chips { display: flex; gap: 12px; margin-top: 18px; }
-  .chip {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 15px; border-radius: 999px;
-    background: rgba(255, 255, 255, .72); border: 1px solid #d9e2f4; color: #1d4fb8; font-size: var(--fs-13); font-weight: 500;
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    box-shadow: 0 6px 14px -12px rgba(40, 70, 170, .6);
-    transition: background .2s, border-color .2s, transform .15s, box-shadow .2s;
-  }
-  .chip svg { width: 16px; height: 16px; flex: none; color: #5b7fd9; }
-  .chip:hover { background: #fff; border-color: #b7cdf5; transform: translateY(-1px); box-shadow: 0 10px 18px -12px rgba(40, 70, 170, .7); }
-  .chip:active { transform: scale(.97); }
 
   /* ---------- Chat view ---------- */
   .chat-top, .thread, .panel, .row.chat, .disclaimer { display: none; }
   body.chatting { background: #f9fafb; }
   body.chatting main {
-    width: auto; height: 1274px; margin: 0;
+    width: auto; height: calc(var(--ch, 1380px) - 106px); margin: 0;
     padding: 4px 22px 30px 0;
     display: grid;
     grid-template-columns: minmax(0, 1fr) 540px;
     grid-template-rows: auto minmax(0, 1fr) auto;
     grid-template-areas: "top panel" "thread panel" "dock panel";
   }
-  body.chatting main > h1, body.chatting .sub, body.chatting .grid,
-  body.chatting .banner, body.chatting .chips { display: none; }
+  body.chatting main > h1, body.chatting .home-head, body.chatting .sub, body.chatting .grid,
+  body.chatting .banner { display: none; }
   body.chatting .chat-top { display: flex; grid-area: top; width: min(1380px, calc(100% - 96px)); justify-self: center; }
   body.chatting .thread { display: flex; grid-area: thread; }
   body.chatting .dock { grid-area: dock; margin-top: 6px; width: min(1380px, calc(100% - 96px)); justify-self: center; position: relative; }
@@ -296,6 +302,12 @@
     animation: shimmer 1.8s linear infinite;
   }
   @keyframes shimmer { from { background-position: 110% 0; } to { background-position: -110% 0; } }
+  .working { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+  .body:empty + .widget-slot:empty + .body2:empty + .working { margin-top: 0; }
+  .working .shimmer { margin-top: 0; }
+  .working:first-child { margin-top: 0; margin-bottom: 14px; }
+  .w-orb { width: 30px; height: 24px; flex: none; object-fit: contain; animation: w-orb 2.6s ease-in-out infinite; }
+  @keyframes w-orb { 0%, 100% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(1.12); } }
   @keyframes in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
   .body p { margin: 0 0 22px; }
@@ -431,7 +443,7 @@
   body.view-library .library { display: flex; }
 
   /* ---------- Dashboard + Spaces (only the Library touchpoints are built) ---------- */
-  .page { display: none; flex-direction: column; gap: 24px; height: 1236px; width: min(1560px, calc(100% - 96px)); margin: 14px auto 0; padding-top: 12px; }
+  .page { display: none; flex-direction: column; gap: 24px; height: calc(var(--ch, 1380px) - 144px); width: min(1560px, calc(100% - 96px)); margin: 14px auto 0; padding-top: 12px; }
   body.view-dashboard main, body.view-spaces main { display: none; }
   body.view-dashboard #dashboard, body.view-spaces #spaces { display: flex; }
   .page-head h1 { font-size: var(--fs-32); line-height: 1.2; }
@@ -473,6 +485,135 @@
   .lib-empty > span { display: block; margin-bottom: 18px; }
   .d-top-r { display: flex; align-items: center; gap: 6px; }
   .d-top .lib-more { padding-right: 0; }
+
+  /* ---------- Library overview: one surface, three sections ---------- */
+  body.view-library .library {
+    display: block; height: calc(var(--ch, 1380px) - 144px); overflow-y: auto; padding: 12px 0 48px;
+    background: none; border: 0; border-radius: 0; box-shadow: none; scrollbar-width: thin; scrollbar-color: #d5d9e4 transparent;
+  }
+  #libOverview { display: flex; flex-direction: column; gap: 40px; }
+  #ovSections { display: flex; flex-direction: column; gap: 40px; }
+  /* Docked "Ask Aurora" chat beside an open item */
+  body.ichat-open .library .lib-detail { margin-right: 600px; }
+  .ichat, .ic-pill { position: absolute; z-index: 40; right: calc((100% - min(1560px, 100% - 96px)) / 2); }
+  .ichat {
+    top: 150px; bottom: 34px; width: 560px; display: flex; flex-direction: column; overflow: hidden;
+    background: #fff; border: 1px solid #e6e9ef; border-radius: 26px; box-shadow: 0 30px 70px -34px rgba(20, 30, 70, .4);
+    animation: in .2s ease;
+  }
+  .ic-head { display: flex; align-items: center; gap: 12px; padding: 16px 20px 10px; }
+  .ic-min { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; color: #4a5263; flex: none; }
+  .ic-min svg { width: 22px; height: 22px; }
+  .ic-min:hover { background: #f1f3f6; color: #111827; }
+  .ic-orb { width: 30px; height: 24px; object-fit: contain; flex: none; }
+  .ichat.busy .ic-orb { animation: w-orb 2.6s ease-in-out infinite; }
+  .ic-title { min-width: 0; display: flex; align-items: center; gap: 10px; font-size: var(--fs-14); color: #4a5263; }
+  .ic-title svg { width: 20px; height: 20px; flex: none; }
+  .ic-title span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ic-thread { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; padding: 12px 26px 22px; font-size: var(--fs-14); line-height: 1.6; scrollbar-width: thin; }
+  .ic-me { align-self: flex-end; max-width: 85%; padding: 12px 18px; border-radius: 20px; background: #eaf2fe; color: #0f2a55; }
+  .ichat .body p { margin: 0 0 12px; }
+  .ichat .body p:last-child { margin-bottom: 0; }
+  .ichat .body ul, .ichat .body ol { margin: 0 0 12px; padding-left: 22px; }
+  .ichat .working { margin-top: 0; }
+  .ic-hello { margin: auto 0; text-align: center; color: #4a5263; }
+  .ic-hello img { width: 56px; height: 44px; object-fit: contain; }
+  .ic-hello p { margin: 10px 0 0; }
+  .ic-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
+  .ic-chip { height: 40px; padding: 0 16px; border: 1px solid #dfe4ee; border-radius: 999px; font-size: var(--fs-13); color: #1f2937; transition: border-color .15s, color .15s; }
+  .ic-chip:hover { border-color: #b7cdf5; color: var(--blue); }
+  .ic-compose { display: flex; align-items: center; gap: 8px; padding: 14px 16px 14px 24px; border-top: 1px solid #eef0f4; }
+  .ic-input { flex: 1; min-width: 0; height: 46px; border: 0; outline: none; background: none; font: inherit; font-size: var(--fs-14); color: #111827; }
+  .ic-input::placeholder { color: #6b7280; }
+  .ic-mic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: #4a5263; }
+  .ic-mic svg { width: 22px; height: 22px; }
+  .ic-mic:hover { background: #f1f3f6; }
+  .ic-send { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--blue); color: #fff; transition: background .2s, opacity .2s; }
+  .ic-send svg { width: 22px; height: 22px; }
+  .ic-send:hover { background: #185fd0; }
+  .ic-send:disabled { opacity: .5; cursor: default; }
+  .ic-pill {
+    bottom: 34px; display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 22px 0 16px; border-radius: 999px;
+    background: #fff; border: 1px solid #e3e7ef; box-shadow: 0 16px 40px -20px rgba(20, 30, 70, .45);
+    font-size: var(--fs-14); font-weight: 600; color: #1f2937;
+  }
+  .ic-pill img { width: 30px; height: 24px; object-fit: contain; }
+  .ic-pill:hover { border-color: #b7cdf5; color: var(--blue); }
+  /* Breadcrumb, as in the Assistiv course pages: grey path, current page in blue */
+  .crumbs { display: flex; align-items: center; flex-wrap: wrap; margin: 4px 0 18px; font-size: var(--fs-13); line-height: 1.4; color: #4a5263; }
+  .crumbs .crumb { padding: 0; font-size: inherit; color: #4a5263; text-underline-offset: 3px; }
+  .crumbs .crumb:hover { color: var(--blue); text-decoration: underline; }
+  .crumbs .sep { padding: 0 6px; color: #4a5263; }
+  .crumbs [aria-current="page"] { color: #175CD3; font-weight: 600; }
+  .ov-head { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+  .ov-head .lib-search { width: 440px; }
+  /* Filter tabs: same pill pattern as the reference (active = soft grey fill) */
+  .ov-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: -16px 0 -12px; }
+  .ov-tab {
+    display: inline-flex; align-items: center; gap: 8px; height: 52px; padding: 0 26px; border-radius: 999px;
+    font-size: var(--fs-16); font-weight: 400; color: #6b7280; transition: background .15s, color .15s;
+  }
+  .ov-tab:hover { color: #1f2937; }
+  .ov-tab[aria-pressed="true"] { background: #eef0f2; color: #111827; font-weight: 500; }
+  .ov-tab .n { font-size: var(--fs-13); color: #5d6576; }
+  .ov-tab:focus-visible { outline: 3px solid rgba(21, 112, 239, .4); outline-offset: 2px; }
+  .ov-sec h2 { margin: 0 0 10px; font-size: var(--fs-18); font-weight: 600; color: #111827; }
+  .ov-group + .ov-group { margin-top: 22px; }
+  .ov-ghead { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .ov-ghead .dic { width: 32px; height: 32px; border-radius: 9px; border: 1px solid transparent; }
+  .ov-ghead .dic svg { width: 17px; height: 17px; }
+  .ov-ghead b { font-size: var(--fs-14); font-weight: 600; color: #1f2937; }
+  .ov-n { font-size: var(--fs-13); color: #6b7280; }
+  /* Rows: plain list on the page, thin dividers, soft grey highlight on hover (reference style) */
+  .ov-rows { display: flex; flex-direction: column; }
+  .lr { position: relative; display: flex; align-items: center; border-radius: 18px; transition: background .15s; }
+  .lr::after { content: ""; position: absolute; left: 22px; right: 22px; bottom: 0; height: 1px; background: #eceef1; }
+  .lr:hover, .lr:focus-within, .lr.selected { background: #f1f2f4; }
+  .lr:hover::after, .lr:focus-within::after, .lr.selected::after { opacity: 0; }
+  .lr .lib-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 24px; padding: 16px 12px 16px 30px; text-align: left; border-radius: 18px; }
+  .lr-thumb {
+    position: relative; flex: none; width: 54px; height: 66px; padding: 7px 7px 0; overflow: hidden;
+    background: #fff; border: 1px solid #e3e6eb; border-radius: 8px;
+    font-size: 5px; line-height: 1.4; color: #6b7280;
+  }
+  .lr-thumb b { display: block; margin-bottom: 4px; font-size: 6.5px; font-weight: 700; line-height: 1.25; color: #111827; }
+  .lr-thumb i { position: absolute; right: 3px; bottom: 3px; width: 20px; height: 20px; border-radius: 6px; }
+  .lr-thumb i svg { width: 12px; height: 12px; }
+  .lr-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+  .lr-txt b { font-size: var(--fs-16); font-weight: 400; color: #111827; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lr-txt span { font-size: var(--fs-14); color: #5d6576; }
+  .lr-ctx { flex: none; width: 330px; display: flex; align-items: center; gap: 14px; font-size: var(--fs-14); color: #4a5263; overflow: hidden; }
+  .lr-ctx span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lr-ctx i { width: 30px; height: 30px; border-radius: 50%; flex: none; display: grid; place-items: center; font-style: normal; font-size: var(--fs-13); font-weight: 600; color: #fff; }
+  .ctx-course { background: #b54708; } .ctx-space { background: #6938ef; } .ctx-library { background: #667085; }
+  .lr-acts { flex: none; width: 120px; display: flex; align-items: center; justify-content: flex-end; gap: 4px; padding-right: 14px; }
+  .lr-pin, .lr .lr-more { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: #4a5263; opacity: 0; transition: opacity .15s, background .15s; }
+  .lr-pin svg, .lr .lr-more svg { width: 22px; height: 22px; }
+  .lr:hover .lr-pin, .lr:hover .lr-more, .lr:focus-within .lr-pin, .lr:focus-within .lr-more, .lr-more[aria-expanded="true"], .lr.pinned .lr-pin { opacity: 1; }
+  .lr-pin:hover, .lr .lr-more:hover { background: #e4e6ea; color: #111827; }
+  .lr.pinned .lr-pin { color: var(--blue); }
+  .lr.pinned .lr-pin svg { fill: currentColor; }
+  .lr .lib-more { padding: 0; }
+  /* selection checkbox sits just outside the row, like the reference */
+  .lr-check { position: absolute; left: -46px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; display: grid; place-items: center; cursor: pointer; opacity: 0; transition: opacity .15s; }
+  .lr-check input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .lr-check span { width: 24px; height: 24px; border: 1.5px solid #7b8494; border-radius: 7px; background: #fff; transition: background .15s, border-color .15s; }
+  .lr-check input:checked + span { background: var(--blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center / 16px no-repeat; border-color: var(--blue); }
+  .lr-check input:focus-visible + span { outline: 3px solid rgba(21, 112, 239, .45); outline-offset: 2px; }
+  .lr:hover .lr-check, .lr:focus-within .lr-check, .lr.selected .lr-check, .selecting .lr-check { opacity: 1; }
+  @media (hover: none) { .lr-pin, .lr .lr-more, .lr-check { opacity: 1; } }
+  #dashRecent .lr-check, #spaceSaved .lr-check, #dashRecent .lr-acts, #spaceSaved .lr-acts { display: none; }
+  .sel-bar { display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 20px; border-radius: 999px; background: #1d2433; color: #fff; font-size: var(--fs-14); width: fit-content; }
+  .sel-bar button { height: 38px; padding: 0 14px; border-radius: 999px; color: #fff; font-size: var(--fs-14); font-weight: 500; }
+  .sel-bar button:hover { background: rgba(255, 255, 255, .12); }
+  .sel-bar .del { color: #fda29b; }
+  .ov-more { height: 38px; margin-top: 6px; margin-left: -10px; }
+  .ov-empty { padding: 18px 22px; border: 1px dashed #d5dae4; border-radius: 16px; font-size: var(--fs-14); color: #5d6576; }
+  .ov-empty .nav-btn { margin-left: 14px; }
+  body.view-library .library .lib-detail {
+    min-height: auto; overflow: visible; padding: 24px 40px 36px;
+    background: #fff; border: 1px solid #e8ebf1; border-radius: 20px; box-shadow: none; animation: none;
+  }
 
   /* ---------- Home composer: attach course material ---------- */
   .row-left { display: flex; align-items: center; gap: 10px; }
@@ -530,7 +671,7 @@
   .field > label, .field > .lbl { display: block; margin-bottom: 10px; font-size: var(--fs-14); font-weight: 600; color: #374151; }
   .field .help { margin-top: 8px; font-size: var(--fs-13); color: #5d6576; }
   .input, .select {
-    width: 100%; height: 52px; padding: 0 18px; border: 1px solid #d5dae4; border-radius: 14px; background: #fff;
+    width: 100%; height: 52px; padding: 0 18px; border: 1px solid #8a94a6; border-radius: 14px; background: #fff;
     font: inherit; font-size: var(--fs-14); color: #111827; transition: border-color .2s, box-shadow .2s;
   }
   .select {
@@ -588,12 +729,12 @@
 
   /* toast with action */
   .toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 14px; }
-  .toast .t-act { color: #9ec5ff; font-weight: 600; font-size: var(--fs-12); padding: 2px 4px; border-radius: 6px; }
+  .toast .t-act { color: #9ec5ff; font-weight: 600; font-size: var(--fs-14); padding: 2px 4px; border-radius: 6px; }
   .toast .t-act:hover { color: #fff; text-decoration: underline; }
 
   /* ---------- Library ---------- */
   .library {
-    height: 1236px; width: min(1560px, calc(100% - 96px)); margin: 14px auto 0;
+    height: calc(var(--ch, 1380px) - 144px); width: min(1560px, calc(100% - 96px)); margin: 14px auto 0;
     background: #fff; border: 1px solid #e6e9f0; border-radius: 26px; overflow: hidden;
     box-shadow: 0 24px 60px -40px rgba(20, 30, 70, .35);
   }
@@ -647,7 +788,17 @@
   .view-toggle button:hover { background: #f3f4f7; }
   .view-toggle button[aria-pressed="true"] { background: #eceef2; color: #111827; }
   .lib-main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .lib-main.has-detail { grid-template-columns: minmax(0, 1fr) 680px; }
+  .lib-main.has-detail { grid-template-columns: minmax(0, 1fr) 460px; }
+  .lib-main.reading { grid-template-columns: minmax(0, 1fr); }
+  .lib-main.reading .lib-list { display: none; }
+  .lib-main.reading .lib-detail { padding: 24px 40px 36px; }
+  .d-read-head { margin: 22px 0 26px; }
+  .d-read-head .d-title { margin: 12px 0 6px; }
+  .d-back { margin-left: -14px; }
+  .d-preview { margin: 18px 0 0; font-size: var(--fs-14); line-height: 1.6; color: #4a5263; }
+  .d-cta { display: flex; align-items: center; gap: 10px; margin-top: 24px; }
+  .d-cta .lib-more { padding-right: 0; }
+  .lib-main.has-detail .d-meta { grid-template-columns: 130px 1fr; }
   .lib-list { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: #d5d9e4 transparent; align-content: start; }
   .lib-row { position: relative; display: flex; align-items: center; border-bottom: 1px solid #eef0f4; border-radius: 0; transition: background .15s; }
   .lib-row:hover { background: #f8f9fb; }
@@ -938,7 +1089,7 @@
   .right-tools { display: flex; align-items: center; gap: 10px; }
   .source-wrap { position: relative; }
   .source-btn { display: inline-flex; align-items: center; gap: 10px; height: 50px; padding: 0 14px; border-radius: 12px; font-size: var(--fs-16); color: #1d2433; }
-  .source-btn .dim { color: #8a91a0; }
+  .source-btn .dim { color: #6b7280; }
   .source-btn:hover { background: #f1f4fa; }
   .send-circle { width: 62px; height: 62px; border-radius: 50%; background: var(--blue); color: #fff; display: grid; place-items: center; transition: background .2s, transform .15s; }
   .send-circle:hover { background: #185fd0; }
@@ -975,9 +1126,34 @@
   .p-plus:hover { background: #f1f4fa; color: var(--ink); }
   .p-count { display: inline-grid; place-items: center; min-width: 26px; height: 26px; padding: 0 8px; margin-left: 10px; border-radius: 13px; background: var(--blue-soft); color: var(--blue); font-size: var(--fs-13); font-weight: 600; vertical-align: 3px; }
   .p-saved { margin-top: 26px; padding-top: 24px; border-top: 1px solid #eef0f5; }
-  #savedBody { max-height: 380px; overflow-y: auto; scrollbar-width: thin; margin: 0 -10px; padding: 0 10px; }
-  .saved-row .lib-ic { width: 34px; height: 34px; border-radius: 9px; }
-  .saved-row .lib-ic svg { width: 18px; height: 18px; }
+  #savedBody { max-height: 420px; overflow-y: auto; scrollbar-width: thin; margin: 4px -10px 0; padding: 0 10px; }
+  /* Saved docs: document thumbnail + title + time, separated by thin lines */
+  .saved-row {
+    width: 100%; display: flex; align-items: center; gap: 18px; padding: 14px 10px; margin: 0 -10px; width: calc(100% + 20px);
+    border-bottom: 1px solid #eef0f4; border-radius: 0; text-align: left; transition: background .2s;
+  }
+  .saved-row:last-child { border-bottom: 0; }
+  .saved-row:hover { background: #f8f9fb; }
+  .saved-row.flash { background: #eaf2fe; }
+  .sd-thumb {
+    position: relative; flex: none; width: 52px; height: 64px; padding: 6px 6px 0; overflow: hidden;
+    background: #fff; border: 1px solid #e3e7ef; border-radius: 8px; box-shadow: 0 2px 6px -3px rgba(20, 30, 70, .2);
+    font-size: 5px; line-height: 1.35; color: #6b7280;
+  }
+  .sd-thumb b { display: block; margin-bottom: 3px; font-size: 6px; font-weight: 700; color: #111827; }
+  .sd-thumb i { position: absolute; right: 3px; bottom: 3px; width: 18px; height: 18px; border-radius: 5px; }
+  .sd-thumb i svg { width: 11px; height: 11px; }
+  .sd-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .sd-txt b { font-size: var(--fs-14); font-weight: 500; color: #1f2937; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sd-txt span { font-size: var(--fs-13); color: #6b7280; }
+  .sd-empty { margin: 0; font-size: var(--fs-14); color: #6b7280; }
+  .p-lib {
+    width: 100%; height: 52px; margin-top: 22px; display: flex; align-items: center; justify-content: center; gap: 10px;
+    border: 1px solid #d5dae4; border-radius: 999px; background: #fff; font-size: var(--fs-14); font-weight: 600; color: #1f2937;
+    transition: border-color .2s, color .2s, background .2s;
+  }
+  .p-lib svg { width: 20px; height: 20px; color: var(--blue); }
+  .p-lib:hover { border-color: #b7cdf5; color: var(--blue); background: #f5f9ff; }
   .p-body { margin-top: 16px; font-size: var(--fs-16); color: #5d6576; line-height: 1.5; }
   .src { width: calc(100% + 20px); text-align: left; display: flex; align-items: center; gap: 14px; padding: 10px 10px; margin: 0 -10px; border-radius: 14px; animation: in .3s ease both; transition: background .3s; }
   .src:hover { background: #f5f7fb; }
@@ -990,13 +1166,16 @@
   .src-txt { display: block; }
   .src-txt > span { display: block; font-size: var(--fs-14); color: #5d6576; }
 
+  /* Lives inside the scaled stage so it matches the UI's size, and sits above everything (composer, modals). */
   .toast {
-    position: fixed; left: 50%; bottom: 28px; transform: translate(-50%, 20px);
-    background: #1d2433; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: var(--fs-12);
+    position: absolute; z-index: 300; left: 50%; bottom: 40px; transform: translate(-50%, 20px);
+    max-width: 900px; background: #1d2433; color: #fff; padding: 14px 22px; border-radius: 14px; font-size: var(--fs-14);
+    box-shadow: 0 18px 40px -18px rgba(15, 23, 42, .6);
     opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+  @media (forced-colors: active) { .shimmer { color: CanvasText; background: none; -webkit-background-clip: border-box; background-clip: border-box; } }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
@@ -1026,10 +1205,6 @@
     <linearGradient id="star" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#3d8bff"/>
       <stop offset="1" stop-color="#6b4dff"/>
-    </linearGradient>
-    <linearGradient id="dashGrad" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#7c5cff"/>
-      <stop offset="1" stop-color="#2f74ff"/>
     </linearGradient>
     <linearGradient id="paperBack" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#dbe8fb"/>
@@ -1069,6 +1244,7 @@
 </svg>
 
 <div class="stage" id="stage">
+<a href="#" class="skip-link" id="skipLink">Skip to main content</a>
 <header>
   <a class="brand" href="#" aria-label="Assistiv home">
     <svg width="161" height="40" viewBox="0 39.6 161 40" fill="none" aria-hidden="true">
@@ -1103,12 +1279,12 @@
     </svg>
   </a>
 
-  <nav class="tabs" role="tablist" aria-label="Primary">
-    <button role="tab" aria-selected="false">Dashboard</button>
-    <button role="tab" aria-selected="false">Courses</button>
-    <button role="tab" class="active" aria-selected="true">Study</button>
-    <button role="tab" aria-selected="false">Spaces</button>
-    <button role="tab" aria-selected="false">Grades &amp; Insights</button>
+  <nav class="tabs" aria-label="Primary">
+    <button type="button">Dashboard</button>
+    <button type="button">Courses</button>
+    <button type="button" class="active" aria-current="page">Study</button>
+    <button type="button">Spaces</button>
+    <button type="button">Grades &amp; Insights</button>
   </nav>
 
   <div class="util">
@@ -1129,8 +1305,17 @@
 </header>
 
 <main>
-  <h1>Start offloop <span class="grad">from here</span></h1>
-  <p class="sub">How can Aurora help you study today? <button type="button" class="link-inline" data-go="library">Open Library</button></p>
+  <div class="home-head">
+    <div>
+      <h1>Start offloop <span class="grad">from here</span></h1>
+      <p class="sub">How can Aurora help you study today?</p>
+    </div>
+    <button type="button" class="lib-pill" data-go="library">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7C12 5.93913 11.5786 4.92172 10.8284 4.17157C10.0783 3.42143 9.06087 3 8 3H2V18H9C9.79565 18 10.5587 18.3161 11.1213 18.8787C11.6839 19.4413 12 20.2044 12 21M12 7V21M12 7C12 5.93913 12.4214 4.92172 13.1716 4.17157C13.9217 3.42143 14.9391 3 16 3H22V18H15C14.2044 18 13.4413 18.3161 12.8787 18.8787C12.3161 19.4413 12 20.2044 12 21"/></svg>
+      <span>Your Library</span><span class="n" id="homeLibCount"></span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
+  </div>
 
   <section class="grid" id="modes">
     <!-- Ask Aurora -->
@@ -1150,11 +1335,6 @@
                   fill="url(#glassBlue)" stroke="#fff" stroke-width="2.5" filter="url(#soft)"/>
             <path d="M189 90 H270 Q296 90 298 108" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="3" stroke-linecap="round"/>
             <path class="float f-spin" d="M237 106 C240 128 245 133 267 136 C245 139 240 144 237 166 C234 144 229 139 207 136 C229 133 234 128 237 106 Z" fill="url(#star)"/>
-          </g>
-          <g class="spark" stroke="url(#dashGrad)" stroke-width="5" stroke-linecap="round">
-            <line x1="287" y1="52" x2="290" y2="64"/>
-            <line x1="300" y1="72" x2="308" y2="80"/>
-            <line x1="310" y1="90" x2="322" y2="94"/>
           </g>
         </svg>
       </span>
@@ -1185,11 +1365,6 @@
               <rect x="160" y="190" width="56" height="7" rx="3.5" fill="#a9c5ef"/>
             </g>
           </g>
-          <g class="spark" stroke="#3b82f6" stroke-width="5" stroke-linecap="round">
-            <line x1="315" y1="56" x2="318" y2="67"/>
-            <line x1="327" y1="74" x2="334" y2="82"/>
-            <line x1="335" y1="92" x2="346" y2="96"/>
-          </g>
         </svg>
       </span>
       <h3>Create a quiz</h3>
@@ -1214,11 +1389,6 @@
               <rect x="128" y="182" width="90" height="8" rx="4" fill="#a9c5ef"/>
               <rect x="128" y="198" width="70" height="8" rx="4" fill="#a9c5ef"/>
             </g>
-          </g>
-          <g class="spark" stroke="url(#dashGrad)" stroke-width="5" stroke-linecap="round">
-            <line x1="60" y1="108" x2="72" y2="112"/>
-            <line x1="68" y1="92" x2="76" y2="99"/>
-            <line x1="86" y1="78" x2="88" y2="90"/>
           </g>
         </svg>
       </span>
@@ -1315,12 +1485,6 @@
         </div>
       </div>
     </form>
-    <div class="chips">
-      <button class="chip" data-fill="Explain a course topic: "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Explain a course topic</button>
-      <button class="chip" data-fill="Make flashcards from "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M7 3h12a2 2 0 0 1 2 2v10"/></svg>Make flashcards</button>
-      <button class="chip" data-fill="Quiz me on "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5V14M12 17.5v.01"/></svg>Quiz me</button>
-      <button class="chip" data-fill="Summarize "><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7"/></svg>Summarize a lecture</button>
-    </div>
     <div class="orb-wrap" aria-live="polite">
       <button type="button" class="orb" id="orb" data-state="idle" aria-label="Aurora voice">
         <span class="orb-inner" aria-hidden="true">
@@ -1341,50 +1505,51 @@
     <div class="p-body">
       <div id="sourcesBody">Where Aurora's answers come from will appear here.</div>
     </div>
-    <div class="p-saved" id="savedSec" hidden>
-      <div class="p-head"><span>Saved<span class="p-count" id="savedCount"></span></span><button type="button" class="link-btn" data-go="library">Open Library</button></div>
+    <div class="p-saved" id="savedSec">
+      <div class="p-head"><span>Saved docs<span class="p-count" id="savedCount" hidden></span></span></div>
       <div class="p-body" id="savedBody"></div>
     </div>
+    <button type="button" class="p-lib" data-go="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 7C12 5.93913 11.5786 4.92172 10.8284 4.17157C10.0783 3.42143 9.06087 3 8 3H2V18H9C9.79565 18 10.5587 18.3161 11.1213 18.8787C11.6839 19.4413 12 20.2044 12 21M12 7V21M12 7C12 5.93913 12.4214 4.92172 13.1716 4.17157C13.9217 3.42143 14.9391 3 16 3H22V18H15C14.2044 18 13.4413 18.3161 12.8787 18.8787C12.3161 19.4413 12 20.2044 12 21"/></svg>Go to Library</button>
   </aside>
 </main>
 
-<section class="library" id="library" aria-labelledby="libTitle">
-  <aside class="lib-side" aria-label="Library sections">
-    <div class="ls-head"><b>Library</b></div>
-    <nav class="ls-nav" id="libCats" aria-label="Library sections"></nav>
-    <button type="button" class="ls-study" id="libToStudy">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Study with Aurora
-    </button>
-  </aside>
-  <div class="lib-body">
-    <div class="lib-top">
-      <div>
-        <h1 id="libTitle">Recent</h1>
-        <p class="lib-count" id="libCount"></p>
-      </div>
-      <div class="lib-top-r">
-        <label class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="input" id="libSearch" type="search" placeholder="Search your Library" aria-label="Search your Library"></label>
-        <button type="button" class="lib-create" id="libNewNote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New note</button>
-      </div>
+<section class="library" id="library" role="main" aria-labelledby="libTitle">
+  <nav class="crumbs" id="libCrumbs" aria-label="Breadcrumb"></nav>
+  <div id="libOverview">
+    <div class="ov-head">
+      <div class="page-head"><h1 id="libTitle">Library</h1><p class="lib-count" id="libCount"></p></div>
+      <label class="lib-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input class="input" id="libSearch" type="search" placeholder="Search your Library" aria-label="Search your Library"></label>
     </div>
-    <div class="lib-tools">
-      <select class="select" id="libCourse" aria-label="Filter by course"></select>
-      <select class="select" id="libSpace" aria-label="Filter by Space"></select>
-      <select class="select" id="libSort" aria-label="Sort">
-        <option value="edited">Last edited</option>
-        <option value="opened">Last activity</option>
-        <option value="created">Date created</option>
-        <option value="title">Title A–Z</option>
-      </select>
+    <div class="ov-tabs" id="libTabs" role="group" aria-label="Filter by type"></div>
+    <div class="sel-bar" id="selBar" role="region" aria-label="Selection" hidden></div>
+    <div id="ovSections">
+      <section class="ov-sec" id="secPinnedWrap" aria-labelledby="hPinned" hidden><h2 id="hPinned">Pinned</h2><div id="secPinned"></div></section>
+      <section class="ov-sec" id="secCoursesWrap" aria-labelledby="hCourses"><h2 id="hCourses">Courses</h2><div id="secCourses"></div></section>
+      <section class="ov-sec" id="secSpacesWrap" aria-labelledby="hSpaces"><h2 id="hSpaces">Spaces</h2><div id="secSpaces"></div></section>
+      <section class="ov-sec" id="secRecentWrap" aria-labelledby="hRecent"><h2 id="hRecent">Most recent</h2><div id="secRecent"></div></section>
     </div>
-    <div class="lib-main" id="libMain">
-      <div class="lib-list" id="libList" role="list" aria-label="Saved items"></div>
-      <aside class="lib-detail" id="libDetail" aria-label="Item details" hidden></aside>
-    </div>
+    <section class="ov-sec" id="ovResults" aria-labelledby="hResults" hidden><h2 id="hResults"></h2><div id="resultsBody"></div></section>
   </div>
+  <article class="lib-detail" id="libDetail" aria-label="Saved item" hidden></article>
 </section>
 
-<section class="page" id="dashboard" aria-labelledby="dashTitle">
+<!-- Ask Aurora about the open item: docked chat beside the reader -->
+<aside class="ichat" id="iChat" aria-label="Ask Aurora about this item" hidden>
+  <div class="ic-head">
+    <button type="button" class="ic-min" id="icMin" aria-label="Minimize chat" title="Minimize"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+    <img class="ic-orb" src="assets/aurora-orb.png" alt="">
+    <span class="ic-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span id="icTitle"></span></span>
+  </div>
+  <div class="ic-thread" id="icThread" aria-live="polite"></div>
+  <form class="ic-compose" id="icForm">
+    <input class="ic-input" id="icInput" autocomplete="off" aria-label="Message Aurora">
+    <button type="button" class="ic-mic" aria-label="Voice input" title="Voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+    <button type="submit" class="ic-send" id="icSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+  </form>
+</aside>
+<button type="button" class="ic-pill" id="icPill" hidden><img src="assets/aurora-orb.png" alt=""><span>Ask Aurora about this</span></button>
+
+<section class="page" id="dashboard" role="main" aria-labelledby="dashTitle">
   <div class="page-head"><h1 id="dashTitle">Welcome back</h1><p class="lib-count">Pick up where you left off.</p></div>
   <div class="panel-card">
     <div class="pc-head"><h2>Recent saved work</h2><button type="button" class="link-btn" data-go="library">Open Library</button></div>
@@ -1392,7 +1557,7 @@
   </div>
 </section>
 
-<section class="page" id="spaces" aria-labelledby="spacesTitle">
+<section class="page" id="spaces" role="main" aria-labelledby="spacesTitle">
   <div class="page-head"><h1 id="spacesTitle">Spaces</h1><p class="lib-count">Organize your learning around a course, topic or project.</p></div>
   <div class="spaces-grid" id="spaceList" role="group" aria-label="Your Spaces"></div>
   <div class="panel-card grow">
@@ -1414,9 +1579,9 @@
     <div class="m-foot" id="mFoot"></div>
   </div>
 </div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
 
-<div class="toast" id="toast"></div>
 
 <script>
 (() => {
@@ -1428,22 +1593,70 @@
   let saveToLibrary = false;
   let toastTimer;
 
-  // Scale the 1380px-tall design to fit the window height (no scroll) and
-  // stretch the canvas to the full window width, so there are no side bands.
+  // The canvas stretches to the full window width, so there are no side bands.
   const stage = $('#stage');
+  // Accessibility: the canvas is drawn at a steady scale (base text ≈ 14px) instead of shrinking to the
+  // window, so browser zoom and small windows never make text tiny. Chat and Library panels stretch to
+  // the window height (--ch); if they need more room than the window has, the page scrolls.
+  // The Study home is the original design: the full 1380px-tall canvas (full-size cards) scaled to fit
+  // the window, so it never scrolls.
+  const BASE_S = 0.84, MIN_S = 0.8;
+  let S = BASE_S;
   const fit = () => {
-    const w = window.innerWidth, h = window.innerHeight;
-    const s = Math.min(h / 1380, w / 1100); // keep the content column visible on narrow windows
-    const stageW = Math.max(w / s, 1100);
+    const w = window.innerWidth, h = window.innerHeight, b = document.body.classList;
+    const home = !['chatting', 'view-library', 'view-dashboard', 'view-spaces'].some(c => b.contains(c));
+    let stageH;
+    // Study (home + chat) never scrolls; the other pages may.
+    document.documentElement.classList.toggle('no-scroll', home || b.contains('chatting'));
+    if (home) {
+      // Fit the actual content (not a fixed 1380px), so there's no empty band under the input box.
+      const main = $('main');
+      const contentH = main.offsetHeight ? main.offsetTop + main.scrollHeight + 36 : 1380;
+      stageH = contentH;
+      S = Math.min(h / stageH, w / 1100);
+      stage.style.removeProperty('--card-h');
+    } else if (b.contains('chatting')) {
+      // Study chat never scrolls either: the thread scrolls inside; the page scales down only below ~700 canvas px.
+      S = Math.min(BASE_S, h / 700);
+      stageH = h / S;
+    } else {
+      S = Math.max(MIN_S, Math.min(BASE_S, h / 900));
+      stageH = Math.max(h / S, 900);
+    }
+    const stageW = Math.max(w / S, 1100);
     stage.style.width = stageW + 'px';
-    stage.style.left = Math.max(0, (w - stageW * s) / 2) + 'px';
-    stage.style.top = Math.max(0, (h - 1380 * s) / 2) + 'px';
-    stage.style.transform = `scale(${s})`;
+    stage.style.height = stageH + 'px';
+    stage.style.setProperty('--ch', stageH + 'px');
+    stage.style.left = Math.max(0, (w - stageW * S) / 2) + 'px';
+    stage.style.top = (home ? Math.max(0, (h - stageH * S) / 2) : 0) + 'px';
+    stage.style.transform = `scale(${S})`;
+    // Size the page to the canvas; on Study it's clamped to the window so nothing can scroll.
+    const noScroll = document.documentElement.classList.contains('no-scroll');
+    document.body.style.width = (noScroll ? w : Math.max(w, stageW * S)) + 'px';
+    document.body.style.height = (noScroll ? h : stageH * S) + 'px';
   };
   window.addEventListener('resize', fit);
+  $('#skipLink').addEventListener('click', (e) => {
+    e.preventDefault();
+    const b = document.body.classList;
+    const target = b.contains('view-library') ? ($('#libDetail:not([hidden]) .d-title') || $('#libTitle'))
+      : b.contains('view-dashboard') ? $('#dashTitle') : b.contains('view-spaces') ? $('#spacesTitle')
+      : b.contains('chatting') ? $('#prompt') : $('main h1');
+    if (!target) return;
+    if (!target.matches('input, textarea, button, a, [tabindex]')) target.setAttribute('tabindex', '-1');
+    target.focus();
+  });
+  new MutationObserver(fit).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+  window.addEventListener('load', fit);
+  // Re-fit when the input area changes height (banner dismissed, files attached, longer prompt).
+  if (window.ResizeObserver) { let lastH = 0; new ResizeObserver(([e]) => { const hh = Math.round(e.contentRect.height); if (hh !== lastH) { lastH = hh; fit(); } }).observe($('.dock')); }
   fit();
+  // The part of the canvas currently on screen (canvas px), for placing toasts and dialogs.
+  const viewBox = () => { const r = stage.getBoundingClientRect(); return { top: Math.max(0, -r.top) / S, h: window.innerHeight / S }; };
 
+  const placeToast = () => { const vb = viewBox(); toastEl.style.bottom = 'auto'; toastEl.style.top = (vb.top + vb.h - 100) + 'px'; };
   const toast = (msg) => {
+    placeToast();
     toastEl.classList.remove('has-action');
     toastEl.textContent = msg;
     toastEl.classList.add('show');
@@ -1509,7 +1722,6 @@
   }));
 
   // Chips
-  $$('.chip').forEach(c => c.addEventListener('click', () => fill(c.dataset.fill)));
 
   // Banner
   $('#closeBanner').addEventListener('click', () => $('#banner').classList.add('gone'));
@@ -2121,24 +2333,24 @@ Want me to quiz you on this or turn it into flashcards?` };
     tick();
   });
 
+  // Working indicator: the Aurora orb plus a plain-language status for what's happening now.
+  const WORKING = (label) => `<div class="working" role="status"><img class="w-orb" src="assets/aurora-orb.png" alt=""><span class="shimmer">${esc(label)}</span></div>`;
   const respond = async (ai) => {
     const q = ai.dataset.q;
     const { md, sources, widget, widgetLabel, outro } = replyFor(q);
     ai.classList.remove('done');
-    ai.innerHTML = `<button type="button" class="status" aria-expanded="false"><span class="label">Working</span><span class="t">0s</span>${ICON.chev}</button><div class="steps" hidden></div><div class="body"></div><div class="widget-slot"></div><div class="body body2"></div><div class="shimmer"></div>`;
-    const tEl = ai.querySelector('.t'), sh = ai.querySelector('.shimmer'), body = ai.querySelector('.body');
-    const start = Date.now();
-    const timer = setInterval(() => { tEl.textContent = Math.floor((Date.now() - start) / 1000) + 's'; }, 250);
+    ai.innerHTML = `<div class="body"></div><div class="widget-slot"></div><div class="body body2"></div>${WORKING('Thinking…')}`;
+    const sh = ai.querySelector('.working .shimmer'), body = ai.querySelector('.body');
     setBusy(true); stopFlag = false;
+    thread.setAttribute('aria-busy', 'true');
     const src = $('#sourceLabel').textContent.toLowerCase();
     const steps = [];
-    const searchStep = `Searched ${src === 'all sources' ? 'your courses and Library' : src}`;
-    sh.textContent = searchStep.replace('Searched', 'Searching');
-    await wait(1100);
-    if (!stopFlag) { steps.push(searchStep); sh.textContent = `Reading ${sources.length} sources`; setSources(sources); await wait(900); }
-    if (!stopFlag) { steps.push(`Read ${sources.length} sources`); sh.textContent = 'Writing answer'; ai.classList.add('streaming'); await stream(body, md); }
+    await wait(500);
+    if (!stopFlag) { sh.textContent = `Searching ${src === 'all sources' ? 'your courses and Library' : src}…`; await wait(1000); }
+    if (!stopFlag) { sh.textContent = `Reading ${sources.length} sources…`; setSources(sources); await wait(900); }
+    if (!stopFlag) { sh.textContent = 'Writing answer…'; ai.classList.add('streaming'); await stream(body, md); }
     if (!stopFlag && widget) {
-      sh.textContent = widgetLabel || 'Building';
+      sh.textContent = `${widgetLabel || 'Building'}…`;
       await wait(500);
       if (!stopFlag) {
         const stick = nearBottom();
@@ -2149,17 +2361,15 @@ Want me to quiz you on this or turn it into flashcards?` };
       }
     }
     if (!stopFlag) steps.push('Wrote answer');
-    clearInterval(timer);
     ai.classList.remove('streaming');
     ai.classList.add('done');
-    sh.remove();
-    const secs = Math.max(1, Math.round((Date.now() - start) / 1000));
-    ai.querySelector('.label').textContent = stopFlag ? 'Stopped after' : 'Worked for';
-    tEl.textContent = ` ${secs}s`;
-    ai.querySelector('.steps').innerHTML = steps.map(s => `<div>${esc(s)}</div>`).join('') || '<div>Stopped</div>';
+    thread.removeAttribute('aria-busy');
+    // The working indicator only shows while Aurora is answering.
+    ai.querySelector('.working')?.remove();
     if (!body.innerHTML) body.innerHTML = '<p style="color:var(--muted)">Response stopped.</p>';
+    // Quiz / flashcard answers are saved with their own "Save quiz" / "Save flashcards" button, not as a note.
     ai.insertAdjacentHTML('beforeend', `<div class="actions">
-      <button type="button" class="act" data-act="save">${ICON.note}<span>Save to notes</span></button>
+      ${widget ? '' : `<button type="button" class="act" data-act="save">${ICON.note}<span>Save to notes</span></button>`}
       <button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button>
       <button type="button" class="act" data-act="regen">${ICON.regen}<span>Regenerate</span></button></div>`);
     ai.dataset.md = outro ? `${md}\n\n${outro}` : md;
@@ -2595,12 +2805,12 @@ Want me to quiz you on this or turn it into flashcards?` };
     stopFlag = false;
     setOrb('thinking');
     const plan = voicePlan(q);
-    const ai = addMsg('ai spoken', '<div class="shimmer">Thinking</div><div class="body spoken-body"><p></p></div>');
+    const ai = addMsg('ai spoken', WORKING('Thinking…') + '<div class="body spoken-body"><p></p></div>');
     ai.dataset.q = q;
     keepBottom();
     await wait(plan.md || plan.widget ? 900 : 500);
     if (turn !== vTurn) return;
-    $('.shimmer', ai)?.remove();
+    $('.working', ai)?.remove();
     setOrb('speaking');
     const completed = await sayInto($('.spoken-body p', ai), plan.say, turn);
     if (!completed || turn !== vTurn) return;
@@ -2646,7 +2856,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     stopFlag = true;
     const last = [...$$('.msg.ai.spoken', inner)].pop();
     if (last) {
-      $('.shimmer', last)?.remove();
+      $('.working', last)?.remove();
       $$('.w.fresh', last).forEach(w => w.classList.remove('fresh'));
       const p = $('.spoken-body p', last);
       if (p && !$('.cut-note', last)) p.insertAdjacentHTML('beforeend', '<span class="cut-note">Interrupted</span>');
@@ -2864,6 +3074,7 @@ Want me to quiz you on this or turn it into flashcards?` };
 
   // ---------- Toast with an action ----------
   const toastAction = (msg, label, fn) => {
+    placeToast();
     toastEl.classList.add('has-action');
     toastEl.innerHTML = `<span>${esc(msg)}</span><button type="button" class="t-act">${esc(label)}</button>`;
     $('.t-act', toastEl).addEventListener('click', () => { toastEl.classList.remove('show'); fn(); });
@@ -2877,6 +3088,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   let modalReturn = null;
   const closeModal = () => {
     layer.hidden = true;
+    document.documentElement.style.overflow = '';
     ddClose(); $('#mBody').innerHTML = ''; $('#mFoot').innerHTML = '';
     if (modalReturn && document.contains(modalReturn)) modalReturn.focus();
     modalReturn = null;
@@ -2896,6 +3108,9 @@ Want me to quiz you on this or turn it into flashcards?` };
       });
       foot.appendChild(el);
     });
+    const vb = viewBox();
+    layer.style.top = vb.top + 'px'; layer.style.height = vb.h + 'px'; layer.style.bottom = 'auto';
+    document.documentElement.style.overflow = 'hidden';
     layer.hidden = false;
     const first = $('#mBody input:not([type="radio"]):not([type="checkbox"]), #mBody select, #mBody textarea') || foot.lastElementChild;
     first?.focus();
@@ -3033,6 +3248,13 @@ Want me to quiz you on this or turn it into flashcards?` };
     opts.onSaved && opts.onSaved(item);
     renderLibrary();
     renderSaved();
+    // In chat, saving never interrupts: the item appears under "Saved docs" in the right panel.
+    if (document.body.classList.contains('chatting')) {
+      toast(dup ? 'Already in your Library' : 'Saved to Library');
+      const row = $(`#savedBody .saved-row[data-id="${item.id}"]`);
+      row?.classList.add('flash'); setTimeout(() => row?.classList.remove('flash'), 1400);
+      return;
+    }
     showSaved(item, dup ? 'dup' : 'new');
   };
 
@@ -3041,13 +3263,12 @@ Want me to quiz you on this or turn it into flashcards?` };
   function renderSaved() {
     const ids = [...new Set([...session.saved].reverse().concat(session.libId ? [session.libId] : []))];
     const items = ids.map(getItem).filter(Boolean);
-    $('#savedSec').hidden = !items.length;
     $('#savedCount').textContent = items.length;
-    $('#savedBody').innerHTML = items.map((it, i) => `<button type="button" class="src saved-row" data-id="${it.id}" style="animation-delay:${i * 50}ms" title="Open ${esc(it.title)} in Library">
-        <span class="lib-ic t-${it.type}">${L_ICON[it.type]}</span>
-        <span class="src-txt"><b>${esc(it.title)}</b><span>${esc(typeOne(it.type))} · ${esc(assoc(it))}</span></span>
-        <svg class="src-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>
-      </button>`).join('');
+    $('#savedCount').hidden = !items.length;
+    $('#savedBody').innerHTML = items.length ? items.map((it) => `<button type="button" class="saved-row" data-id="${it.id}" title="Open ${esc(it.title)} in Library">
+        <span class="sd-thumb" aria-hidden="true"><b>${esc(it.title)}</b>${esc(previewOf(it).slice(0, 90))}<i class="lib-ic t-${it.type}">${L_ICON[it.type]}</i></span>
+        <span class="sd-txt"><b>${esc(it.title)}</b><span>${esc(typeOne(it.type))} · ${esc(fmtAgo(it.edited))}</span></span>
+      </button>`).join('') : '<p class="sd-empty">Quizzes, flashcards, notes and code you save will show up here.</p>';
   }
   $('#savedBody').addEventListener('click', (e) => {
     const row = e.target.closest('.saved-row');
@@ -3089,7 +3310,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   $('#saveSession').addEventListener('click', () => {
     if (!$('.msg', inner)) { toast('Ask Aurora something first'); return; }
     const existing = session.libId && getItem(session.libId);
-    if (existing) { autoSaveSession(); existing.act = { t: Date.now(), l: 'Updated' }; persist(); renderLibrary(); showSaved(existing, 'updated'); return; }
+    if (existing) { autoSaveSession(); existing.act = { t: Date.now(), l: 'Updated' }; persist(); renderLibrary(); toast('Session updated in your Library'); return; }
     openSave({
       type: 'session', title: sessionTitle(), body: transcriptMd(), source: isVoiceSession() ? 'Voice session' : 'Study session',
       session: sessionTitle(),
@@ -3182,43 +3403,19 @@ Want me to quiz you on this or turn it into flashcards?` };
     $$('nav.tabs button').forEach(b => {
       const on = b.textContent.trim() === TAB_FOR[v];
       b.classList.toggle('active', on);
-      b.setAttribute('aria-selected', String(on));
+      on ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current');
     });
     $('.avatar').classList.toggle('active', v === 'library');
     if (v !== 'study' && vActive) endVoice(true);
     closeRowMenu();
-    if (v === 'library') renderLibrary();
+    if (v === 'library') { lv.open = null; renderLibrary(); }
     if (v === 'dashboard') renderDashboard();
     if (v === 'spaces') renderSpaces();
+    renderIChat();
   }
   const lastAct = (it) => it.act || { t: it.edited, l: it.edited - it.created > 1000 ? 'Edited' : 'Saved' };
   const groupOf = (key) => GROUPS.find(g => g.key === key) || GROUPS[0];
   const inGroup = (it, key) => { const g = groupOf(key); return !g.types || g.types.includes(it.type); };
-  const hasFilters = () => !!(lv.q.trim() || lv.course || lv.space);
-  const filtered = () => {
-    const q = lv.q.trim().toLowerCase();
-    const items = lib.filter(it => inGroup(it, lv.cat) &&
-      (!lv.course || it.course === lv.course) &&
-      (!lv.space || it.space === lv.space) &&
-      (!q || [it.title, it.body, it.course, it.space, it.source, typeOne(it.type)].join(' ').toLowerCase().includes(q)));
-    const by = lv.sort === 'title' ? (a, b) => a.title.localeCompare(b.title)
-      : lv.sort === 'opened' ? (a, b) => lastAct(b).t - lastAct(a).t
-      : lv.sort === 'created' ? (a, b) => b.created - a.created
-      : (a, b) => b.edited - a.edited;
-    return items.sort(by);
-  };
-  const renderCats = () => {
-    $('#libCats').innerHTML = GROUPS.map(g => {
-      const n = lib.filter(i => inGroup(i, g.key)).length;
-      return `<button type="button" class="ls-item lib-cat" data-cat="${g.key}" aria-current="${lv.cat === g.key}">${g.icon || L_ICON[g.key]}<span class="lbl">${g.label}</span><span class="n">${n}</span></button>`;
-    }).join('');
-    $('#libTitle').textContent = groupOf(lv.cat).label;
-  };
-  const fillFilters = () => {
-    $('#libCourse').innerHTML = '<option value="">All courses</option>' + COURSES.map(c => `<option${lv.course === c ? ' selected' : ''}>${esc(c)}</option>`).join('');
-    $('#libSpace').innerHTML = '<option value="">All Spaces</option>' + SPACES.map(c => `<option${lv.space === c ? ' selected' : ''}>${esc(c)}</option>`).join('');
-    $('#libSort').value = lv.sort;
-  };
   const fmtAgo = (ts) => {
     const m = Math.round((Date.now() - ts) / 60000);
     if (m < 1) return 'just now';
@@ -3233,36 +3430,74 @@ Want me to quiz you on this or turn it into flashcards?` };
     const k = it.space ? 'space' : it.course ? 'course' : 'library';
     return `<i style="background:${WHERE_C[k]}"></i>${esc(it.space ? `Space · ${it.space}` : it.course || 'Personal Library')}`;
   };
-  // One row component, reused by Library, Dashboard and Spaces. Primary action: Open.
-  const itemRow = (it, active) => {
-    const a = lastAct(it);
-    return `<div class="lib-row${active ? ' active' : ''}" role="listitem" data-id="${it.id}">
-      <button type="button" class="lib-open" data-id="${it.id}" aria-label="Open ${esc(it.title)}">
-        <span class="lib-cap">
-          <span class="lib-ic t-${it.type}">${L_ICON[it.type]}</span>
-          <span class="lib-txt"><b>${esc(it.title)}</b><span class="lib-meta">${esc(typeOne(it.type))} · ${esc(it.source)}</span></span>
-        </span>
-        <span class="lib-where">${where(it)}</span>
-        <span class="lib-when">${it.edited - it.created > 1000 ? 'Edited' : 'Created'} ${esc(fmtAgo(it.edited))}<small>Last activity: ${esc(a.l.toLowerCase())} ${esc(fmtAgo(a.t))}</small></span>
+  // One row component, reused by Library, Dashboard and Spaces.
+  // Plain row on the page: document thumbnail, title, type · time, context; select / pin / ⋯ appear on hover.
+  const PIN_ICON = svgI('<path d="M15 4.5l4.5 4.5-3 1.5-3.5 3.5.5 4-1.5 1.5-3.5-3.5L4 20l4.5-4.5L5 12l1.5-1.5 4 .5L14 7.5z"/>');
+  const ctxOf = (it) => it.space ? ['space', it.space] : it.course ? ['course', it.course] : ['library', 'Personal Library'];
+  const itemRow = (it) => {
+    const [k, name] = ctxOf(it);
+    const checked = lv.sel && lv.sel.has(it.id);
+    return `<div class="lr${it.pinned ? ' pinned' : ''}${checked ? ' selected' : ''}" role="listitem" data-id="${it.id}">
+      <label class="lr-check"><input type="checkbox" data-sel="${it.id}"${checked ? ' checked' : ''} aria-label="Select ${esc(it.title)}"><span></span></label>
+      <button type="button" class="lib-open" data-id="${it.id}">
+        <span class="lr-thumb" aria-hidden="true"><b>${esc(it.title)}</b>${esc(previewOf(it).slice(0, 110))}<i class="lib-ic t-${it.type}">${L_ICON[it.type]}</i></span>
+        <span class="lr-txt"><b>${esc(it.title)}</b><span>${esc(typeOne(it.type))} · ${esc(fmtAgo(it.edited))}</span></span>
+        <span class="lr-ctx"><i class="ctx-${k}">${esc(name.charAt(0))}</i><span>${esc(name)}</span></span>
       </button>
-      <button type="button" class="nav-btn sm lib-go" data-id="${it.id}" tabindex="-1" aria-hidden="true">Open</button>
+      <div class="lr-acts">
+        <button type="button" class="lr-pin" data-pin="${it.id}" aria-pressed="${!!it.pinned}" aria-label="${it.pinned ? 'Unpin' : 'Pin'} ${esc(it.title)}" title="${it.pinned ? 'Unpin' : 'Pin'}">${PIN_ICON}</button>
+        <div class="lib-more"><button type="button" class="lib-menu-btn lr-more" data-more="${it.id}" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for ${esc(it.title)}">${L_ICON.dots}</button></div>
+      </div>
     </div>`;
   };
-  const emptyState = () => {
-    if (!lib.length) {
-      return `<div class="lib-empty">${L_ICON.lesson}<b>Your Library is empty</b><span>Save notes, quizzes, flashcards and study sessions from Study. They'll wait for you here.</span><button type="button" class="nav-btn primary" data-empty="study">Go to Study</button></div>`;
+  // Courses and Spaces organize the content; Most recent gives quick access.
+  const GROUP_LIMIT = 3, RECENT_LIMIT = 5;
+  const expanded = new Set();
+  const moreBtnFor = (key, n, limit) => n > limit ? `<button type="button" class="link-btn ov-more" data-expand="${esc(key)}">${expanded.has(key) ? 'Show less' : `Show all ${n}`}</button>` : '';
+  const rowsFor = (key, items, limit) => `<div class="ov-rows" role="list">${(expanded.has(key) ? items : items.slice(0, limit)).map(it => itemRow(it)).join('')}</div>${moreBtnFor(key, items.length, limit)}`;
+  const groupBlock = (key, title, items, tone, icon) => `<div class="ov-group">
+      <div class="ov-ghead"><span class="dic ${tone}">${icon}</span><b>${esc(title)}</b><span class="ov-n">${items.length} saved</span></div>
+      ${rowsFor(key, items, GROUP_LIMIT)}</div>`;
+  const byEdited = (a, b) => b.edited - a.edited;
+  // Tabs filter by type; search matches title, content, course, Space, source and type.
+  // "All" with no search shows the organized sections; anything else shows one flat result list.
+  const TABS = [['recent', 'All'], ['note', 'Notes'], ['quiz', 'Quizzes'], ['flashcards', 'Flashcards'], ['session', 'Sessions'], ['document', 'Documents']];
+  const renderOverview = () => {
+    const q = lv.q.trim().toLowerCase();
+    lv.sel = lv.sel || new Set();
+    [...lv.sel].forEach(id => { if (!getItem(id)) lv.sel.delete(id); });
+    $('#libOverview').classList.toggle('selecting', lv.sel.size > 0);
+    $('#selBar').hidden = !lv.sel.size;
+    $('#selBar').innerHTML = lv.sel.size ? `<span>${lv.sel.size} selected</span><button type="button" data-bulk="pin">Pin</button><button type="button" class="del" data-bulk="delete">Delete</button><button type="button" data-bulk="clear">Clear</button>` : '';
+    const pinned = lib.filter(x => x.pinned).sort(byEdited);
+    $('#secPinnedWrap').hidden = !pinned.length;
+    $('#secPinned').innerHTML = pinned.length ? `<div class="ov-rows" role="list">${pinned.map(it => itemRow(it)).join('')}</div>` : '';
+    $('#libTabs').innerHTML = TABS.map(([k, l]) => {
+      const n = lib.filter(i => inGroup(i, k)).length;
+      return `<button type="button" class="ov-tab" data-tab="${k}" aria-pressed="${lv.cat === k}">${l}<span class="n" aria-label="${n} items">${n}</span></button>`;
+    }).join('');
+    const filteredMode = lv.cat !== 'recent' || q;
+    $('#ovSections').hidden = !!filteredMode;
+    $('#ovResults').hidden = !filteredMode;
+    if (filteredMode) {
+      const items = lib.filter(it => inGroup(it, lv.cat) &&
+        (!q || [it.title, it.body, it.course, it.space, it.source, typeOne(it.type)].join(' ').toLowerCase().includes(q)))
+        .sort((a, b) => lastAct(b).t - lastAct(a).t);
+      const label = TABS.find(([k]) => k === lv.cat)[1];
+      $('#hResults').textContent = q ? `${items.length} result${items.length === 1 ? '' : 's'} for “${lv.q.trim()}”${lv.cat !== 'recent' ? ` in ${label}` : ''}` : `${label} · ${items.length}`;
+      $('#resultsBody').innerHTML = items.length ? `<div class="ov-rows" role="list">${items.map(it => itemRow(it)).join('')}</div>`
+        : `<div class="ov-empty">${q ? `Nothing matches “${esc(lv.q.trim())}”. Try another word.` : `No ${label.toLowerCase()} saved yet. Create them in Study, then select Save.`}<button type="button" class="nav-btn sm" data-empty="clear">${q ? 'Clear search' : 'Show all'}</button></div>`;
     }
-    if (hasFilters()) {
-      const q = lv.q.trim();
-      return `<div class="lib-empty">${SEARCH_ICON}<b>${q ? `No results for “${esc(q)}”` : 'Nothing matches these filters'}</b><span>Try another word, or clear the search and filters.</span><button type="button" class="nav-btn" data-empty="clear">Clear search and filters</button></div>`;
-    }
-    const g = groupOf(lv.cat);
-    return `<div class="lib-empty">${g.icon || L_ICON[g.key]}<b>No ${g.label.toLowerCase()} saved yet</b><span>Create them in Study, then select Save.</span><button type="button" class="nav-btn primary" data-empty="study">Go to Study</button></div>`;
-  };
-  const renderList = () => {
-    const items = filtered(), list = $('#libList');
-    $('#libCount').textContent = `${items.length} item${items.length === 1 ? '' : 's'}`;
-    list.innerHTML = items.length ? items.map(it => itemRow(it, lv.open === it.id)).join('') : emptyState();
+    const cg = COURSES.map(c => [c, lib.filter(x => x.course === c).sort(byEdited)]).filter(([, a]) => a.length);
+    const sg = SPACES.map(sp => [sp, lib.filter(x => x.space === sp).sort(byEdited)]).filter(([, a]) => a.length);
+    const recent = [...lib].sort((a, b) => lastAct(b).t - lastAct(a).t);
+    $('#libCount').textContent = lib.length ? `${lib.length} saved item${lib.length === 1 ? '' : 's'}, organized by course and Space.` : 'Nothing saved yet.';
+    $('#secCourses').innerHTML = cg.length ? cg.map(([c, a]) => groupBlock('c:' + c, c, a, 't-lesson', L_ICON.lesson)).join('')
+      : '<div class="ov-empty">Nothing saved from your courses yet.</div>';
+    $('#secSpaces').innerHTML = sg.length ? sg.map(([sp, a]) => groupBlock('s:' + sp, sp, a, 't-session', L_ICON.space)).join('')
+      : '<div class="ov-empty">Nothing in a Space yet. Open an item and choose ⋯ › Add to Space.</div>';
+    $('#secRecent').innerHTML = recent.length ? rowsFor('recent', recent, RECENT_LIMIT)
+      : '<div class="ov-empty">Save notes, quizzes, flashcards or sessions from Study and they’ll appear here.<button type="button" class="nav-btn sm primary" data-empty="study">Go to Study</button></div>';
   };
   const menuFor = (it) => [
     !it.payload && ['edit', 'Edit note'],
@@ -3273,45 +3508,59 @@ Want me to quiz you on this or turn it into flashcards?` };
     ['share', 'Share'],
     ['delete', 'Delete'],
   ].filter(Boolean);
+  // Two states: a narrow drawer (summary + "Open …" + ⋯) next to the list, and a full reader once opened.
+  const OPEN_LABEL = { quiz: 'Open quiz', flashcards: 'Open flashcards', session: 'Open session', tutorme: 'Open session', code: 'Open code', document: 'Open document', lesson: 'Open lesson', video: 'Open video notes' };
+  const previewOf = (it) => (it.payload?.kind === 'quiz' ? `${it.payload.data.questions.length} questions · ${it.payload.data.questions.map(q => q.q).slice(0, 2).join(' · ')}`
+    : it.payload?.kind === 'flash' ? `${it.payload.data.cards.length} cards · ${it.payload.data.cards.map(c => c.q).slice(0, 2).join(' · ')}`
+    : it.payload?.kind === 'code' ? it.payload.code
+    : String(it.body || '')).replace(/\[([^\]]+)\]\([^)]*\)/g, '$1').replace(/[#*`>]/g, '').replace(/\s+/g, ' ').trim().slice(0, 220);
+  const moreBtn = `<div class="lib-more"><button type="button" class="lib-menu-btn" id="dMore" aria-haspopup="menu" aria-expanded="false" aria-label="More actions">${L_ICON.dots}</button></div>`;
   const renderDetail = () => {
-    const det = $('#libDetail'), main = $('#libMain');
+    const det = $('#libDetail');
     const it = lv.open && getItem(lv.open);
-    if (!it) { det.hidden = true; main.classList.remove('has-detail'); det.innerHTML = ''; det.dataset.id = ''; return; }
+    $('#libOverview').hidden = !!it;
+    if (!it) { det.hidden = true; det.innerHTML = ''; det.dataset.id = ''; return; }
     const sig = `${it.edited}|${it.title}|${it.space}`;
-    if (!det.hidden && det.dataset.id === it.id && det.dataset.sig === sig) { $('#dLast') && ($('#dLast').textContent = `${lastAct(it).l} · ${fmtFull(lastAct(it).t)}`); return; }
+    if (!det.hidden && det.dataset.id === it.id && det.dataset.sig === sig) return;
     det.dataset.id = it.id; det.dataset.sig = sig;
-    det.hidden = false; main.classList.add('has-detail');
+    det.hidden = false;
+    const typeTag = `<span class="d-type"><span class="lib-ic t-${it.type}">${L_ICON[it.type]}</span>${esc(typeOne(it.type))}</span>`;
     det.innerHTML = `
-      <div class="d-top"><span class="d-type"><span class="lib-ic t-${it.type}">${L_ICON[it.type]}</span>${esc(typeOne(it.type))}</span>
-        <div class="d-top-r">
-          <div class="lib-more"><button type="button" class="lib-menu-btn" id="dMore" aria-haspopup="menu" aria-expanded="false" aria-label="More actions">${L_ICON.dots}</button></div>
-          <button type="button" class="m-x d-close" aria-label="Close"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-        </div></div>
-      <h2 class="d-title" tabindex="-1">${esc(it.title)}</h2>
-      <dl class="d-meta">
-        <dt>Type</dt><dd>${esc(typeOne(it.type))}</dd>
-        <dt>Source</dt><dd>${esc(it.source)}${it.session ? ` · ${esc(it.session)}` : ''}</dd>
-        <dt>Course / Space</dt><dd>${esc(assoc(it))}</dd>
-        <dt>Created</dt><dd>${esc(fmtFull(it.created))}</dd>
-        <dt>Last edited</dt><dd>${esc(fmtFull(it.edited))}</dd>
-        <dt>Last activity</dt><dd id="dLast">${esc(lastAct(it).l)} · ${esc(fmtFull(lastAct(it).t))}</dd>
-      </dl>
+      <div class="d-top"><button type="button" class="link-btn d-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to Library</button>${moreBtn}</div>
+      <div class="d-read-head">${typeTag}<h2 class="d-title" tabindex="-1">${esc(it.title)}</h2>
+        <p class="lib-count">${esc(it.source)} · ${esc(it.space || it.course || 'Personal Library')} · Edited ${esc(fmtAgo(it.edited))}</p></div>
       <div class="d-body"></div>`;
     const body = $('.d-body', det);
     if (it.payload?.kind === 'quiz') body.appendChild(buildQuiz(it.payload.data));
     else if (it.payload?.kind === 'flash') body.appendChild(buildFlash(it.payload.data, it.payload.topic || ''));
     else if (it.payload?.kind === 'code') body.innerHTML = codeBlock(it.payload.code, it.payload.lang);
     else body.innerHTML = `<div class="body">${it.body ? render(it.body) : '<p style="color:#5d6576">This note is empty. Open the ⋯ menu and choose Edit note.</p>'}</div>`;
-    det.scrollTop = 0;
+    $('#library').scrollTop = 0;
   };
-  function renderLibrary() { renderCats(); renderList(); renderDetail(); renderSaved(); }
+  // Breadcrumb: Student / Courses / Library (/ item when one is open)
+  const renderCrumbs = () => {
+    const it = lv.open && getItem(lv.open);
+    const parts = [['Student', 'dashboard'], ['Courses', 'courses'], ['Library', it ? 'library' : null]];
+    if (it) parts.push([clip(it.title, 48), null]);
+    $('#libCrumbs').innerHTML = parts.map(([label, go], i) => {
+      const last = i === parts.length - 1;
+      return (last ? `<span aria-current="page">${esc(label)}</span>` : `<button type="button" class="crumb" data-crumb="${go}">${esc(label)}</button>`) + (last ? '' : '<span class="sep" aria-hidden="true">/</span>');
+    }).join('');
+  };
+  function renderLibrary() { renderOverview(); renderDetail(); renderSaved(); renderCrumbs(); renderIChat(); $('#homeLibCount').textContent = lib.length || ''; }
+  $('#libCrumbs').addEventListener('click', (e) => {
+    const c = e.target.closest('[data-crumb]');
+    if (!c) return;
+    const go = c.dataset.crumb;
+    if (go === 'library') { lv.open = null; renderLibrary(); }
+    else if (go === 'dashboard') showView('dashboard');
+    else toast('Courses — coming soon');
+  });
   function openItem(id) {
     const it = getItem(id);
     if (!it) return;
-    it.act = { t: Date.now(), l: 'Opened' };
-    persist();
+    it.act = { t: Date.now(), l: 'Opened' }; persist();
     lv.open = id;
-    if (!inGroup(it, lv.cat)) lv.cat = 'recent';
     renderLibrary();
     $('#libDetail .d-title')?.focus({ preventScroll: true });
   }
@@ -3429,14 +3678,59 @@ Want me to quiz you on this or turn it into flashcards?` };
   });
 
   // Library interactions
-  $('#libList').addEventListener('click', (e) => {
+  $('#libTabs').addEventListener('click', (e) => {
+    const t = e.target.closest('[data-tab]');
+    if (!t) return;
+    lv.cat = t.dataset.tab; renderOverview();
+    $(`#libTabs [data-tab="${lv.cat}"]`)?.focus();
+  });
+  $('#libTabs').addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const i = TABS.findIndex(([k]) => k === lv.cat), n = (i + (e.key === 'ArrowRight' ? 1 : -1) + TABS.length) % TABS.length;
+    lv.cat = TABS[n][0]; renderOverview(); $(`#libTabs [data-tab="${lv.cat}"]`)?.focus();
+  });
+  $('#libSearch').addEventListener('input', (e) => { lv.q = e.target.value; renderOverview(); });
+  $('#libSearch').addEventListener('keydown', (e) => { if (e.key === 'Escape' && lv.q) { e.stopPropagation(); lv.q = ''; e.target.value = ''; renderOverview(); } });
+  $('#libOverview').addEventListener('change', (e) => {
+    const c = e.target.closest('input[data-sel]');
+    if (!c) return;
+    c.checked ? lv.sel.add(c.dataset.sel) : lv.sel.delete(c.dataset.sel);
+    renderOverview();
+    $(`#libOverview input[data-sel="${c.dataset.sel}"]`)?.focus();
+  });
+  $('#libOverview').addEventListener('click', (e) => {
+    const pin = e.target.closest('[data-pin]');
+    if (pin) {
+      const it = getItem(pin.dataset.pin);
+      it.pinned = !it.pinned; persist(); renderOverview();
+      toast(it.pinned ? 'Pinned to the top of your Library' : 'Unpinned');
+      return;
+    }
+    const mb = e.target.closest('[data-more]');
+    if (mb) { const id = mb.dataset.more; openMenuFor(mb, menuFor(getItem(id)), (a) => doAction(a, id)); return; }
+    const bulk = e.target.closest('[data-bulk]');
+    if (bulk) {
+      const ids = [...lv.sel];
+      if (bulk.dataset.bulk === 'clear') { lv.sel.clear(); renderOverview(); return; }
+      if (bulk.dataset.bulk === 'pin') { ids.forEach(id => { getItem(id).pinned = true; }); lv.sel.clear(); persist(); renderOverview(); toast(`Pinned ${ids.length} item${ids.length === 1 ? '' : 's'}`); return; }
+      openModal({
+        title: `Delete ${ids.length} item${ids.length === 1 ? '' : 's'}?`,
+        sub: `This will remove ${ids.length === 1 ? 'the item' : 'them'} from your Library. This can't be undone.`,
+        buttons: [{ label: 'Cancel' }, { label: 'Delete', kind: 'danger', onClick: () => {
+          lib = lib.filter(x => !lv.sel.has(x.id)); lv.sel.clear(); persist(); renderLibrary(); toast('Deleted');
+        } }],
+      });
+      return;
+    }
+    const x = e.target.closest('[data-expand]');
+    if (x) { const k = x.dataset.expand; expanded.has(k) ? expanded.delete(k) : expanded.add(k); renderOverview(); return; }
     const o = e.target.closest('.lib-open, .lib-go');
     if (o) openItem(o.dataset.id);
   });
   $('#libDetail').addEventListener('click', (e) => {
-    if (e.target.closest('.d-close')) {
+    if (e.target.closest('[data-act="back"]')) {
       const id = lv.open; lv.open = null; renderLibrary();
-      $(`.lib-open[data-id="${id}"]`)?.focus();
+      $(`#libOverview .lib-open[data-id="${id}"]`)?.focus();
       return;
     }
     const more = e.target.closest('#dMore');
@@ -3446,24 +3740,6 @@ Want me to quiz you on this or turn it into flashcards?` };
     if (b.dataset.act === 'save-edit') { const it = getItem(lv.open); it.body = $('#dEdit').value; touch(it, 'Edited'); toast('Note saved'); return; }
     $('#libDetail').dataset.sig = ''; renderDetail();
   });
-  $('#libCats').addEventListener('click', (e) => {
-    const c = e.target.closest('.lib-cat');
-    if (!c) return;
-    lv.cat = c.dataset.cat; renderCats(); renderList();
-    $(`.lib-cat[data-cat="${lv.cat}"]`)?.focus();
-  });
-  $('#libSearch').addEventListener('input', (e) => { lv.q = e.target.value; renderList(); });
-  $('#libCourse').addEventListener('change', (e) => { lv.course = e.target.value; renderList(); });
-  $('#libSpace').addEventListener('change', (e) => { lv.space = e.target.value; renderList(); });
-  $('#libSort').addEventListener('change', (e) => { lv.sort = e.target.value; renderList(); });
-  $('#libNewNote').addEventListener('click', () => {
-    const t = Date.now();
-    const it = { id: uidLib(), type: 'note', title: 'Untitled note', body: '', source: 'Manual entry', created: t, edited: t, act: { t, l: 'Created' }, session: '', tags: [], course: '', space: '', payload: null, dest: { kind: 'library' } };
-    lib.unshift(it); persist();
-    lv.cat = 'recent'; openItem(it.id); editItem(it.id);
-  });
-  $('#libToStudy').addEventListener('click', () => { showView('study'); prompt.focus(); });
-
   // ---------- Dashboard: Recent saved work ----------
   const renderDashboard = () => {
     const items = [...lib].sort((a, b) => lastAct(b).t - lastAct(a).t).slice(0, 5);
@@ -3481,7 +3757,7 @@ Want me to quiz you on this or turn it into flashcards?` };
       : `<div class="lib-empty">${L_ICON.space}<b>No saved materials in this Space yet</b><span>Open an item in your Library, then choose ⋯ › Add to Space.</span><button type="button" class="nav-btn" data-go="library">Open Library</button></div>`;
   };
   $('#spaceList').addEventListener('click', (e) => { const c = e.target.closest('[data-space]'); if (c) { curSpace = c.dataset.space; renderSpaces(); } });
-  $('#spaceToLib').addEventListener('click', () => { lv.space = curSpace; lv.cat = 'recent'; fillFilters(); showView('library'); });
+  $('#spaceToLib').addEventListener('click', () => { showView('library'); expanded.add('s:' + curSpace); renderOverview(); $('#secSpacesWrap').scrollIntoView?.({ block: 'start' }); });
   ['#dashRecent', '#spaceSaved'].forEach(sel => $(sel).addEventListener('click', (e) => {
     const o = e.target.closest('.lib-open, .lib-go');
     if (o) { showView('library'); openItem(o.dataset.id); }
@@ -3494,11 +3770,87 @@ Want me to quiz you on this or turn it into flashcards?` };
     const em = e.target.closest('[data-empty]');
     if (!em) return;
     if (em.dataset.empty === 'study') { showView('study'); prompt.focus(); }
-    if (em.dataset.empty === 'clear') { lv.q = ''; lv.course = ''; lv.space = ''; $('#libSearch').value = ''; fillFilters(); renderList(); }
+    if (em.dataset.empty === 'clear') { if (lv.q) { lv.q = ''; $('#libSearch').value = ''; } else lv.cat = 'recent'; renderOverview(); }
   });
 
+  // ---------- Ask Aurora about the open item (docked chat) ----------
+  // Answers are built from the item itself (no model is connected), so they stay on-topic.
+  const ichat = { open: true, busy: false, convo: {}, forId: null };
+  const typeWord = (it) => ({ flashcards: 'flashcard set', quiz: 'quiz', session: 'session', tutorme: 'session', code: 'code', document: 'document' }[it.type] || 'note');
+  const IC_CHIPS = ['Summarize this', 'Quiz me on this', 'Explain the key idea', 'What should I review next?'];
+  const pointsOf = (it) => it.payload?.kind === 'quiz' ? it.payload.data.questions.map(x => x.q)
+    : it.payload?.kind === 'flash' ? it.payload.data.cards.map(c => `**${c.q}** ${c.a}`)
+    : previewOf(it).split(/(?<=[.!?])\s+/).filter(x => x.length > 20);
+  const icReply = (it, q) => {
+    const s = q.toLowerCase(), t = it.title, pts = pointsOf(it);
+    if (/summar|tl;?dr|overview/.test(s)) return `Here's a short summary of **${t}**:\n\n${pts.slice(0, 3).map(p => `- ${p}`).join('\n') || '- There isn\'t much in this item yet.'}\n\nWant it as flashcards? Use ⋯ › Create flashcards.`;
+    if (/quiz|test me|question/.test(s)) {
+      const qs = it.payload?.kind === 'quiz' ? it.payload.data.questions.slice(0, 3).map(x => x.q)
+        : it.payload?.kind === 'flash' ? it.payload.data.cards.slice(0, 3).map(c => c.q)
+        : [`In your own words, what is the main idea of “${t}”?`, `Which example would you use to explain it to a classmate?`, `What's one part you're still unsure about?`];
+      return `Let's check what stuck. Answer these from memory:\n\n${qs.map((x, i) => `${i + 1}. ${x}`).join('\n')}\n\nReply with your answers and I'll give feedback.`;
+    }
+    if (/explain|key idea|main idea|simpl/.test(s)) return `The key idea in **${t}**: ${pts[0] ? pts[0].replace(/\*\*/g, '') : "there isn't much content yet."}\n\nStart from that one point, then connect each detail back to it.`;
+    if (/review|next|plan/.test(s)) return `For **${t}**, I'd review in this order:\n\n1. Re-read the key points (5 min)\n2. Answer three questions from memory\n3. Revisit anything you missed tomorrow\n\nSay “quiz me” to start step 2.`;
+    return `Here's how that connects to **${t}**:\n\n${pts.slice(0, 2).map(p => `- ${p}`).join('\n') || '- This item is still empty.'}\n\nI can also summarize it, quiz you, or explain the key idea.`;
+  };
+  const icDraw = (it) => {
+    const msgs = ichat.convo[it.id] || [];
+    $('#icThread').innerHTML = msgs.length
+      ? msgs.map(m => m.me ? `<div class="ic-me">${esc(m.t)}</div>` : `<div class="ic-ai body">${render(m.t)}</div>`).join('')
+      : `<div class="ic-hello"><img src="assets/aurora-orb.png" alt=""><p>Ask me anything about <b>${esc(it.title)}</b>.</p><div class="ic-chips">${IC_CHIPS.map(c => `<button type="button" class="ic-chip" data-ask="${esc(c)}">${esc(c)}</button>`).join('')}</div></div>`;
+    $('#icThread').scrollTop = $('#icThread').scrollHeight;
+  };
+  function renderIChat() {
+    const it = currentView === 'library' && lv.open && getItem(lv.open);
+    $('#iChat').hidden = !it || !ichat.open;
+    $('#icPill').hidden = !it || ichat.open;
+    document.body.classList.toggle('ichat-open', !!it && ichat.open);
+    if (!it) return;
+    $('#icTitle').textContent = it.title;
+    $('#icInput').placeholder = `Ask Aurora about this ${typeWord(it)}`;
+    $('#icPill span').textContent = `Ask Aurora about this ${typeWord(it)}`;
+    if (ichat.forId !== it.id) { ichat.forId = it.id; icDraw(it); }
+  }
+  const icStream = (el, md) => new Promise(res => {
+    let n = 0;
+    const th = $('#icThread');
+    const tick = () => {
+      n = Math.min(md.length, n + 4 + Math.floor(Math.random() * 6));
+      el.innerHTML = render(md.slice(0, n));
+      th.scrollTop = th.scrollHeight;
+      if (n < md.length) setTimeout(tick, 16); else res();
+    };
+    tick();
+  });
+  const icAsk = async (q) => {
+    const it = lv.open && getItem(lv.open);
+    q = (q || '').trim();
+    if (!it || ichat.busy || !q) return;
+    const msgs = ichat.convo[it.id] = ichat.convo[it.id] || [];
+    msgs.push({ me: true, t: q });
+    icDraw(it);
+    ichat.busy = true; $('#iChat').classList.add('busy'); $('#icSend').disabled = true; $('#icThread').setAttribute('aria-busy', 'true');
+    $('#icThread').insertAdjacentHTML('beforeend', WORKING('Thinking…'));
+    $('#icThread').scrollTop = $('#icThread').scrollHeight;
+    await wait(700);
+    const md = icReply(it, q);
+    $('#icThread .working')?.remove();
+    const el = document.createElement('div');
+    el.className = 'ic-ai body';
+    $('#icThread').appendChild(el);
+    await icStream(el, md);
+    msgs.push({ me: false, t: md });
+    ichat.busy = false; $('#iChat').classList.remove('busy'); $('#icSend').disabled = false; $('#icThread').removeAttribute('aria-busy');
+    it.act = { t: Date.now(), l: 'Asked Aurora' }; persist();
+  };
+  $('#icForm').addEventListener('submit', (e) => { e.preventDefault(); const v = $('#icInput').value; $('#icInput').value = ''; icAsk(v); });
+  $('#icThread').addEventListener('click', (e) => { const c = e.target.closest('[data-ask]'); if (c) icAsk(c.dataset.ask); });
+  $('#icMin').addEventListener('click', () => { ichat.open = false; renderIChat(); $('#icPill').focus(); });
+  $('#icPill').addEventListener('click', () => { ichat.open = true; renderIChat(); $('#icInput').focus(); });
+  $('#iChat .ic-mic').addEventListener('click', () => toast('Voice works in Study › Voice mode'));
+
   loadLib();
-  fillFilters();
   renderLibrary();
 })();
 </script>
