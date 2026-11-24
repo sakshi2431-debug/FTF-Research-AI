@@ -412,7 +412,6 @@
   body.voice .composer { order: 2; display: flex; align-items: center; gap: 10px; padding: 12px 14px 12px 16px; border-radius: 999px; }
   body.voice .row.chat, body.voice .right-tools { display: contents; }
   body.voice #attachBtn { order: -1; }
-  body.voice #saveSession { display: none; }
   body.voice .composer textarea { order: 0; flex: 1; min-width: 0; font-size: var(--fs-16); }
   body.voice .source-wrap { order: 1; }
   body.voice #micBtn, body.voice #sendChat, body.voice .attachments { display: none; }
@@ -461,6 +460,65 @@
   .space-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: #fff; border: 1px solid #e6e9f0; border-radius: 20px; text-align: left; transition: border-color .15s, box-shadow .15s; }
   .space-card:hover { border-color: #c6d2e8; }
   .space-card[aria-pressed="true"] { border-color: var(--blue); background: #f5f9ff; box-shadow: 0 0 0 1px var(--blue) inset; }
+  /* Chats: they live where they started (Study or a Space), never in the Library */
+  .msg.ctx-intro .body p { color: #4a5263; }
+  /* Left chat navigation (Study only). Study chats by date; Space chats stay in their Space. */
+  .chat-nav {
+    display: none; position: absolute; z-index: 5; left: 0; top: 106px; width: var(--nav-w, 320px); height: calc(var(--ch, 1380px) - 106px);
+    flex-direction: column; gap: 14px; padding: 18px 16px 24px 28px; background: #fff; border-right: 1px solid #eceef1;
+  }
+  body:not(.view-library):not(.view-dashboard):not(.view-spaces) .chat-nav { display: flex; }
+  .cn-head { display: flex; align-items: center; gap: 8px; }
+  .cn-toggle { flex: none; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center; color: #4a5263; }
+  .cn-toggle:hover, .cn-new:hover { background: #f1f2f4; }
+  .cn-toggle svg { width: 24px; height: 24px; }
+  .cn-new { flex: 1; min-width: 0; height: 48px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border-radius: 12px; font-size: var(--fs-16); font-weight: 500; color: #111827; text-align: left; }
+  .cn-new svg { flex: none; width: 22px; height: 22px; color: var(--blue); }
+  .cn-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; }
+  .cn-search { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border: 1px solid #8a94a6; border-radius: 12px; color: #5d6576; }
+  .cn-search svg { flex: none; width: 20px; height: 20px; }
+  .cn-search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: inherit; font-size: var(--fs-14); color: #111827; }
+  .cn-search:focus-within { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(21, 112, 239, .18); }
+  .cn-list { flex: 1; min-height: 0; overflow-y: auto; margin-right: -8px; padding-right: 8px; scrollbar-width: thin; scrollbar-color: #d5d9e4 transparent; }
+  .cn-group + .cn-group { margin-top: 18px; }
+  .cn-h { margin: 0 0 6px; padding: 0 12px; font-size: var(--fs-13); font-weight: 600; color: #4a5263; }
+  .cn-group ul { list-style: none; margin: 0; padding: 0; }
+  .cn-item { position: relative; display: flex; align-items: center; border-radius: 12px; }
+  .cn-item:hover, .cn-item:focus-within { background: #f1f2f4; }
+  .cn-item.active { background: #eff4ff; }
+  .cn-row { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border-radius: 12px; text-align: left; font-size: var(--fs-14); color: #1f2937; }
+  .cn-item.active .cn-row { color: #175CD3; font-weight: 600; }
+  .cn-ic { flex: none; width: 20px; height: 20px; display: grid; place-items: center; color: #1f2937; }
+  .cn-ic svg { width: 18px; height: 18px; }
+  .cn-item.active .cn-ic { color: #175CD3; }
+  .cn-t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cn-badge { flex: none; padding: 2px 8px; border-radius: 999px; background: #f4f3ff; color: #5925dc; font-size: var(--fs-12, 12px); font-weight: 500; }
+  .cn-n { flex: none; min-width: 26px; padding: 1px 8px; border-radius: 999px; background: #f2f4f7; color: #4a5263; font-size: var(--fs-12, 12px); text-align: center; }
+  .cn-row .dic { width: 28px; height: 28px; border-radius: 8px; }
+  .cn-row .dic svg { width: 16px; height: 16px; }
+  .cn-item .lib-more { padding-right: 4px; }
+  .cn-more { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; color: #4a5263; opacity: 0; }
+  .cn-more svg { width: 20px; height: 20px; }
+  .cn-item:hover .cn-more, .cn-item:focus-within .cn-more, .cn-more[aria-expanded="true"] { opacity: 1; }
+  .cn-more:hover { background: #e4e7ec; }
+  .cn-empty { padding: 8px 12px; font-size: var(--fs-14); color: #5d6576; }
+  /* collapsed: a slim rail with expand + new chat */
+  body.cn-collapsed .chat-nav { padding: 18px 14px; }
+  body.cn-collapsed .cn-head { flex-direction: column; }
+  body.cn-collapsed .cn-body, body.cn-collapsed .cn-new span { display: none; }
+  body.cn-collapsed .cn-new { flex: none; width: 48px; padding: 0; justify-content: center; }
+  /* room for the sidebar: home stays centered in the space to its right, chat starts after it */
+  main { position: relative; left: calc(var(--nav-w, 320px) / 2); }
+  body.chatting main { left: 0; padding-left: calc(var(--nav-w, 320px) + 24px); }
+  body.view-library main, body.view-dashboard main, body.view-spaces main { left: 0; }
+  /* Spaces: Materials, All Chats, Notes, Quizzes, Flashcards, TutorMe */
+  .pc-actions { display: flex; align-items: center; gap: 8px; }
+  .pc-actions .nav-btn svg { width: 20px; height: 20px; }
+  .ov-tabs.sp-tabs { margin: 2px 0 10px; }
+  .lr .sp-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 24px; padding: 16px 12px 16px 30px; text-align: left; border-radius: 18px; }
+  .sp-ic { flex: none; width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; border: 1px solid transparent; }
+  .sp-ic svg { width: 22px; height: 22px; }
+  .lr-ctx.sp-meta { width: 220px; }
   /* account menu (Library lives here, not in the primary nav) */
   .util { position: relative; }
   .util .lib-menu { right: 0; top: calc(100% + 8px); min-width: 180px; }
@@ -1304,6 +1362,17 @@
   </div>
 </header>
 
+<nav class="chat-nav" id="chatNav" aria-label="Chats">
+  <div class="cn-head">
+    <button type="button" class="cn-toggle" id="cnToggle" aria-expanded="true" aria-controls="cnBody" aria-label="Collapse chat list" title="Collapse"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg></button>
+    <button type="button" class="cn-new" id="cnNew" title="New chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>New chat</span></button>
+  </div>
+  <div class="cn-body" id="cnBody">
+    <label class="cn-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="cnSearch" placeholder="Search chats" aria-label="Search chats" autocomplete="off"></label>
+    <div class="cn-list" id="cnList"></div>
+  </div>
+</nav>
+
 <main>
   <div class="home-head">
     <div>
@@ -1431,7 +1500,7 @@
     </button>
     <div class="banner" id="banner">
       <b>New</b>
-      <span>Save notes, sessions, quizzes, and flashcards to your Library.</span>
+      <span>Save notes, quizzes and flashcards from any chat to your Library.</span>
       <button class="close" id="closeBanner" aria-label="Dismiss">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -1453,7 +1522,6 @@
         <button type="button" class="icon-btn" id="attachBtn" aria-label="Attach files">
           <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         </button>
-        <button type="button" class="save-session" id="saveSession"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M9 14h6M12 11v6"/></svg><span>Save session</span></button>
         <input type="file" id="fileInput" multiple hidden accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.md,.csv,.xls,.xlsx,image/*" />
         <div class="right-tools">
           <div class="source-wrap">
@@ -1561,8 +1629,10 @@
   <div class="page-head"><h1 id="spacesTitle">Spaces</h1><p class="lib-count">Organize your learning around a course, topic or project.</p></div>
   <div class="spaces-grid" id="spaceList" role="group" aria-label="Your Spaces"></div>
   <div class="panel-card grow">
-    <div class="pc-head"><div><h2>Saved materials</h2><p class="lib-count" id="spaceSub"></p></div><button type="button" class="link-btn" id="spaceToLib">Open in Library</button></div>
-    <div class="lib-list" id="spaceSaved" role="list" aria-label="Saved materials"></div>
+    <div class="pc-head"><div><h2 id="spaceName">Space</h2><p class="lib-count" id="spaceSub"></p></div>
+      <div class="pc-actions"><button type="button" class="link-btn" id="spaceToLib">Open in Library</button><button type="button" class="nav-btn sm primary" id="spaceNewChat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>New chat</span></button></div></div>
+    <div class="ov-tabs sp-tabs" id="spaceTabs" role="group" aria-label="Space sections"></div>
+    <div class="lib-list" id="spaceSaved" role="list" aria-label="Space contents"></div>
   </div>
 </section>
 
@@ -1602,6 +1672,9 @@
   // the window, so it never scrolls.
   const BASE_S = 0.84, MIN_S = 0.8;
   let S = BASE_S;
+  // Chat sidebar width in canvas px (a slim rail when collapsed).
+  let homeH = 1380; // last measured height of the Study home content (canvas px)
+  const navW = () => document.body.classList.contains('cn-collapsed') ? 76 : 320;
   const fit = () => {
     const w = window.innerWidth, h = window.innerHeight, b = document.body.classList;
     const home = !['chatting', 'view-library', 'view-dashboard', 'view-spaces'].some(c => b.contains(c));
@@ -1611,20 +1684,22 @@
     if (home) {
       // Fit the actual content (not a fixed 1380px), so there's no empty band under the input box.
       const main = $('main');
-      const contentH = main.offsetHeight ? main.offsetTop + main.scrollHeight + 36 : 1380;
-      stageH = contentH;
-      S = Math.min(h / stageH, w / 1100);
+      if (main.offsetHeight) homeH = main.offsetTop + main.scrollHeight + 36;
+      stageH = homeH;
+      S = Math.min(h / stageH, w / (900 + navW()));
       stage.style.removeProperty('--card-h');
     } else if (b.contains('chatting')) {
       // Study chat never scrolls either: the thread scrolls inside; the page scales down only below ~700 canvas px.
-      S = Math.min(BASE_S, h / 700);
+      // Same scale as the Study home, so switching between them never changes the size of anything.
+      S = Math.min(h / homeH, w / (900 + navW()));
       stageH = h / S;
     } else {
       S = Math.max(MIN_S, Math.min(BASE_S, h / 900));
       stageH = Math.max(h / S, 900);
     }
-    const stageW = Math.max(w / S, 1100);
+    const stageW = Math.max(w / S, (home || b.contains('chatting')) ? 900 + navW() : 1100);
     stage.style.width = stageW + 'px';
+    stage.style.setProperty('--nav-w', navW() + 'px');
     stage.style.height = stageH + 'px';
     stage.style.setProperty('--ch', stageH + 'px');
     stage.style.left = Math.max(0, (w - stageW * S) / 2) + 'px';
@@ -1686,7 +1761,7 @@
   // Tabs
   $$('nav.tabs button').forEach(btn => btn.addEventListener('click', () => {
     const name = btn.textContent.trim();
-    if (name === 'Study') { if (currentView === 'study') exitChat(); else showView('study'); }
+    if (name === 'Study') { if (currentView === 'study') exitChat(true); else showView('study'); }
     else if (name === 'Dashboard') showView('dashboard');
     else if (name === 'Spaces') showView('spaces');
     else toast(`${name} — coming soon`);
@@ -2373,7 +2448,7 @@ Want me to quiz you on this or turn it into flashcards?` };
       <button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button>
       <button type="button" class="act" data-act="regen">${ICON.regen}<span>Regenerate</span></button></div>`);
     ai.dataset.md = outro ? `${md}\n\n${outro}` : md;
-    if (saveToLibrary && !stopFlag) { autoSaveSession(); toastAction('Session saved to your Library', 'View', () => { showView('library'); openItem(session.libId); }); }
+    if (!stopFlag) saveChat();
     setBusy(false);
     updateScrollBtn();
   };
@@ -2844,7 +2919,7 @@ Want me to quiz you on this or turn it into flashcards?` };
         <button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button></div>`);
     }
     keepBottom();
-    if (saveToLibrary) autoSaveSession();
+    saveChat();
     resumeListening();
   };
 
@@ -2929,7 +3004,8 @@ Want me to quiz you on this or turn it into flashcards?` };
   $('#micBtn').addEventListener('click', startVoice);
 
   const enterChat = () => document.body.classList.add('chatting');
-  function exitChat() {
+  function exitChat(stay) {
+    const toSpace = stay !== true && session.ctx.kind === 'space' && session.ctx.name;
     if (vActive) endVoice(true);
     collapseCode();
     stopFlag = true;
@@ -2940,8 +3016,9 @@ Want me to quiz you on this or turn it into flashcards?` };
     setBusy(false);
     scrollDown.classList.remove('show');
     resetSession();
+    if (toSpace) { curSpace = toSpace; showView('spaces'); }
   }
-  $('#back').addEventListener('click', exitChat);
+  $('#back').addEventListener('click', () => exitChat());
 
   const send = async (e) => {
     e && e.preventDefault();
@@ -2980,8 +3057,10 @@ Want me to quiz you on this or turn it into flashcards?` };
   // Icons from the Fuel the Future design system (Figma): play, book-open, help-circle, 2-layers, terminal
   const figI = (p) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
   const L_ICON = {
+    space: figI('<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>'),
+    library: figI('<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>'),
     note: svgI('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>'),
-    session: svgI('<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/>'),
+    session: figI('<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'),
     quiz: figI('<path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13M12 17H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"/>'),
     flashcards: figI('<path d="M2 14.5L12 19.5L22 14.5M12 4.5L2 9.5L12 14.5L22 9.5L12 4.5Z"/>'),
     lesson: figI('<path d="M12 7C12 5.93913 11.5786 4.92172 10.8284 4.17157C10.0783 3.42143 9.06087 3 8 3H2V18H9C9.79565 18 10.5587 18.3161 11.1213 18.8787C11.6839 19.4413 12 20.2044 12 21M12 7V21M12 7C12 5.93913 12.4214 4.92172 13.1716 4.17157C13.9217 3.42143 14.9391 3 16 3H22V18H15C14.2044 18 13.4413 18.3161 12.8787 18.8787C12.3161 19.4413 12 20.2044 12 21"/>'),
@@ -3021,8 +3100,6 @@ Want me to quiz you on this or turn it into flashcards?` };
     return [
       mk({ type: 'note', title: 'Progressive disclosure — key idea', source: 'Aurora response', course: COURSES[2], session: 'UX & Product Design quiz prep', tags: ['ux', 'exam'], created: t - 2 * h, edited: t - h, dest: { kind: 'course', name: COURSES[2] },
         body: '**Progressive disclosure** reveals information and features gradually, only when people need them, to reduce cognitive load.\n\n- Example: an "Advanced settings" section that stays collapsed until opened.\n- Related ideas: recognition over recall, visual hierarchy.' }),
-      mk({ type: 'session', title: 'I want to learn Python development', source: 'Voice session', course: COURSES[1], space: SPACES[2], session: 'I want to learn Python development', tags: ['python', 'voice'], created: t - 26 * h, edited: t - 25 * h, dest: { kind: 'space', name: SPACES[2] },
-        body: "**You:** I want to learn Python development\n\n**Aurora:** Nice. Do you want to start with the theory, or with something you can build right away?\n\n**You:** Can you show me how it looks in VS Code?\n\n**Aurora:** Right. I'll walk you through it. Imagine you've opened VS Code." }),
       mk({ type: 'quiz', title: 'UX & Product Design Quiz', source: 'Aurora response', course: COURSES[2], session: 'UX & Product Design quiz prep', tags: ['quiz', 'ux'], created: t - 3 * DAY, edited: t - 3 * DAY,
         payload: { kind: 'quiz', data: quizFor('') } }),
       mk({ type: 'flashcards', title: 'UX Flashcards', source: 'Aurora response', course: COURSES[2], tags: ['ux'], created: t - 4 * DAY, edited: t - 2 * DAY,
@@ -3032,8 +3109,6 @@ Want me to quiz you on this or turn it into flashcards?` };
         body: '### Passive vs active transport\n\n- **Diffusion** moves molecules down their concentration gradient, with no energy needed.\n- **Active transport** uses ATP to move molecules against the gradient.\n- The sodium-potassium pump moves 3 Na⁺ out and 2 K⁺ in.' }),
       mk({ type: 'document', title: 'Unit 2 study guide.pdf', source: 'Document', course: COURSES[0], tags: ['study guide'], created: t - 9 * DAY, edited: t - 9 * DAY,
         body: 'Uploaded document · 12 pages.\n\n**Aurora summary:** covers cell structure, membranes and transport, with a comparison table on page 3.' }),
-      mk({ type: 'tutorme', title: 'TutorMe: Cellular respiration review', source: 'TutorMe session', course: COURSES[0], session: 'TutorMe review session', tags: ['biology'], created: t - 11 * DAY, edited: t - 11 * DAY,
-        body: '45-minute session.\n\n- Glycolysis happens in the cytoplasm; the Krebs cycle happens in the mitochondria.\n- Practice: write out the ATP yield for each stage before the exam.' }),
       mk({ type: 'note', title: 'Capstone research questions', source: 'Space conversation', space: SPACES[1], tags: ['capstone'], created: t - 12 * DAY, edited: t - 4 * DAY, dest: { kind: 'space', name: SPACES[1] },
         body: '1. Who drops off during onboarding, and when?\n2. Which help content do students open most?\n3. What would make study sessions easier to resume?' }),
       mk({ type: 'note', title: 'Exam checklist', source: 'Manual entry', tags: ['exam'], created: t - 14 * DAY, edited: t - 6 * h, dest: { kind: 'folder', name: 'Exam prep' }, folder: 'Exam prep',
@@ -3041,14 +3116,21 @@ Want me to quiz you on this or turn it into flashcards?` };
     ];
   };
 
-  let lib = [];
+  let lib = [], legacyChats = [];
   const persist = () => { try { localStorage.setItem(STORE_KEY, JSON.stringify({ items: lib, folders: FOLDERS })); } catch { /* storage unavailable */ } };
   const loadLib = () => {
     try {
       const raw = localStorage.getItem(STORE_KEY);
       if (raw) {
         const d = JSON.parse(raw);
-        if (Array.isArray(d.items)) { lib = d.items; if (Array.isArray(d.folders)) FOLDERS = d.folders; return; }
+        if (Array.isArray(d.items)) {
+          // Chats were once saved as Library items. They now stay in Study, so move them out.
+          legacyChats = d.items.filter(x => x.type === 'session');
+          lib = d.items.filter(x => x.type !== 'session' && x.type !== 'tutorme');
+          if (Array.isArray(d.folders)) FOLDERS = d.folders;
+          if (lib.length !== d.items.length) persist();
+          return;
+        }
       }
     } catch { /* fall through to seed */ }
     lib = seedItems();
@@ -3228,7 +3310,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     if (existing) { existing.act = { t, l: 'Saved again' }; persist(); return { item: existing, dup: true }; }
     const item = {
       id: uidLib(), ...draft, fp, source: opts.source || 'Aurora response', created: t, edited: t, act: { t, l: 'Saved' },
-      session: opts.session || '', tags: [], course: opts.course || session.course || '', space: opts.space || '', dest: { kind: 'library' },
+      session: opts.session || '', tags: [], course: opts.course || session.course || '', space: opts.space || (session.ctx.kind === 'space' ? session.ctx.name : ''), dest: { kind: 'library' },
     };
     lib.unshift(item);
     persist();
@@ -3237,14 +3319,14 @@ Want me to quiz you on this or turn it into flashcards?` };
   const showSaved = (item, how) => {
     openModal({
       title: how === 'new' ? 'Saved to Library' : how === 'updated' ? 'Updated in your Library' : 'Already in your Library',
-      sub: how === 'dup' ? "You saved this before, so we didn't make a copy." : how === 'updated' ? 'Your saved session now includes the latest messages.' : '',
+      sub: how === 'dup' ? "You saved this before, so we didn't make a copy." : '',
       body: `<div class="saved-card"><span class="lib-ic t-${item.type}">${L_ICON[item.type]}</span><span class="saved-txt"><b>${esc(item.title)}</b><span>${esc(typeOne(item.type))} · ${esc(assoc(item))}</span></span><span class="saved-ok" aria-hidden="true">${ICON.check}</span></div>`,
       buttons: [{ label: 'Done' }, { label: 'Open', kind: 'primary', onClick: () => { lv.cat = 'recent'; showView('library'); openItem(item.id); } }],
     });
   };
   const openSave = (opts) => {
     const { item, dup } = saveItem(opts);
-    if (document.body.classList.contains('chatting') && item.type !== 'session') session.saved.push(item.id);
+    if (document.body.classList.contains('chatting')) session.saved.push(item.id);
     opts.onSaved && opts.onSaved(item);
     renderLibrary();
     renderSaved();
@@ -3258,10 +3340,59 @@ Want me to quiz you on this or turn it into flashcards?` };
     showSaved(item, dup ? 'dup' : 'new');
   };
 
-  // ---------- Study session tracking ----------
-  const session = { libId: null, saved: [], course: '' };
+  // ---------- Chat sessions ----------
+  // Chats belong to where they started: Study, or a Space (whose answers use that Space's materials).
+  // They are never Library items. Saving a response turns it into a note, quiz or flashcards in the Library.
+  const CHAT_KEY = 'assistiv.chats.v1';
+  const session = { chatId: null, saved: [], course: '', ctx: { kind: 'study' } };
+  let chats = [];
+  const persistChats = () => { try { localStorage.setItem(CHAT_KEY, JSON.stringify(chats)); } catch { /* storage unavailable */ } };
+  const seedChats = () => {
+    const t = Date.now(), h = 3600000;
+    const c = (title, ctx, ago, msgs, voice = false) => ({ id: 'c' + uidLib(), title, ctx, voice, created: t - ago - h, edited: t - ago, msgs: msgs.map(([r, x]) => ({ r, t: x })) });
+    const study = { kind: 'study' }, sp = (name) => ({ kind: 'space', name });
+    return [
+      c('I want to learn Python development', study, 2 * h, [
+        ['me', 'I want to learn Python development'],
+        ['ai', 'Nice. Do you want to start with the theory, or with something you can build right away?'],
+        ['me', 'Can you show me how it looks in VS Code?'],
+        ['ai', "Sure. Install the **Python** extension, create a file called `hello.py`, and add `print(\"Hello\")`. Press **Run** in the top right and the output appears in the terminal."]], true),
+      c('Accessibility principles', study, 26 * h, [
+        ['me', 'Accessibility principles'],
+        ['ai', 'WCAG groups accessibility into four principles: content must be **perceivable**, **operable**, **understandable** and **robust**.\n\n- Perceivable: text alternatives, captions, enough contrast.\n- Operable: everything works from a keyboard, with visible focus.\n- Understandable: clear labels and predictable behavior.\n- Robust: works with assistive technology.']]),
+      c('Biology exam preparation', study, 3 * DAY, [
+        ['me', 'Help me prepare for my biology exam on cell membranes'],
+        ['ai', 'Start with the three ideas that come up most: the **fluid mosaic model**, **passive vs active transport**, and the **sodium-potassium pump**. Want a quick quiz on them?']]),
+      c('Membrane transport questions', sp('Bio study group'), 20 * h, [
+        ['me', 'What does the Lecture 4 slide deck say about facilitated diffusion?'],
+        ['ai', 'From **Lecture 4 — Slides.pdf**: facilitated diffusion moves molecules down their gradient through channel or carrier proteins, with no ATP needed.']]),
+      c('Onboarding drop-off research plan', sp('Capstone team'), 4 * DAY, [
+        ['me', 'Draft research questions for onboarding drop-off'],
+        ['ai', '1. Who drops off during onboarding, and when?\n2. Which help content do students open most?\n3. What would make study sessions easier to resume?']]),
+      c('List comprehension practice', sp('Python practice'), 2 * DAY, [
+        ['me', 'Give me a list comprehension exercise'],
+        ['ai', 'Turn this loop into one line:\n\n```python\nsquares = []\nfor n in range(5):\n    squares.append(n * n)\n```\n\nAnswer: `squares = [n * n for n in range(5)]`']]),
+    ];
+  };
+  const fromLegacy = (it) => ({
+    id: 'c' + it.id, title: it.title, ctx: it.space ? { kind: 'space', name: it.space } : { kind: 'study' }, voice: (it.tags || []).includes('voice'),
+    created: it.created, edited: it.edited,
+    msgs: (it.body || '').split(/\n\n(?=\*\*(?:You|Aurora):\*\*)/).map(part => {
+      const m = /^\*\*(You|Aurora):\*\*\s?([\s\S]*)$/.exec(part.trim());
+      return m ? { r: m[1] === 'You' ? 'me' : 'ai', t: m[2] } : null;
+    }).filter(x => x && x.t),
+  });
+  const loadChats = () => {
+    try {
+      const d = JSON.parse(localStorage.getItem(CHAT_KEY) || 'null');
+      chats = Array.isArray(d) ? d : seedChats();
+    } catch { chats = seedChats(); }
+    legacyChats.map(fromLegacy).forEach(c => { if (c.msgs.length && !chats.some(x => x.id === c.id)) chats.push(c); });
+    persistChats();
+  };
+  const chatsIn = (ctx) => chats.filter(c => ctx.kind === 'space' ? c.ctx.kind === 'space' && c.ctx.name === ctx.name : c.ctx.kind === 'study').sort((a, b) => b.edited - a.edited);
   function renderSaved() {
-    const ids = [...new Set([...session.saved].reverse().concat(session.libId ? [session.libId] : []))];
+    const ids = [...new Set([...session.saved].reverse())];
     const items = ids.map(getItem).filter(Boolean);
     $('#savedCount').textContent = items.length;
     $('#savedCount').hidden = !items.length;
@@ -3279,109 +3410,146 @@ Want me to quiz you on this or turn it into flashcards?` };
   const clip = (s, n = 70) => (s.length > n ? s.slice(0, n - 1).trimEnd() + '…' : s);
   const sessionTitle = () => clip(firstQuestion());
   const noteTitleFrom = (q) => { const s = (q || 'Aurora response').trim(); return clip(s.charAt(0).toUpperCase() + s.slice(1)); };
-  const transcriptMd = () => $$('.msg', inner).map(m => m.classList.contains('me-row')
-    ? `**You:** ${$('.bubble', m)?.dataset.q || $('.bubble', m)?.textContent.trim() || ''}`
-    : `**Aurora:** ${m.dataset.md || $('.spoken-body', m)?.textContent.trim() || ''}`).join('\n\n');
-  const autoSaveSession = () => {
-    if (!$('.msg', inner)) return null;
-    let it = session.libId && getItem(session.libId);
+  const chatMsgs = () => $$('.msg', inner).filter(m => !m.classList.contains('ctx-intro')).map(m => m.classList.contains('me-row')
+    ? { r: 'me', t: $('.bubble', m)?.dataset.q || $('.bubble', m)?.textContent.trim() || '' }
+    : { r: 'ai', t: m.dataset.md || $('.spoken-body', m)?.textContent.trim() || '' }).filter(x => x.t);
+  // Every chat is kept automatically where it started; there is nothing to "save" about the chat itself.
+  const saveChat = () => {
+    const msgs = chatMsgs();
+    if (!msgs.some(m => m.r === 'me')) return null;
     const t = Date.now();
-    if (!it) {
-      it = { id: uidLib(), type: 'session', title: sessionTitle(), body: '', source: isVoiceSession() ? 'Voice session' : 'Study session',
-        created: t, edited: t, session: sessionTitle(), tags: isVoiceSession() ? ['voice'] : [], course: '', space: '', payload: null, dest: { kind: 'library' } };
-      lib.unshift(it);
-      session.libId = it.id;
-    }
-    it.body = transcriptMd();
-    it.edited = t;
-    persist();
-    renderSaved();
-    return it;
+    let c = session.chatId && chats.find(x => x.id === session.chatId);
+    if (!c) { c = { id: 'c' + uidLib(), title: sessionTitle(), ctx: { ...session.ctx }, voice: false, created: t }; chats.unshift(c); session.chatId = c.id; }
+    c.msgs = msgs; c.edited = t; c.voice = c.voice || isVoiceSession();
+    persistChats();
+    renderChatCount();
+    return c;
   };
   function resetSession() {
-    session.libId = null;
+    session.chatId = null;
     session.saved = [];
     session.course = '';
+    session.ctx = { kind: 'study' };
     renderSaved();
-    const b = $('#saveSession');
-    b.classList.remove('ok');
-    b.innerHTML = `${ICON.note}<span>Save session</span>`;
+    if (typeof renderChatNav === 'function') renderChatNav();
   }
-  $('#saveSession').addEventListener('click', () => {
-    if (!$('.msg', inner)) { toast('Ask Aurora something first'); return; }
-    const existing = session.libId && getItem(session.libId);
-    if (existing) { autoSaveSession(); existing.act = { t: Date.now(), l: 'Updated' }; persist(); renderLibrary(); toast('Session updated in your Library'); return; }
-    openSave({
-      type: 'session', title: sessionTitle(), body: transcriptMd(), source: isVoiceSession() ? 'Voice session' : 'Study session',
-      session: sessionTitle(),
-      onSaved: (it) => { session.libId = it.id; const b = $('#saveSession'); b.classList.add('ok'); b.innerHTML = `${ICON.check}<span>Session saved</span>`; },
+  const ctxIntro = (name) => addMsg('ai ctx-intro done', `<div class="body"><p>New chat in <b>${esc(name)}</b>. Aurora answers from this Space's materials, and the chat stays in the Space.</p></div>`);
+  const aiActions = () => `<div class="actions"><button type="button" class="act" data-act="save">${ICON.note}<span>Save to notes</span></button><button type="button" class="act" data-act="copy">${ICON.copy}<span>Copy</span></button></div>`;
+  // Reopen a chat where it left off; new messages continue the same chat.
+  const openChat = (id) => {
+    const c = chats.find(x => x.id === id);
+    if (!c) return;
+    showView('study');
+    if (document.body.classList.contains('chatting')) exitChat(true);
+    session.chatId = c.id;
+    session.ctx = { ...c.ctx };
+    enterChat();
+    if (c.ctx.kind === 'space') ctxIntro(c.ctx.name);
+    let lastQ = '';
+    c.msgs.forEach(m => {
+      if (m.r === 'me') {
+        lastQ = m.t;
+        const row = addMsg('me-row', `<div class="bubble">${esc(m.t)}</div><button type="button" class="act me-copy" data-act="copy-me" aria-label="Copy message" title="Copy">${ICON.copy}</button>`);
+        row.querySelector('.bubble').dataset.q = m.t;
+      } else {
+        const ai = addMsg('ai done', `<div class="body">${render(m.t)}</div>${aiActions()}`);
+        ai.dataset.md = m.t; ai.dataset.q = lastQ;
+      }
     });
-  });
+    prompt.placeholder = 'Ask a follow-up...';
+    thread.scrollTop = thread.scrollHeight;
+    updateScrollBtn();
+    renderChatNav();
+    prompt.focus();
+  };
+  // Start a chat inside a Space: it stays in that Space.
+  const startSpaceChat = (name) => {
+    showView('study');
+    if (document.body.classList.contains('chatting')) exitChat(true);
+    session.ctx = { kind: 'space', name };
+    enterChat();
+    ctxIntro(name);
+    prompt.placeholder = `Ask about ${name}...`;
+    prompt.focus();
+  };
 
-  // ---------- Attach course material (home composer) ----------
-  const MATERIALS = [
-    [COURSES[0], [['Lecture 4 — Slides.pdf', '18 pages'], ['Unit 2 study guide.pdf', '12 pages'], ['Lecture 4 — Video lesson', '24 min']]],
-    [COURSES[1], [['Lesson 1 — Variables', 'Lesson'], ['Python cheat sheet.pdf', '2 pages']]],
-    [COURSES[2], [['Week 3 — Usability testing reading', 'Article']]],
-  ];
-  const ALL_MATERIALS = MATERIALS.flatMap(([, mats]) => mats.map(([n]) => n));
-  $('#attachMat').addEventListener('click', () => {
+  // ---------- Left chat navigation ----------
+  // Lists Study chats by date. Space chats stay in their Space, so this links to them instead of listing them.
+  const NAV_KEY = 'assistiv.chatnav.collapsed';
+  const chatMeta = (c) => `${fmtAgo(c.edited)} · ${c.msgs.length} message${c.msgs.length === 1 ? '' : 's'}${c.voice ? ' · Voice' : ''}`;
+  const dayBuckets = (list) => {
+    const d0 = new Date(); d0.setHours(0, 0, 0, 0);
+    const today = d0.getTime(), yest = today - DAY, week = today - 7 * DAY;
+    return [['Today', list.filter(c => c.edited >= today)], ['Yesterday', list.filter(c => c.edited >= yest && c.edited < today)],
+      ['Previous 7 days', list.filter(c => c.edited >= week && c.edited < yest)], ['Older', list.filter(c => c.edited < week)]];
+  };
+  const cnRow = (c) => {
+    const on = c.id === session.chatId;
+    return `<li class="cn-item${on ? ' active' : ''}"><button type="button" class="cn-row" data-chat="${c.id}"${on ? ' aria-current="true"' : ''} title="${esc(c.title)}"><span class="cn-ic" aria-hidden="true">${L_ICON.session}</span><span class="cn-t">${esc(c.title)}</span>${c.voice ? '<span class="cn-badge">Voice</span>' : ''}</button>`
+      + `<div class="lib-more"><button type="button" class="cn-more" data-cnmore="${c.id}" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for ${esc(c.title)}">${L_ICON.dots}</button></div></li>`;
+  };
+  function renderChatNav() {
+    const q = $('#cnSearch').value.trim().toLowerCase();
+    const list = chatsIn({ kind: 'study' }).filter(c => !q || c.title.toLowerCase().includes(q) || c.msgs.some(m => m.t.toLowerCase().includes(q)));
+    const groups = dayBuckets(list).filter(([, a]) => a.length)
+      .map(([label, a]) => `<div class="cn-group"><h2 class="cn-h">${label}</h2><ul>${a.map(cnRow).join('')}</ul></div>`).join('');
+    const spaces = q ? '' : `<div class="cn-group"><h2 class="cn-h">Chats in Spaces</h2><ul>${SPACES.map(sp => {
+      const n = chatsIn({ kind: 'space', name: sp }).length;
+      return `<li class="cn-item"><button type="button" class="cn-row" data-cnspace="${esc(sp)}" title="Open ${esc(sp)} chats"><span class="dic t-session" aria-hidden="true">${L_ICON.space}</span><span class="cn-t">${esc(sp)}</span><span class="cn-n" aria-label="${n} chats">${n}</span></button></li>`;
+    }).join('')}</ul></div>`;
+    $('#cnList').innerHTML = (groups || `<p class="cn-empty">${q ? `No chats match \u201c${esc(q)}\u201d.` : 'No chats yet. Ask Aurora something to start one.'}</p>`) + spaces;
+  }
+  const renderChatCount = renderChatNav;
+  const setNavCollapsed = (on) => {
+    document.body.classList.toggle('cn-collapsed', on);
+    const t = $('#cnToggle');
+    t.setAttribute('aria-expanded', String(!on));
+    t.setAttribute('aria-label', on ? 'Expand chat list' : 'Collapse chat list');
+    t.title = on ? 'Expand' : 'Collapse';
+    try { localStorage.setItem(NAV_KEY, on ? '1' : ''); } catch { /* storage unavailable */ }
+  };
+  try { if (localStorage.getItem(NAV_KEY)) setNavCollapsed(true); } catch { /* storage unavailable */ }
+  $('#cnToggle').addEventListener('click', () => setNavCollapsed(!document.body.classList.contains('cn-collapsed')));
+  $('#cnNew').addEventListener('click', () => {
+    showView('study');
+    if (document.body.classList.contains('chatting')) exitChat(true);
+    prompt.focus();
+  });
+  $('#cnSearch').addEventListener('input', renderChatNav);
+  $('#cnSearch').addEventListener('keydown', (e) => { if (e.key === 'Escape' && e.target.value) { e.stopPropagation(); e.target.value = ''; renderChatNav(); } });
+  const deleteChat = (c) => openModal({
+    title: 'Delete chat?', sub: "This will remove the chat from Study. Anything you saved from it stays in your Library. This can't be undone.",
+    buttons: [{ label: 'Cancel' }, { label: 'Delete', kind: 'danger', onClick: () => {
+      if (session.chatId === c.id) exitChat(true);
+      chats = chats.filter(x => x.id !== c.id); persistChats(); renderChatNav(); toast('Chat deleted');
+    } }],
+  });
+  const renameChat = (c) => {
     openModal({
-      title: 'Attach course material',
-      sub: 'Aurora will use these as sources for your question.',
-      body: MATERIALS.map(([course, mats]) => `<div class="mat-group"><h4>${esc(course)}</h4>${mats.map(([n, s]) =>
-        `<label class="mat"><input type="checkbox" value="${esc(n)}"${files.some(f => f.name === n) ? ' checked' : ''}><span>${esc(n)}</span><small>${esc(s)}</small></label>`).join('')}</div>`).join(''),
-      buttons: [
-        { label: 'Cancel' },
-        { label: 'Attach', kind: 'primary', onClick: () => {
-          const picked = $$('#mBody .mat input:checked').map(x => x.value);
-          files = files.filter(f => !ALL_MATERIALS.includes(f.name)).concat(picked.map(name => ({ name })));
-          if (picked.length) session.course = MATERIALS.find(([, mats]) => mats.some(([n]) => n === picked[0]))[0];
-          renderFiles();
-          toast(picked.length ? `Attached ${picked.length} course item${picked.length > 1 ? 's' : ''}` : 'No course material attached');
-          prompt.focus();
-        } },
-      ],
+      title: 'Rename chat', body: `<div class="field"><label for="chatRenameIn">Title</label><input class="input" id="chatRenameIn" value="${esc(c.title)}" maxlength="120"><p class="help" id="chatRenameHelp">Only the title changes.</p></div>`,
+      buttons: [{ label: 'Cancel' }, { label: 'Rename', kind: 'primary', onClick: () => {
+        const inp = $('#chatRenameIn'), v = inp.value.trim();
+        if (!v) { inp.setAttribute('aria-invalid', 'true'); $('#chatRenameHelp').textContent = 'Enter a title.'; inp.focus(); return false; }
+        c.title = v; c.renamed = true; persistChats(); renderChatNav(); toast('Renamed');
+      } }],
     });
+    $('#chatRenameIn').select();
+  };
+  $('#cnList').addEventListener('click', (e) => {
+    const more = e.target.closest('[data-cnmore]');
+    if (more) {
+      e.stopPropagation();
+      const c = chats.find(x => x.id === more.dataset.cnmore);
+      openMenuFor(more, [['rename', 'Rename'], ['delete', 'Delete']], (a) => (a === 'rename' ? renameChat(c) : deleteChat(c)));
+      return;
+    }
+    const sp = e.target.closest('[data-cnspace]');
+    if (sp) { if (document.body.classList.contains('chatting')) exitChat(true); curSpace = sp.dataset.cnspace; spTab = 'chats'; showView('spaces'); return; }
+    const r = e.target.closest('[data-chat]');
+    if (r) openChat(r.dataset.chat);
   });
 
-  $('#uploadBtn').addEventListener('click', () => {
-    openModal({
-      title: 'Upload docs, images, or URLs',
-      sub: 'Aurora will use these as sources for your question.',
-      body: `<button type="button" class="drop" id="dropZone"><b>Choose files or drag them here</b><small>PDF, Word, PowerPoint, text, spreadsheets, or images</small></button>
-        <div class="or">or add a link</div>
-        <div class="field"><label for="urlIn">Web page or video URL</label>
-        <div class="url-row"><input class="input" id="urlIn" type="url" placeholder="https://"><button type="button" class="nav-btn" id="urlAdd">Add</button></div>
-        <p class="help" id="urlHelp">Paste a link to an article, video, or document.</p></div>`,
-      buttons: [{ label: 'Done', kind: 'primary' }],
-    });
-    const dz = $('#dropZone');
-    dz.addEventListener('click', () => $('#fileInput').click());
-    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('over'); });
-    dz.addEventListener('dragleave', () => dz.classList.remove('over'));
-    dz.addEventListener('drop', (e) => {
-      e.preventDefault(); dz.classList.remove('over');
-      const add = [...(e.dataTransfer?.files || [])];
-      if (add.length) { files = files.concat(add); renderFiles(); toast(`Added ${add.length} file${add.length > 1 ? 's' : ''}`); }
-    });
-    const addUrl = () => {
-      const v = $('#urlIn').value.trim();
-      let u;
-      try { u = new URL(/^https?:\/\//i.test(v) ? v : 'https://' + v); } catch (_) { u = null; }
-      if (!v || !u || !u.hostname.includes('.')) { $('#urlHelp').textContent = 'Enter a valid link, like https://example.com/article'; return; }
-      files.push({ name: u.hostname.replace(/^www\./, '') + (u.pathname.length > 1 ? u.pathname : ''), url: u.href });
-      renderFiles(); $('#urlIn').value = '';
-      $('#urlHelp').textContent = 'Link added. Add another, or choose Done.';
-    };
-    $('#urlAdd').addEventListener('click', addUrl);
-    $('#urlIn').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addUrl(); } });
-  });
 
-  // ---------- Library view ----------
-  // Library = store and revisit. Sections stay few; advanced actions live in one overflow menu on the item.
-  L_ICON.space = svgI('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/>');
-  L_ICON.library = L_ICON.lesson;
   L_ICON.profile = L_ICON.tutorme;
   L_ICON.signout = svgI('<path d="M15 4h4a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1h-4M10 16l-4-4 4-4M6 12h10"/>');
   const RECENT_ICON = svgI('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>');
@@ -3391,7 +3559,6 @@ Want me to quiz you on this or turn it into flashcards?` };
     { key: 'note', label: 'Notes', types: ['note', 'lesson', 'video', 'code'] },
     { key: 'quiz', label: 'Quizzes', types: ['quiz'] },
     { key: 'flashcards', label: 'Flashcards', types: ['flashcards'] },
-    { key: 'session', label: 'Sessions', types: ['session', 'tutorme'] },
     { key: 'document', label: 'Documents', types: ['document'] },
   ];
   const lv = { cat: 'recent', q: '', course: '', space: '', sort: 'edited', open: null };
@@ -3461,7 +3628,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   const byEdited = (a, b) => b.edited - a.edited;
   // Tabs filter by type; search matches title, content, course, Space, source and type.
   // "All" with no search shows the organized sections; anything else shows one flat result list.
-  const TABS = [['recent', 'All'], ['note', 'Notes'], ['quiz', 'Quizzes'], ['flashcards', 'Flashcards'], ['session', 'Sessions'], ['document', 'Documents']];
+  const TABS = [['recent', 'All'], ['note', 'Notes'], ['quiz', 'Quizzes'], ['flashcards', 'Flashcards'], ['document', 'Documents']];
   const renderOverview = () => {
     const q = lv.q.trim().toLowerCase();
     lv.sel = lv.sel || new Set();
@@ -3497,7 +3664,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     $('#secSpaces').innerHTML = sg.length ? sg.map(([sp, a]) => groupBlock('s:' + sp, sp, a, 't-session', L_ICON.space)).join('')
       : '<div class="ov-empty">Nothing in a Space yet. Open an item and choose ⋯ › Add to Space.</div>';
     $('#secRecent').innerHTML = recent.length ? rowsFor('recent', recent, RECENT_LIMIT)
-      : '<div class="ov-empty">Save notes, quizzes, flashcards or sessions from Study and they’ll appear here.<button type="button" class="nav-btn sm primary" data-empty="study">Go to Study</button></div>';
+      : '<div class="ov-empty">Save notes, quizzes or flashcards from Study and they’ll appear here.<button type="button" class="nav-btn sm primary" data-empty="study">Go to Study</button></div>';
   };
   const menuFor = (it) => [
     !it.payload && ['edit', 'Edit note'],
@@ -3577,7 +3744,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     it.act = { t: Date.now(), l: kind === 'quiz' ? 'Quiz created' : 'Flashcards created' }; persist();
     const topic = it.title.replace(/\s+(quiz|flashcards)$/i, '').replace(/\.(pdf|docx?)$/i, '');
     showView('study');
-    exitChat();
+    exitChat(true);
     fill(kind === 'quiz' ? `Quiz me on ${topic}` : `Make flashcards on ${topic}`);
     send();
   };
@@ -3747,16 +3914,68 @@ Want me to quiz you on this or turn it into flashcards?` };
       : `<div class="lib-empty">${L_ICON.lesson}<b>Nothing saved yet</b><span>Save something from Study and it'll show up here.</span><button type="button" class="nav-btn primary" data-empty="study">Go to Study</button></div>`;
   };
 
-  // ---------- Spaces: Saved materials ----------
-  let curSpace = SPACES[0];
+  // ---------- Spaces: Materials, All Chats, Notes, Quizzes, Flashcards, TutorMe ----------
+  // Space chats stay in the Space; Notes, Quizzes and Flashcards are Library items added to it.
+  const SPACE_MATERIALS = {
+    'Bio study group': [['Lecture 4 — Slides.pdf', '18 pages · BIO 201'], ['Unit 2 study guide.pdf', '12 pages · BIO 201'], ['Lecture 4 — Video lesson', '24 min · BIO 201']],
+    'Capstone team': [['Capstone brief.pdf', '6 pages'], ['Week 3 — Usability testing reading', 'Article · UX 220']],
+    'Python practice': [['Lesson 1 — Variables', 'Lesson · CS 101'], ['Python cheat sheet.pdf', '2 pages · CS 101']],
+  };
+  const TUTORME = [
+    { id: 'tm1', space: 'Bio study group', title: 'Cellular respiration review', ago: 11 * DAY, len: '45 min',
+      body: '- Glycolysis happens in the cytoplasm; the Krebs cycle happens in the mitochondria.\n- Practice: write out the ATP yield for each stage before the exam.' },
+    { id: 'tm2', space: 'Python practice', title: 'Loops and functions', ago: 6 * DAY, len: '30 min',
+      body: '- Use a `for` loop when you know how many times to repeat.\n- Practice: write a function that returns the largest number in a list.' },
+  ];
+  const SP_TABS = [['materials', 'Materials'], ['chats', 'All Chats'], ['note', 'Notes'], ['quiz', 'Quizzes'], ['flashcards', 'Flashcards'], ['tutorme', 'TutorMe']];
+  let curSpace = SPACES[0], spTab = 'materials';
+  const spaceItems = (sp, key) => lib.filter(x => x.space === sp && inGroup(x, key)).sort((a, b) => b.edited - a.edited);
+  const spCount = (sp, key) => key === 'materials' ? (SPACE_MATERIALS[sp] || []).length : key === 'chats' ? chatsIn({ kind: 'space', name: sp }).length
+    : key === 'tutorme' ? TUTORME.filter(x => x.space === sp).length : spaceItems(sp, key).length;
+  const spRow = (attrs, icon, tone, title, sub, meta) => `<div class="lr" role="listitem"><button type="button" class="sp-open" ${attrs}>
+      <span class="sp-ic lib-ic ${tone}" aria-hidden="true">${icon}</span>
+      <span class="lr-txt"><b>${esc(title)}</b><span>${esc(sub)}</span></span>
+      <span class="lr-ctx sp-meta"><span>${esc(meta)}</span></span></button></div>`;
+  const spEmpty = (title, msg, btn) => `<div class="lib-empty">${L_ICON.space}<b>${title}</b><span>${msg}</span>${btn || ''}</div>`;
   const renderSpaces = () => {
-    $('#spaceList').innerHTML = SPACES.map(sp => `<button type="button" class="space-card" data-space="${esc(sp)}" aria-pressed="${sp === curSpace}"><span class="dic t-session">${L_ICON.space}</span><span class="dtx"><b>${esc(sp)}</b><small>${lib.filter(x => x.space === sp).length} saved materials</small></span></button>`).join('');
-    const items = lib.filter(x => x.space === curSpace).sort((a, b) => b.edited - a.edited);
-    $('#spaceSub').textContent = `${curSpace} · ${items.length} item${items.length === 1 ? '' : 's'}`;
-    $('#spaceSaved').innerHTML = items.length ? items.map(it => itemRow(it)).join('')
-      : `<div class="lib-empty">${L_ICON.space}<b>No saved materials in this Space yet</b><span>Open an item in your Library, then choose ⋯ › Add to Space.</span><button type="button" class="nav-btn" data-go="library">Open Library</button></div>`;
+    $('#spaceList').innerHTML = SPACES.map(sp => {
+      const nc = spCount(sp, 'chats'), ns = lib.filter(x => x.space === sp).length;
+      return `<button type="button" class="space-card" data-space="${esc(sp)}" aria-pressed="${sp === curSpace}"><span class="dic t-session">${L_ICON.space}</span><span class="dtx"><b>${esc(sp)}</b><small>${nc} chat${nc === 1 ? '' : 's'} · ${ns} saved</small></span></button>`;
+    }).join('');
+    $('#spaceName').textContent = curSpace;
+    $('#spaceSub').textContent = 'Chats here answer from this Space\'s materials.';
+    $('#spaceTabs').innerHTML = SP_TABS.map(([k, l]) => `<button type="button" class="ov-tab" data-sptab="${k}" aria-pressed="${spTab === k}">${l}<span class="n" aria-label="${spCount(curSpace, k)} items">${spCount(curSpace, k)}</span></button>`).join('');
+    $('#spaceToLib').hidden = !['note', 'quiz', 'flashcards'].includes(spTab);
+    const body = $('#spaceSaved');
+    if (spTab === 'materials') {
+      const m = SPACE_MATERIALS[curSpace] || [];
+      body.innerHTML = m.length ? m.map(([t, sub]) => spRow('data-mat="1"', L_ICON.document, 't-document', t, sub, 'Connected material')).join('')
+        : spEmpty('No materials yet', 'Attach course files to give this Space\'s chats something to answer from.');
+    } else if (spTab === 'chats') {
+      const list = chatsIn({ kind: 'space', name: curSpace });
+      body.innerHTML = list.length ? list.map(c => spRow(`data-chat="${c.id}"`, L_ICON.session, 't-session', c.title, chatMeta(c), 'Space chat')).join('')
+        : spEmpty('No chats in this Space yet', 'Start one and Aurora will answer from this Space\'s materials.', '<button type="button" class="nav-btn primary" data-spnew="1">New chat</button>');
+    } else if (spTab === 'tutorme') {
+      const list = TUTORME.filter(x => x.space === curSpace);
+      body.innerHTML = list.length ? list.map(x => spRow(`data-tm="${x.id}"`, L_ICON.tutorme, 't-tutorme', x.title, `TutorMe session · ${x.len}`, fmtAgo(Date.now() - x.ago))).join('')
+        : spEmpty('No TutorMe sessions yet', 'TutorMe sessions booked for this Space will appear here.');
+    } else {
+      const items = spaceItems(curSpace, spTab), word = SP_TABS.find(t => t[0] === spTab)[1].toLowerCase();
+      body.innerHTML = items.length ? items.map(it => itemRow(it)).join('')
+        : spEmpty(`No ${word} in this Space yet`, `Save a response from a chat in this Space, or open a Library item and choose ⋯ › Add to Space.`, '<button type="button" class="nav-btn" data-go="library">Open Library</button>');
+    }
   };
   $('#spaceList').addEventListener('click', (e) => { const c = e.target.closest('[data-space]'); if (c) { curSpace = c.dataset.space; renderSpaces(); } });
+  $('#spaceTabs').addEventListener('click', (e) => { const t = e.target.closest('[data-sptab]'); if (t) { spTab = t.dataset.sptab; renderSpaces(); $(`#spaceTabs [data-sptab="${spTab}"]`)?.focus(); } });
+  $('#spaceNewChat').addEventListener('click', () => startSpaceChat(curSpace));
+  $('#spaceSaved').addEventListener('click', (e) => {
+    if (e.target.closest('[data-spnew]')) { startSpaceChat(curSpace); return; }
+    const c = e.target.closest('[data-chat]');
+    if (c) { openChat(c.dataset.chat); return; }
+    const tm = e.target.closest('[data-tm]');
+    if (tm) { const x = TUTORME.find(y => y.id === tm.dataset.tm); openModal({ title: x.title, sub: `TutorMe session · ${x.len} · ${curSpace}`, body: `<div class="d-body">${render(x.body)}</div>`, buttons: [{ label: 'Done', kind: 'primary' }] }); return; }
+    if (e.target.closest('[data-mat]')) toast('Opening course files is coming soon');
+  });
   $('#spaceToLib').addEventListener('click', () => { showView('library'); expanded.add('s:' + curSpace); renderOverview(); $('#secSpacesWrap').scrollIntoView?.({ block: 'start' }); });
   ['#dashRecent', '#spaceSaved'].forEach(sel => $(sel).addEventListener('click', (e) => {
     const o = e.target.closest('.lib-open, .lib-go');
@@ -3851,7 +4070,9 @@ Want me to quiz you on this or turn it into flashcards?` };
   $('#iChat .ic-mic').addEventListener('click', () => toast('Voice works in Study › Voice mode'));
 
   loadLib();
+  loadChats();
   renderLibrary();
+  renderChatCount();
 })();
 </script>
 </body>
