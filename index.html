@@ -1080,7 +1080,7 @@
   .w-secondary:hover:not(:disabled) { background: var(--brand-25); border-color: var(--brand-200); color: var(--blue); }
   .w-secondary:disabled { opacity: .45; cursor: default; }
 
-  /* Quiz — one question at a time */
+  /* Quiz: one question at a time */
   .quiz { padding: 32px 40px 34px; }
   .qz-count, .fc-count { font-size: var(--fs-16); color: var(--gray-600); }
   .quiz .fc-progress { margin: 22px 0 32px; }
@@ -2763,6 +2763,8 @@
 <script>
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
+  // Saved data from before: swap em dashes for colons in titles and text.
+  try { ['assistiv.library.v1', 'assistiv.chats.v1', 'assistiv.spaces.v1', 'assistiv.shares.v1', 'assistiv.deckThumbs'].forEach(k => { const v = localStorage.getItem(k); if (v && v.includes('\u2014')) localStorage.setItem(k, v.replace(/ \u2014 /g, ': ').replace(/\u2014/g, ', ')); }); } catch { /* storage off */ }
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const prompt = $('#prompt');
   const thread = $('#thread');
@@ -2892,7 +2894,7 @@
     if (name === 'Study') { if (currentView === 'study') exitChat(true); else showView('study'); }
     else if (name === 'Dashboard') showView('dashboard');
     else if (name === 'Spaces') { sv.open = null; showView('spaces'); }
-    else toast(`${name} — coming soon`);
+    else toast(`${name} is coming soon`);
   }));
 
   $$('[data-toast]').forEach(b => b.addEventListener('click', () => toast(b.dataset.toast)));
@@ -3033,7 +3035,7 @@
     return b;
   };
 
-  // Question banks (demo content — no model is connected)
+  // Question banks (demo content, no model is connected)
   const isUX = (topic) => !topic || /\bux\b|product design|user experience|usability/i.test(topic);
   const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
   const isPy = (topic) => /\b(python|coding|programming|code|variables?)\b/i.test(topic || '');
@@ -3129,7 +3131,7 @@
     ],
   };
 
-  // Quiz widget — one question at a time, with a results screen
+  // Quiz widget: one question at a time, with a results screen
   const buildQuiz = (quiz) => {
     const uid = ++widgetUid;
     const n = quiz.questions.length;
@@ -3486,7 +3488,7 @@
     return el;
   };
 
-  // Canned answers (demo only — no model is connected)
+  // Canned answers (demo only, no model is connected)
   // Study is general learning: Aurora searches public resources for any topic, not your course files.
   // The source picker narrows the search: Web (default), Academic or Videos.
   const WEB = {
@@ -3923,7 +3925,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   let liveRow = null, finalText = '', silenceTimer = null;
   const orb = $('#orb'), orbLabel = $('#orbLabel'), muteBtn = $('#muteBtn');
   const ORB_LABEL = {
-    listening: 'Listening — go ahead and talk',
+    listening: 'Listening. Go ahead and talk',
     hearing: 'Listening…',
     thinking: 'Thinking · tap the orb to stop',
     speaking: 'Aurora is speaking · tap the orb to interrupt',
@@ -4363,7 +4365,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   // =====================================================================
   const COURSES = ['BIO 201 · Cell Biology', 'CS 101 · Intro to Python', 'UX 220 · Product Design'];
   let SPACES = ['Bio study group', 'Capstone team', 'Python practice']; // refreshed from the stored Spaces
-  const LESSONS = { 'Lecture 4 — Cell membranes': COURSES[0], 'Lesson 1 — Variables': COURSES[1], 'Week 3 — Usability testing': COURSES[2] };
+  const LESSONS = { 'Lecture 4: Cell membranes': COURSES[0], 'Lesson 1: Variables': COURSES[1], 'Week 3: Usability testing': COURSES[2] };
   let FOLDERS = ['Exam prep', 'Interview practice'];
   const DAY = 86400000;
   const svgI = (p, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? 'currentColor' : 'none'}" stroke="${fill ? 'none' : 'currentColor'}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
@@ -4411,14 +4413,14 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const t = Date.now(), h = 3600000;
     const mk = (o) => ({ id: uidLib(), body: '', session: '', tags: [], course: '', space: '', payload: null, dest: { kind: 'library' }, ...o });
     return [
-      mk({ type: 'note', title: 'Progressive disclosure — key idea', source: 'Aurora response', course: COURSES[2], session: 'UX & Product Design quiz prep', tags: ['ux', 'exam'], created: t - 2 * h, edited: t - h, dest: { kind: 'course', name: COURSES[2] },
+      mk({ type: 'note', title: 'Progressive disclosure: key idea', source: 'Aurora response', course: COURSES[2], session: 'UX & Product Design quiz prep', tags: ['ux', 'exam'], created: t - 2 * h, edited: t - h, dest: { kind: 'course', name: COURSES[2] },
         body: '**Progressive disclosure** reveals information and features gradually, only when people need them, to reduce cognitive load.\n\n- Example: an "Advanced settings" section that stays collapsed until opened.\n- Related ideas: recognition over recall, visual hierarchy.' }),
       mk({ type: 'quiz', title: 'UX & Product Design Quiz', source: 'Aurora response', course: COURSES[2], session: 'UX & Product Design quiz prep', tags: ['quiz', 'ux'], created: t - 3 * DAY, edited: t - 3 * DAY,
         payload: { kind: 'quiz', data: quizFor('') } }),
       mk({ type: 'flashcards', title: 'UX Flashcards', source: 'Aurora response', course: COURSES[2], tags: ['ux'], created: t - 4 * DAY, edited: t - 2 * DAY,
         payload: { kind: 'flash', data: flashFor(''), topic: '' } }),
-      mk({ type: 'lesson', title: 'Lesson 1 — Variables', source: 'Course lesson', course: COURSES[1], tags: ['python'], created: t - 5 * DAY, edited: t - 5 * DAY, dest: { kind: 'lesson', name: 'Lesson 1 — Variables' }, body: LESSON_MD }),
-      mk({ type: 'note', title: 'Membrane transport — video notes', source: 'Video lesson', course: COURSES[0], session: 'Lecture 4 — Video lesson', tags: ['biology', 'week 4'], created: t - 6 * DAY, edited: t - 30 * h, dest: { kind: 'lesson', name: 'Lecture 4 — Cell membranes' },
+      mk({ type: 'lesson', title: 'Lesson 1: Variables', source: 'Course lesson', course: COURSES[1], tags: ['python'], created: t - 5 * DAY, edited: t - 5 * DAY, dest: { kind: 'lesson', name: 'Lesson 1: Variables' }, body: LESSON_MD }),
+      mk({ type: 'note', title: 'Membrane transport: video notes', source: 'Video lesson', course: COURSES[0], session: 'Lecture 4: Video lesson', tags: ['biology', 'week 4'], created: t - 6 * DAY, edited: t - 30 * h, dest: { kind: 'lesson', name: 'Lecture 4: Cell membranes' },
         body: '### Passive vs active transport\n\n- **Diffusion** moves molecules down their concentration gradient, with no energy needed.\n- **Active transport** uses ATP to move molecules against the gradient.\n- The sodium-potassium pump moves 3 Na⁺ out and 2 K⁺ in.' }),
       mk({ type: 'document', title: 'Unit 2 study guide.pdf', source: 'Document', course: COURSES[0], tags: ['study guide'], created: t - 9 * DAY, edited: t - 9 * DAY,
         body: 'Uploaded document · 12 pages.\n\n**Aurora summary:** covers cell structure, membranes and transport, with a comparison table on page 3.' }),
@@ -4682,7 +4684,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
         ['ai', 'Start with the three ideas that come up most: the **fluid mosaic model**, **passive vs active transport**, and the **sodium-potassium pump**. Want a quick quiz on them?']]),
       c('Membrane transport questions', sp('Bio study group'), 20 * h, [
         ['me', 'What does the Lecture 4 slide deck say about facilitated diffusion?'],
-        ['ai', 'From **Lecture 4 — Slides.pdf**: facilitated diffusion moves molecules down their gradient through channel or carrier proteins, with no ATP needed.']]),
+        ['ai', 'From **Lecture 4: Slides.pdf**: facilitated diffusion moves molecules down their gradient through channel or carrier proteins, with no ATP needed.']]),
       c('Onboarding drop-off research plan', sp('Capstone team'), 4 * DAY, [
         ['me', 'Draft research questions for onboarding drop-off'],
         ['ai', '1. Who drops off during onboarding, and when?\n2. Which help content do students open most?\n3. What would make study sessions easier to resume?']]),
@@ -5091,7 +5093,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const go = c.dataset.crumb;
     if (go === 'library') { lv.open = null; renderLibrary(); }
     else if (go === 'dashboard') showView('dashboard');
-    else toast('Courses — coming soon');
+    else toast('Courses are coming soon');
   });
   function openItem(id) {
     const it = getItem(id);
@@ -5211,7 +5213,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   $('.avatar').addEventListener('click', (e) => {
     openMenuFor(e.currentTarget, [['library', 'Library'], ['profile', 'Profile'], ['signout', 'Sign out']], (a) => {
       if (a === 'library') showView('library');
-      else toast(a === 'profile' ? 'Profile — coming soon' : 'Sign out is disabled in this prototype');
+      else toast(a === 'profile' ? 'Profile is coming soon' : 'Sign out is disabled in this prototype');
     });
   });
 
@@ -5321,15 +5323,15 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   const FE_COURSE = 'CS 240 · Front-end Development';
   // Only courses and documents this student can access.
   const COURSE_DOCS = [
-    { id: 'cd-bio-l4', course: COURSES[0], title: 'Lecture 4 — Slides.pdf', meta: '18 pages' },
+    { id: 'cd-bio-l4', course: COURSES[0], title: 'Lecture 4: Slides.pdf', meta: '18 pages' },
     { id: 'cd-bio-sg', course: COURSES[0], title: 'Unit 2 study guide.pdf', meta: '12 pages' },
-    { id: 'cd-bio-vt', course: COURSES[0], title: 'Lecture 4 — Video transcript', meta: '24 min' },
-    { id: 'cd-py-l1', course: COURSES[1], title: 'Lesson 1 — Variables', meta: 'Lesson' },
+    { id: 'cd-bio-vt', course: COURSES[0], title: 'Lecture 4: Video transcript', meta: '24 min' },
+    { id: 'cd-py-l1', course: COURSES[1], title: 'Lesson 1: Variables', meta: 'Lesson' },
     { id: 'cd-py-cs', course: COURSES[1], title: 'Python cheat sheet.pdf', meta: '2 pages' },
-    { id: 'cd-ux-w3', course: COURSES[2], title: 'Week 3 — Usability testing reading', meta: 'Article' },
+    { id: 'cd-ux-w3', course: COURSES[2], title: 'Week 3: Usability testing reading', meta: 'Article' },
     { id: 'cd-ux-sd', course: COURSES[2], title: 'Service design blueprint guide.pdf', meta: '9 pages' },
     { id: 'cd-fe-cp', course: FE_COURSE, title: 'Component Patterns.pdf', meta: '14 pages' },
-    { id: 'cd-fe-hk', course: FE_COURSE, title: 'Hooks in depth — Lecture 6.pdf', meta: '22 pages' },
+    { id: 'cd-fe-hk', course: FE_COURSE, title: 'Hooks in depth: Lecture 6.pdf', meta: '22 pages' },
     { id: 'cd-fe-pf', course: FE_COURSE, title: 'Rendering performance checklist.pdf', meta: '4 pages' },
   ];
   const DOC_COURSES = [...new Set(COURSE_DOCS.map(d => d.course))];
@@ -5372,8 +5374,8 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
         const t = Date.now();
         chats.push({ id: 'c' + uidLib(), title: 'Explain useEffect cleanup', ctx: { kind: 'space', name: spaces[0].name }, voice: false, created: t - 3 * 3600000, edited: t - 2 * 3600000,
           msgs: [{ r: 'me', t: 'Explain useEffect cleanup' },
-            { r: 'ai', t: 'Based on **Hooks in depth — Lecture 6.pdf** and **react.dev/reference/react/hooks**:\n\nA cleanup function is what your effect **returns**. React runs it before the effect runs again and when the component unmounts.\n\n- Use it to remove event listeners, cancel timers or close subscriptions.\n- Without it, an effect that subscribes on every render keeps adding listeners.\n\n_Where these materials don’t cover a point, I’ve said so rather than guessing._',
-              src: ['Hooks in depth — Lecture 6.pdf', 'react.dev/reference/react/hooks'] }] });
+            { r: 'ai', t: 'Based on **Hooks in depth: Lecture 6.pdf** and **react.dev/reference/react/hooks**:\n\nA cleanup function is what your effect **returns**. React runs it before the effect runs again and when the component unmounts.\n\n- Use it to remove event listeners, cancel timers or close subscriptions.\n- Without it, an effect that subscribes on every render keeps adding listeners.\n\n_Where these materials don’t cover a point, I’ve said so rather than guessing._',
+              src: ['Hooks in depth: Lecture 6.pdf', 'react.dev/reference/react/hooks'] }] });
         persistChats();
       }
       persistSpaces();
@@ -5886,7 +5888,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const names = usedTitles.length ? usedTitles.slice(0, 4) : ready.slice(0, 3).map(matTitle);
     const list = names.map(n => `**${n}**`).join(names.length > 2 ? ', ' : ' and ');
     const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
-    const baseName = names[0].replace(/\.[a-z0-9]+$/i, '').replace(/^.*\//, '').replace(/ — .*/, '');
+    const baseName = names[0].replace(/\.[a-z0-9]+$/i, '').replace(/^.*\//, '').replace(/ \u2014 .*/, '');
     const reading = `Reading ${ready.length} source${ready.length === 1 ? '' : 's'}…`;
     const cite = (f) => `_(${f.from}${f.where ? `, ${f.where}` : ''})_`;
     const asks = topic || (/flash ?cards?|\bdeck\b|\bquiz|practice test|test me|summar|key concepts|key ideas|study guide|tutor me/.test(t) ? '' : topicFromQ(q));
