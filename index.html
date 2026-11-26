@@ -2175,6 +2175,49 @@
   .lib-menu button.del:hover svg { color: var(--error-600); }
   .sel-bar { margin-bottom: 14.4px; }
   #ovResults .ov-empty { margin-top: 0; }
+
+  /* Voice input in the Spaces composer */
+  .ws-mic { width: 52.8px; height: 52.8px; flex: none; display: grid; place-items: center; border-radius: 50%; color: var(--gray-600); transition: background .15s, color .15s; }
+  .ws-mic:hover { background: var(--gray-100); color: var(--gray-900); }
+  .ws-mic svg { width: 24px; height: 24px; }
+  .ws-mic.on { background: var(--error-50); color: var(--error-600); animation: wsMic 1.4s ease-in-out infinite; }
+  @keyframes wsMic { 0%, 100% { box-shadow: 0 0 0 0 rgba(217, 45, 32, .25); } 50% { box-shadow: 0 0 0 7.2px rgba(217, 45, 32, 0); } }
+  @media (prefers-reduced-motion: reduce) { .ws-mic.on { animation: none; } }
+
+  /* Quiz / flashcards expanded into a large popup */
+  .modal.aid-full { width: min(1296px, 92%); max-height: calc(var(--vh, 1100px) - 96px); display: flex; flex-direction: column; }
+  .modal.aid-full #mBody { flex: 1; min-height: 0; overflow-y: auto; }
+  .aid-pop { padding: 9.6px 0 4.8px; }
+  .aid-pop .w-save { display: none; }   /* saving is the popup's own Save to Space button */
+  .aid-pop > * { margin: 0 auto; max-width: 1056px; }
+  .aid-exp { width: 38.4px; height: 38.4px; flex: none; display: grid; place-items: center; border-radius: var(--radius-md); color: var(--gray-500); }
+  .aid-exp:hover { background: var(--gray-100); color: var(--gray-900); }
+  .aid-exp svg { width: 19.2px; height: 19.2px; }
+  .ws-open { text-align: left; background: none; border: 0; padding: 0; cursor: pointer; }
+  .ws-open:hover b { text-decoration: underline; }
+
+  /* Source chips: design-system Badge (pill, gray, icon + label), no numbers */
+  .sp-src ol { gap: 7.2px; }
+  .sp-src .src-chip, .ws-chat .sp-src .src-chip { display: inline-flex; align-items: center; gap: 6px; height: 28.8px; max-width: 100%; padding: 0 10.8px 0 9.6px;
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius-full);
+    font-size: var(--fs-12); line-height: var(--lh-12); font-weight: 500; color: var(--gray-700); }
+  .sp-src .src-ic { display: grid; width: auto; height: auto; padding: 0; background: none; border: 0; border-radius: 0; color: var(--gray-500); }
+  .sp-src .src-ic svg { width: 14.4px; height: 14.4px; }
+  .sp-src .src-t { max-width: 360px; }
+
+  /* Library icon tiles: each type keeps its own color (design-system 50 fill + 600 icon),
+     matching the type colors used in Spaces (documents red, quizzes blue, flashcards pink). */
+  .lt-ic { border: 1px solid transparent; }
+  .lt-ic.t-note       { background: var(--warning-50); color: var(--warning-600); border-color: var(--warning-100); }
+  .lt-ic.t-document   { background: var(--error-50);   color: var(--error-600);   border-color: var(--error-100); }
+  .lt-ic.t-quiz       { background: var(--brand-50);   color: var(--brand-600);   border-color: var(--brand-100); }
+  .lt-ic.t-flashcards { background: var(--pink-50);    color: var(--pink-600);    border-color: var(--pink-100, #FCE7F6); }
+  .lt-ic.t-lesson     { background: var(--success-50); color: var(--success-600); border-color: var(--success-100); }
+  .lt-ic.t-video      { background: var(--purple-50);  color: var(--purple-600);  border-color: var(--purple-100); }
+  .lt-ic.t-session    { background: var(--purple-50);  color: var(--purple-600);  border-color: var(--purple-100); }
+  .lt-ic.t-code       { background: var(--indigo-50);  color: var(--indigo-600);  border-color: var(--indigo-100); }
+  .lt-ic.t-tutorme    { background: var(--orange-50);  color: var(--orange-600);  border-color: #F9DBAF; }
+  [data-theme="dark"] .lt-ic { border-color: transparent; }
 </style>
 </head>
 <body>
@@ -2473,14 +2516,13 @@
         <div class="right-tools">
           <div class="source-wrap">
             <button type="button" class="source-btn" id="sourceBtn" aria-haspopup="menu" aria-expanded="false">
-              <span>Search</span><span class="dim" id="sourceLabel">All sources</span>
+              <span>Search</span><span class="dim" id="sourceLabel">Web</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a91a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="menu" id="sourceMenu" role="menu" hidden>
-              <button type="button" role="menuitemradio" aria-checked="true">All sources</button>
-              <button type="button" role="menuitemradio" aria-checked="false">Course materials</button>
-              <button type="button" role="menuitemradio" aria-checked="false">My notes</button>
-              <button type="button" role="menuitemradio" aria-checked="false">Library</button>
+              <button type="button" role="menuitemradio" aria-checked="true">Web</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Academic</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Videos</button>
             </div>
           </div>
           <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" aria-pressed="false">
@@ -2604,6 +2646,7 @@
           <form class="ws-composer" id="spComposer">
             <textarea id="spPrompt" rows="1" aria-label="Ask Aurora about this Space’s sources" placeholder="Ask a question or create something"></textarea>
             <span class="ws-ctx" id="spCtx"></span>
+            <button type="button" class="ws-mic" id="spMic" aria-pressed="false" aria-label="Speak your question" title="Voice input"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
             <button type="submit" class="ws-send" id="spSend" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
           </form>
           <p class="ws-note">Aurora can make mistakes, so double-check it against your sources.</p>
@@ -2860,6 +2903,8 @@
   const inline = (s) => esc(s)
     .replace(/`([^`]+)`/g, '<code class="inline">$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/(^|[\s(])_([^_\n]+)_(?=[\s.,;:!?)]|$)/g, '$1<em>$2</em>')
+    .replace(/(^|[\s(])\*([^*\n]+)\*(?=[\s.,;:!?)]|$)/g, '$1<em>$2</em>')
     .replace(/\[([^\]]+)\]\(src:(\d+)\)/g, '<a href="#" class="cite" data-src="$2">$1</a>');
   const codeBlock = (code, lang) => {
     const l = (lang || '').toLowerCase();
@@ -2983,17 +3028,17 @@
     title: `${titleCase(topic)} Quiz`,
     questions: [
       { type: 'mc', q: `When studying ${topic}, which approach builds the most durable understanding?`,
-        options: ['Explaining it in your own words', 'Re-reading the slides several times', 'Highlighting key terms', 'Memorizing definitions word for word'], answer: [0],
+        options: ['Explaining it in your own words', 'Re-reading the same page several times', 'Highlighting key terms', 'Memorizing definitions word for word'], answer: [0],
         why: 'Putting ideas in your own words forces you to connect them, which is what makes them stick.' },
       { type: 'multi', q: `Which of these are good ways to check your understanding of ${topic}? Select all that apply.`,
-        options: ['Teach it to a classmate', 'Do practice problems without notes', 'Connect it to an earlier unit', 'Skim the summary once'], answer: [0, 1, 2],
+        options: ['Teach it to a friend', 'Do practice problems without notes', 'Connect it to something you already know', 'Skim the summary once'], answer: [0, 1, 2],
         why: 'Teaching, retrieval practice and making connections all test real understanding. Skimming only feels productive.' },
       { type: 'mc', q: `You get a ${topic} question wrong on a practice quiz. What is the most useful next step?`,
         options: ['Work out why, then retry it later', 'Move on to the next topic', 'Memorize the correct answer', 'Skip similar questions'], answer: [0],
         why: 'Understanding the mistake and retrying after a gap turns an error into learning.' },
       { type: 'short', q: `In one sentence, what problem or question does ${topic} address?`,
-        keywords: [], model: 'Compare your sentence with the opening slide of Lecture 4.' },
-      { type: 'long', q: `Explain ${topic} to a classmate who missed the lecture. Include an example.`,
+        keywords: [], model: 'Compare your sentence with the opening line of the first source Aurora cited.' },
+      { type: 'long', q: `Explain ${topic} to someone who has never heard of it. Include an example.`,
         rubric: [
           { label: 'Defines the core idea', kw: ['is', 'means', 'refers', 'defined'] },
           { label: 'Gives an example', kw: ['example', 'for instance', 'such as', 'like'] },
@@ -3014,10 +3059,10 @@
   } : {
     title: `${titleCase(topic)} Flashcards`,
     cards: [
-      { q: `What is ${topic}?`, a: 'Write a one-line definition in your own words, then compare it with Lecture 4, slide 12.', ex: '' },
+      { q: `What is ${topic}?`, a: 'Write a one-line definition in your own words, then compare it with the sources Aurora found.', ex: '' },
       { q: `Why does ${topic} matter?`, a: 'Name the problem it solves or the question it answers.', ex: '' },
-      { q: `What are the key terms in ${topic}?`, a: 'List the 3–4 terms your lecture uses most, and define each.', ex: '' },
-      { q: `Give an example of ${topic}.`, a: 'Use the worked example from the Unit 2 study guide, then invent one of your own.', ex: '' },
+      { q: `What are the key terms in ${topic}?`, a: 'List the 3–4 terms the sources use most, and define each.', ex: '' },
+      { q: `Give an example of ${topic}.`, a: 'Use a worked example from one of the sources, then invent one of your own.', ex: '' },
       { q: `What is a common mistake with ${topic}?`, a: 'Describe the misconception and explain why it is wrong.', ex: '' },
     ],
   };
@@ -3238,34 +3283,67 @@
   };
 
   // Canned answers (demo only — no model is connected)
-  const COURSE_SOURCES = [
-    { ic: 'L4', t: 'Lecture 4 — Slides', s: 'Course materials · slides 12–15' },
-    { ic: 'SG', t: 'Unit 2 study guide', s: 'Course materials · p. 3' },
-    { ic: 'N', t: 'Your notes: Week 3', s: 'Library · your notes' },
-  ];
+  // Study is general learning: Aurora searches public resources for any topic, not your course files.
+  // The source picker narrows the search: Web (default), Academic or Videos.
+  const WEB = {
+    wiki:   (t) => ({ ic: 'W',  t: `Wikipedia: ${t}`, s: 'en.wikipedia.org · Encyclopedia' }),
+    brit:   (t) => ({ ic: 'Br', t: `Britannica: ${t}`, s: 'britannica.com · Encyclopedia' }),
+    khan:   (t) => ({ ic: 'KA', t: `Khan Academy: ${t}`, s: 'khanacademy.org · Lessons and practice' }),
+    ostax:  ()  => ({ ic: 'OS', t: 'OpenStax Biology 2e', s: 'openstax.org · Open textbook' }),
+    nng:    (t) => ({ ic: 'NN', t: `Nielsen Norman Group: ${t}`, s: 'nngroup.com · UX research' }),
+    idf:    (t) => ({ ic: 'ID', t: `Interaction Design Foundation: ${t}`, s: 'interaction-design.org · Articles' }),
+    pydocs: (t) => ({ ic: 'Py', t: `Python docs: ${t}`, s: 'docs.python.org · Official documentation' }),
+    realpy: (t) => ({ ic: 'RP', t: `Real Python: ${t}`, s: 'realpython.com · Tutorials' }),
+    mdn:    (t) => ({ ic: 'MD', t: `MDN: ${t}`, s: 'developer.mozilla.org · Documentation' }),
+    react:  (t) => ({ ic: 'Re', t: `react.dev: ${t}`, s: 'react.dev · Official documentation' }),
+    yt:     (t, ch) => ({ ic: 'YT', t: `${ch}: ${t}`, s: 'youtube.com · Video explainer' }),
+    scholar:(t) => ({ ic: 'GS', t: `Google Scholar: ${t}`, s: 'scholar.google.com · Peer-reviewed papers' }),
+    jstor:  (t) => ({ ic: 'JS', t: `JSTOR: ${t}`, s: 'jstor.org · Journal articles' }),
+  };
+  const topicKind = (t) => /cell|membran|biolog|dna|rna|protein|osmosis|diffusion|photosynth|enzyme|mitosis|gene|organ/i.test(t) ? 'bio'
+    : /\bux\b|usab|user experience|product design|interface|heuristic|disclosure|design/i.test(t) ? 'ux'
+    : /react|hook|javascript|\bjs\b|css|html|web dev/i.test(t) ? 'web'
+    : /python|code|program|script|function|variable|loop|api|csv/i.test(t) ? 'py' : 'gen';
+  const webSources = (topic) => {
+    const T = titleCase(topic || 'this topic'), k = topicKind(topic || '');
+    const focus = ($('#sourceLabel')?.textContent || 'Web').toLowerCase();
+    if (focus === 'academic') return k === 'bio' ? [WEB.ostax(), WEB.scholar(T), WEB.jstor(T)] : [WEB.scholar(T), WEB.jstor(T), WEB.brit(T)];
+    if (focus === 'videos') return [WEB.yt(T, k === 'bio' ? 'CrashCourse Biology' : k === 'py' ? 'freeCodeCamp' : k === 'ux' ? 'NN/g' : 'CrashCourse'), WEB.khan(T), WEB.yt(T, 'TED-Ed')];
+    if (k === 'bio') return [WEB.ostax(), WEB.khan(T), WEB.wiki(T)];
+    if (k === 'ux') return [WEB.nng(T), WEB.idf(T), WEB.wiki(T)];
+    if (k === 'web') return [WEB.react(T), WEB.mdn(T), WEB.wiki(T)];
+    if (k === 'py') return [WEB.pydocs(T), WEB.realpy(T), WEB.wiki(T)];
+    return [WEB.wiki(T), WEB.brit(T), WEB.khan(T)];
+  };
+  const cite = (S, i) => `[${S[i].t}](src:${i})`;
+  // "Explain photosynthesis?" -> "photosynthesis"
+  const topicFromQ = (q) => q.replace(/[?.!\s]+$/, '')
+    .replace(/^(please\s+)?(can you\s+)?(explain|define|describe|summari[sz]e|teach me|tell me about|help me understand|what (is|are|was|were)( an?| the)?|how (does|do|did)( an?| the)?|why (is|are|does|do)( an?| the)?|who (is|was))\s+/i, '')
+    .replace(/\s+(work|works|happen|happens|mean|means)$/i, '').trim();
   const replyFor = (q) => {
     const t = q.toLowerCase();
     const m = q.match(/\b(?:on|about|for|from|of|topic:)\s+(.+)/i);
-    const topic = (m ? m[1] : '').replace(/[?.!\s]+$/, '').trim() || 'your current unit';
+    const topic = (m ? m[1] : '').replace(/[?.!\s]+$/, '').trim() || 'this topic';
+    const S = webSources(m ? topic : topicFromQ(q));
     if (t.includes('flashcard')) {
       const set = flashFor(m ? topic : '');
-      return { sources: COURSE_SOURCES,
-        md: `Here are **${set.cards.length} ${set.title.replace(/ Flashcards$/, '')} flashcards**. Think of your answer first, then flip each card to reveal the explanation. [Lecture 4 — Slides](src:0)`,
+      return { sources: S,
+        md: `Here are **${set.cards.length} ${set.title.replace(/ Flashcards$/, '')} flashcards**, built from ${S.length} sources across the web. Think of your answer first, then flip each card to reveal the explanation. ${cite(S, 0)}`,
         widget: () => buildFlash(set, m ? topic : ''),
         widgetLabel: 'Building flashcards',
-        outro: `Try answering each one out loud before flipping, as if you were explaining it to a classmate. Use **Save flashcards** to keep this set in your Notes. [Your notes: Week 3](src:2)` };
+        outro: `Try answering each one out loud before flipping, as if you were explaining it to a friend. Use **Save flashcards** to keep this set in your Library. ${cite(S, 1)}` };
     }
     if (/\bquiz/.test(t)) {
       const quiz = quizFor(m ? topic : '');
-      return { sources: COURSE_SOURCES,
-        md: `Here's a ${quiz.questions.length}-question practice quiz on **${quiz.title.replace(/ Quiz$/, '')}**, covering multiple choice, select-all-that-apply, short answer and long answer. [Lecture 4 — Slides](src:0) · [Unit 2 study guide](src:1)`,
+      return { sources: S,
+        md: `Here's a ${quiz.questions.length}-question practice quiz on **${quiz.title.replace(/ Quiz$/, '')}**, drawn from ${S.length} sources: multiple choice, select-all-that-apply, short answer and long answer. ${cite(S, 0)} · ${cite(S, 1)}`,
         widget: () => buildQuiz(quiz),
         widgetLabel: 'Building quiz',
-        outro: `Answer from memory first, then use **Check answers** to see explanations. Use **Save quiz** to keep it in your Notes and retake it later.` };
+        outro: `Answer from memory first, then use **Check answers** to see explanations. Use **Save quiz** to keep it in your Library and retake it later.` };
     }
     if (/salesforce|python|code|script|program|function|api/.test(t)) {
       const sf = t.includes('salesforce');
-      return { sources: [{ ic: 'Py', t: sf ? 'simple-salesforce docs' : 'Python docs: csv module', s: 'Reference documentation' }, COURSE_SOURCES[2]], md:
+      return { sources: [{ ic: 'Py', t: sf ? 'simple-salesforce docs' : 'Python docs: csv module', s: sf ? 'simple-salesforce.readthedocs.io · Documentation' : 'docs.python.org · Official documentation' }, WEB.realpy(sf ? 'Working with APIs' : 'Reading and writing CSV files')], md:
 `With ${sf ? 'the `simple-salesforce` library, connecting to Salesforce and retrieving all contacts is straightforward' : 'just the standard library you can get this working quickly'}. Here's a quick Python script to get you started. [${sf ? 'simple-salesforce docs' : 'Python docs'}](src:0)
 
 \`\`\`python
@@ -3298,45 +3376,45 @@ for row in rows:
 2. ${sf ? 'We retrieve all contacts using a SOQL query.' : 'We collect every score column except the name.'}
 3. ${sf ? 'We iterate over the contacts and print their first name, last name, and email.' : 'We print each average, rounded to one decimal place.'}
 
-This is a basic script to get you going. Want me to walk through any line, or turn it into a short practice quiz? [Your notes: Week 3](src:1)` };
+This is a basic script to get you going. Want me to walk through any line, or turn it into a short practice quiz? [Real Python](src:1)` };
     }
     if (/\bsummar(y|ise|ize)\b/.test(t)) {
-      const st = ((q.match(/summar(?:y|ise|ize)\s+(?:of\s+|on\s+)?(.+)/i) || [])[1] || topic).replace(/[?.!\s]+$/, '').trim() || 'your current unit';
-      return { sources: COURSE_SOURCES, md:
-`Here's a summary of **${st}**, built from your course materials. [Lecture 4 — Slides](src:0)
+      const st = ((q.match(/summar(?:y|ise|ize)\s+(?:of\s+|on\s+)?(.+)/i) || [])[1] || topic).replace(/[?.!\s]+$/, '').trim() || 'this topic';
+      const S2 = webSources(st);
+      return { sources: S2, md:
+`Here's a summary of **${st}**, drawn from ${S2.length} sources across the web. ${cite(S2, 0)}
 
 ### Key points
 
-- **The big idea:** the one question ${st} answers, and why it matters for this course.
-- **Key terms:** the three or four terms your lecture uses most, each in a single line. [Unit 2 study guide](src:1)
-- **How it connects:** where it builds on earlier units, so you can link new ideas to old ones.
-- **Common mistake:** the misconception your study guide warns about.
+- **The big idea:** the one question ${st} answers, and why people care about it. ${cite(S2, 0)}
+- **Key terms:** the three or four terms every source uses, each in a single line. ${cite(S2, 1)}
+- **How it connects:** what it builds on, so you can link the new ideas to things you already know.
+- **Common mistake:** the misconception the sources most often correct. ${cite(S2, 2)}
 
-### Recommended resources
+### Where to go deeper
 
-- **Lecture 4 — Slides**, slides 12–15: the clearest overview. [Lecture 4 — Slides](src:0)
-- **Unit 2 study guide**, page 3: a comparison table for revision. [Unit 2 study guide](src:1)
-- **Your notes: Week 3**: you already covered part of this. [Your notes: Week 3](src:2)
+- **${S2[0].t}**: the clearest overview to start with. ${cite(S2, 0)}
+- **${S2[1].t}**: explanations with worked examples. ${cite(S2, 1)}
+- **${S2[2].t}**: a different angle, useful for revision. ${cite(S2, 2)}
 
-Want me to save this summary to your notes, or turn it into flashcards?` };
+Want me to save this summary to your Library, or turn it into flashcards?` };
     }
-    return { sources: COURSE_SOURCES, md:
-`Let's break down **${topic}** step by step. Your Lecture 4 slides frame it around one central question, and the study guide has a good comparison table to anchor the details. [Lecture 4 — Slides](src:0)
+    return { sources: S, md:
+`Let's break down **${topic}** step by step, using ${S.length} sources from across the web. ${cite(S, 0)}
 
 ### Three steps to understand it
 
-1. **Start with the big idea.** Before details, name the one question this topic answers.
-2. **Connect it to what you already know.** Link each new term to something from earlier units. [Unit 2 study guide](src:1)
-3. **Check your understanding.** Explain it out loud in two sentences, as if teaching a friend.
+1. **Start with the big idea.** Before the details, name the one question this topic answers. ${cite(S, 0)}
+2. **Learn the key terms.** Each source leans on the same few terms; define them in your own words. ${cite(S, 1)}
+3. **Test yourself.** Explain it out loud or try a few practice questions, then check against the sources. ${cite(S, 2)}
 
-Your Week 3 notes already cover part of this, so start there. [Your notes: Week 3](src:2)
+### Where to go deeper
 
-### Recommended resources
+- **${S[0].t}**: the clearest overview to start with. ${cite(S, 0)}
+- **${S[1].t}**: explanations with worked examples. ${cite(S, 1)}
+- **${S[2].t}**: a different angle, useful for revision. ${cite(S, 2)}
 
-- **Lecture 4 — Slides**, slides 12–15: start here for the overview. [Lecture 4 — Slides](src:0)
-- **Unit 2 study guide**, page 3: the comparison table. [Unit 2 study guide](src:1)
-
-Want me to quiz you on this or turn it into flashcards?` };
+Want a quick quiz or a set of flashcards on ${topic}?` };
   };
 
   // ---------- Sources panel: where the answer's information comes from ----------
@@ -3444,7 +3522,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     const src = $('#sourceLabel').textContent.toLowerCase();
     const steps = [];
     await wait(500);
-    if (!stopFlag) { sh.textContent = `Searching ${src === 'all sources' ? 'your courses and Library' : src}…`; await wait(1000); }
+    if (!stopFlag) { sh.textContent = src === 'academic' ? 'Searching academic sources…' : src === 'videos' ? 'Searching video explainers…' : 'Searching the web…'; await wait(1000); }
     if (!stopFlag) { sh.textContent = `Reading ${sources.length} sources…`; setSources(sources); await wait(900); }
     if (!stopFlag) { sh.textContent = 'Writing answer…'; ai.classList.add('streaming'); await stream(body, md); }
     if (!stopFlag && widget) {
@@ -3802,11 +3880,11 @@ Want me to quiz you on this or turn it into flashcards?` };
     "",
     "One important thing: Python is **case-sensitive**, so `name` and `Name` are two different variables.",
     "",
-    "Before we move on to Lesson 2, a quick question: why did we put `\"Ava\"` in quotation marks but not `25`? [Your notes: Week 3](src:1)",
+    "Before we move on to Lesson 2, a quick question: why did we put `\"Ava\"` in quotation marks but not `25`? [Real Python: variables](src:1)",
   ].join('\n');
   const LESSON_SOURCES = [
     { ic: 'Py', t: 'Python docs: variables', s: 'Reference documentation' },
-    { ic: 'N', t: 'Your notes: Week 3', s: 'Library · your notes' },
+    { ic: 'RP', t: 'Real Python: variables', s: 'realpython.com · Tutorials' },
   ];
   const plain = (md) => md
     .replace(/\[([^\]]+)\]\(src:\d+\)/g, '')
@@ -4196,7 +4274,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   const closeModal = () => {
     if (modalGuard) { const g = modalGuard; if (!g()) return; }
     modalGuard = null;
-    $('.modal').classList.remove('wide');
+    $('.modal').classList.remove('wide', 'aid-full');
     layer.hidden = true;
     document.documentElement.style.overflow = '';
     ddClose(); $('#mBody').innerHTML = ''; $('#mFoot').innerHTML = '';
@@ -5051,10 +5129,18 @@ Want me to quiz you on this or turn it into flashcards?` };
   const seedSpaces = () => {
     const t = Date.now();
     const doc = (id) => { const d = COURSE_DOCS.find(x => x.id === id); return mkMat('course', d.title, d.course, d.id); };
+    const HOOKS_DECK = { title: 'Advanced Hooks', cards: [
+      { q: 'When does React run an effect’s cleanup function?', a: 'Before the effect runs again, and when the component unmounts.', ex: 'Removing a resize listener added in the same effect.' },
+      { q: 'What does the dependency array of useEffect control?', a: 'Which values, when changed, make the effect run again. An empty array runs it once after mount.', ex: '[userId] refetches when the user changes.' },
+      { q: 'useMemo or useCallback: which caches a function?', a: 'useCallback caches a function; useMemo caches a computed value.', ex: 'Pass a useCallback handler to a memoized child to avoid re-renders.' },
+      { q: 'What is useRef useful for besides DOM nodes?', a: 'Keeping a mutable value between renders without causing a re-render.', ex: 'Storing a timer id or the previous value of a prop.' },
+      { q: 'Why must hooks be called in the same order every render?', a: 'React matches hook state to calls by their order, so conditional hooks break that mapping.', ex: 'Never call useState inside an if statement.' },
+    ] };
     let deck = lib.find(x => x.type === 'flashcards' && x.title === 'Advanced Hooks');
+    if (deck && deck.payload?.data?.title === 'UX Flashcards') { deck.payload = { kind: 'flash', data: HOOKS_DECK, topic: 'React hooks' }; persist(); }
     if (!deck) {
       deck = { id: uidLib(), type: 'flashcards', title: 'Advanced Hooks', body: '', source: 'Aurora response', created: t - 3 * DAY, edited: t - 3 * DAY,
-        session: '', tags: [], course: FE_COURSE, space: '', payload: { kind: 'flash', data: flashFor(''), topic: '' }, dest: { kind: 'library' } };
+        session: '', tags: [], course: FE_COURSE, space: '', payload: { kind: 'flash', data: HOOKS_DECK, topic: 'React hooks' }, dest: { kind: 'library' } };
       lib.push(deck); persist();
     }
     return [
@@ -5179,7 +5265,7 @@ Want me to quiz you on this or turn it into flashcards?` };
       : `<span>${esc(it ? `${it.payload?.data?.cards?.length || it.payload?.data?.questions?.length || ''} ${m.cat === 'flash' ? 'cards' : 'questions'} · ${fmtAgo(it.edited)}` : (m.meta || label))}</span>`;
     return `<li class="mat ws-row ${m.status} c-${m.cat}" data-cat="${m.cat}">
       <span class="ws-ric" aria-hidden="true" title="${label}">${icon}</span>
-      <span class="ws-rt"><b>${esc(matTitle(m))}</b>${meta}</span>
+      ${it && m.status === 'ready' ? `<button type="button" class="ws-rt ws-open" data-aidopen="${m.ref}" aria-label="Open ${esc(matTitle(m))}"><b>${esc(matTitle(m))}</b>${meta}</button>` : `<span class="ws-rt"><b>${esc(matTitle(m))}</b>${meta}</span>`}
       <div class="lib-more"><button type="button" class="cn-more" data-matmore="${m.id}" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for ${esc(matTitle(m))}">${L_ICON.dots}</button></div>
       ${side}
     </li>`;
@@ -5378,16 +5464,25 @@ Want me to quiz you on this or turn it into flashcards?` };
     : `<div class="sp-msg ai"><div class="body">${render(pub ? pubText(m.t, sp) : m.t)}</div>
         ${m.incomplete ? '<p class="sp-incomplete">Response stopped. This answer is incomplete.</p>' : ''}
         ${m.aid ? `<div class="sp-aid" data-aid="${i}"></div>` : ''}
-        ${m.src && m.src.length ? `<div class="sp-src"><span class="src-lbl">Sources</span><ol>${m.src.map((t, k) => { const gone = !pub && sp && !liveMats(sp).some(x => matTitle(x) === t && x.status === 'ready'); const mt = sp && sp.mats.find(x => matTitle(x) === t); const cat = catOf(mt ? mt.cat : 'course') || MAT_CATS[0]; return `<li class="src-chip"><span class="src-n">${k + 1}</span><span class="src-ic" aria-hidden="true">${cat[2]}</span><span class="src-t">${esc(srcText(t, sp, pub))}${gone ? ' <em>(removed from Space)</em>' : ''}</span></li>`; }).join('')}</ol></div>` : ''}
+        ${m.src && m.src.length ? `<div class="sp-src"><span class="src-lbl">Sources</span><ol>${m.src.map((t, k) => { const gone = !pub && sp && !liveMats(sp).some(x => matTitle(x) === t && x.status === 'ready'); const mt = sp && sp.mats.find(x => matTitle(x) === t); const cat = catOf(mt ? mt.cat : 'course') || MAT_CATS[0]; return `<li class="src-chip"><span class="src-ic" aria-hidden="true">${cat[2]}</span><span class="src-t">${esc(srcText(t, sp, pub))}${gone ? ' <em>(removed from Space)</em>' : ''}</span></li>`; }).join('')}</ol></div>` : ''}
         ${pub ? '' : `<div class="actions"><button type="button" class="act" data-spact="save" data-i="${i}">${ICON.note}<span>Save to note</span></button><button type="button" class="act icon" data-spact="copy" data-i="${i}" aria-label="Copy" title="Copy">${ICON.copy}</button></div>`}
       </div>`;
   const aidCard = (c, i, pub) => {
     const a = c.msgs[i].aid, saved = a.libId && getItem(a.libId), flash = a.kind === 'flash';
     return `<div class="aid-card"><span class="lib-ic t-${flash ? 'flashcards' : 'quiz'}" aria-hidden="true">${flash ? L_ICON.flashcards : L_ICON.quiz}</span>
       <span class="aid-txt"><b>${esc(a.title)}</b><span>${flash ? `${a.count} flashcards` : `${a.count}-question practice quiz`} · from ${esc(pub ? a.from.split(', ').map(t => srcText(t, curSp(), true)).join(', ') : a.from)}</span>${flash ? '' : '<span>Practice only: doesn’t change grades, course progress or instructor assessments.</span>'}</span>
-      ${pub ? '<span class="aid-note">Not interactive in a shared view</span>' : `<button type="button" class="nav-btn sm" data-spact="review" data-i="${i}" aria-expanded="false">${flash ? 'Review cards' : 'Start practice'}</button>
+      ${pub ? '<span class="aid-note">Not interactive in a shared view</span>' : `<button type="button" class="aid-exp" data-spact="expand" data-i="${i}" aria-label="Open ${flash ? 'flashcards' : 'quiz'} in a larger view" title="Expand"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button><button type="button" class="nav-btn sm" data-spact="review" data-i="${i}" aria-expanded="false">${flash ? 'Review cards' : 'Start practice'}</button>
       ${saved ? `<span class="aid-saved">${ICON.check} Saved to ${flash ? 'Flashcards' : 'Quizzes'}</span>` : `<button type="button" class="nav-btn sm primary" data-spact="saveaid" data-i="${i}">Save to Space</button>`}`}</div>
       <div class="aid-widget" hidden></div>`;
+  };
+  // Expanded view of a quiz or flashcard deck, in a large popup
+  const openAidPopup = ({ kind, title, sub, data, topic, onSave }) => {
+    const flash = kind === 'flash';
+    openModal({ title, sub, body: '<div class="aid-pop" id="aidPop"></div>',
+      buttons: onSave ? [{ label: 'Close' }, { label: 'Save to Space', kind: 'primary', onClick: () => { onSave(); } }] : [{ label: 'Close', kind: 'primary' }] });
+    $('.modal').classList.add('aid-full');
+    $('#aidPop').appendChild(flash ? buildFlash(data, topic) : buildQuiz(data));
+    $('#aidPop button, #aidPop [tabindex]')?.focus();
   };
   const mountAids = (root, c, pub) => root.querySelectorAll('.sp-aid:empty').forEach(el => { el.innerHTML = aidCard(c, +el.dataset.aid, pub); });
   // Sessions list in the Study aids panel (return to earlier work, Claude Projects style)
@@ -5416,36 +5511,141 @@ Want me to quiz you on this or turn it into flashcards?` };
     mountAids(el, c);
     el.scrollTop = el.scrollHeight;
   };
+
+  // ---------- What each material says (Spaces answers only from these) ----------
+  // Prototype excerpts standing in for the text extracted from each connected material.
+  const MAT_KB = {
+    'cd-bio-l4': [
+      { q: 'What does the fluid mosaic model describe?', a: 'The cell membrane as a phospholipid bilayer with proteins embedded in it that can drift sideways.', where: 'slide 4' },
+      { q: 'How does facilitated diffusion move molecules?', a: 'Down their concentration gradient through channel or carrier proteins, with no ATP needed.', where: 'slide 12' },
+      { q: 'What makes active transport different from diffusion?', a: 'It moves molecules against their gradient and needs energy from ATP, like the sodium–potassium pump.', where: 'slide 14' },
+    ],
+    'cd-bio-sg': [
+      { q: 'What is osmosis?', a: 'The diffusion of water across a selectively permeable membrane, from lower to higher solute concentration.', where: 'p. 3' },
+      { q: 'What happens to a cell in a hypertonic solution?', a: 'Water leaves the cell, so it shrinks.', where: 'p. 4' },
+      { q: 'What is endocytosis?', a: 'The cell takes in large particles by wrapping them in a piece of membrane that pinches off as a vesicle.', where: 'p. 6' },
+    ],
+    'cd-bio-vt': [
+      { q: 'Why can’t ions cross the lipid bilayer on their own?', a: 'Their charge makes them repelled by the hydrophobic core, so they need channel proteins.', where: '06:40' },
+      { q: 'What sets the direction of passive transport?', a: 'The concentration gradient: molecules move from high to low concentration.', where: '11:15' },
+    ],
+    'cd-py-l1': [
+      { q: 'What is a variable in Python?', a: 'A name that refers to a value, created the first time you assign to it with =.', where: 'section 1' },
+      { q: 'Is Python case-sensitive with variable names?', a: 'Yes: name and Name are two different variables.', where: 'section 3' },
+      { q: 'What does age = age + 1 do?', a: 'Reads the current value of age, adds 1, and stores the result back in age.', where: 'section 2' },
+    ],
+    'cd-py-cs': [
+      { q: 'How do you insert a variable into a string?', a: 'Use an f-string, for example f"Hello {name}".', where: 'Strings' },
+      { q: 'How do you add an item to the end of a list?', a: 'Call append on the list, for example scores.append(90).', where: 'Lists' },
+      { q: 'How do you read a value from a dictionary safely?', a: 'Use get with a default, for example user.get("email", "").', where: 'Dictionaries' },
+    ],
+    'cd-ux-w3': [
+      { q: 'How many users per round of usability testing does the reading recommend?', a: 'About five; they reveal most major problems, so test again after fixing them.', where: 'p. 2' },
+      { q: 'What is the think-aloud method?', a: 'Participants say what they are thinking while they use the product, so you hear their expectations.', where: 'p. 3' },
+      { q: 'What makes a good task scenario?', a: 'A realistic goal written in the user’s words, without naming the buttons to press.', where: 'p. 5' },
+    ],
+    'cd-ux-sd': [
+      { q: 'What does a service blueprint map?', a: 'The customer’s journey alongside the frontstage and backstage work and systems that support it.', where: 'p. 1' },
+      { q: 'What is the line of visibility?', a: 'The line separating what the customer sees from the backstage work they don’t see.', where: 'p. 3' },
+      { q: 'What are support processes in a blueprint?', a: 'Internal systems and teams that enable employees to deliver the service.', where: 'p. 5' },
+    ],
+    'cd-fe-cp': [
+      { q: 'What is component composition?', a: 'Building UI by nesting small components and passing children, instead of making one component do everything.', where: 'p. 2' },
+      { q: 'Where should shared state live?', a: 'In the closest common parent of the components that need it (lifting state up).', where: 'p. 6' },
+      { q: 'Which way does data flow in React?', a: 'Down, through props; children report changes back up through callbacks.', where: 'p. 4' },
+    ],
+    'cd-fe-hk': [
+      { q: 'When does React run an effect’s cleanup?', a: 'Before the effect runs again and when the component unmounts.', where: 'p. 7' },
+      { q: 'What does the useEffect dependency array control?', a: 'Which changed values make the effect run again; an empty array runs it once after mount.', where: 'p. 9' },
+      { q: 'Why must hooks be called in the same order every render?', a: 'React matches state to hook calls by order, so conditional hooks break that mapping.', where: 'p. 3' },
+    ],
+    'cd-fe-pf': [
+      { q: 'When is React.memo worth using?', a: 'When a component re-renders often with the same props and is costly to render.', where: 'item 3' },
+      { q: 'Why give list items stable keys?', a: 'So React can match items between renders instead of re-creating them.', where: 'item 5' },
+    ],
+  };
+  const KB_BY_TITLE = [
+    [/react[-\s]?hooks|react\.dev.*hooks/i, [
+      { q: 'What is a custom hook?', a: 'A function starting with use that reuses stateful logic between components.', where: 'p. 1' },
+      { q: 'What does useRef keep between renders?', a: 'A mutable value that doesn’t cause a re-render when it changes.', where: 'p. 2' },
+    ]],
+    [/capstone/i, [
+      { q: 'What is the capstone deliverable?', a: 'A tested prototype and a research report presented at the end of term.', where: 'p. 1' },
+      { q: 'How is the capstone assessed?', a: 'On research quality, design rationale and how well the prototype was validated.', where: 'p. 2' },
+    ]],
+  ];
+  // Facts for one material; anything without known text is described honestly instead of invented.
+  const factsOf = (m) => {
+    const t = matTitle(m);
+    const kb = MAT_KB[m.ref] || (KB_BY_TITLE.find(([re]) => re.test(t)) || [])[1];
+    return kb ? kb.map(f => ({ ...f, from: t })) : [];
+  };
+  const STOP = new Set(['what', 'which', 'when', 'where', 'does', 'this', 'that', 'with', 'from', 'about', 'these', 'materials', 'explain', 'make', 'create', 'give', 'tell', 'please', 'quiz', 'flashcards', 'flashcard', 'practice', 'summarize', 'summary', 'sources', 'tutor', 'teach', 'walk', 'through', 'list', 'write', 'study', 'guide', 'concepts', 'ideas', 'main']);
+  const relevantFacts = (q, mats) => {
+    const words = q.toLowerCase().split(/\W+/).filter(w => w.length > 3 && !STOP.has(w));
+    const all = mats.flatMap(factsOf);
+    const scored = all.map(f => ({ f, s: words.filter(w => (f.q + ' ' + f.a + ' ' + f.from).toLowerCase().includes(w.replace(/s$/, ''))).length }));
+    const hits = scored.filter(x => x.s).sort((a, b) => b.s - a.s).map(x => x.f);
+    return { hits, all, asked: words.length > 0 };
+  };
+  const shuffleWith = (arr, seed) => arr.map((v, i) => [v, (i * 9301 + seed * 49297) % 233280]).sort((a, b) => a[1] - b[1]).map(x => x[0]);
+  const flashFromFacts = (facts, title) => ({ title, cards: facts.slice(0, 8).map(f => ({ q: f.q, a: f.a, ex: `From ${f.from}${f.where ? `, ${f.where}` : ''}` })) });
+  const quizFromFacts = (facts, title) => {
+    const qs = facts.slice(0, 5).map((f, i) => {
+      const others = facts.filter(x => x !== f).map(x => x.a);
+      const pad = ['None of the materials say this.', 'It depends only on the browser.', 'Only when the page reloads.'];
+      const opts = shuffleWith([f.a, ...[...others, ...pad].slice(0, 3)], i + 1);
+      return { type: 'mc', q: f.q, options: opts, answer: [opts.indexOf(f.a)], why: `From ${f.from}${f.where ? `, ${f.where}` : ''}: ${f.a}` };
+    });
+    return { title, questions: qs };
+  };
   const spPlan = (q, sp, ready) => {
     const t = q.toLowerCase();
     if (!ready.length) return { status: 'Checking this Space’s materials…', src: [],
       md: `I can’t answer this **from ${sp.name}’s sources** yet, because none are ${readyMats(sp).length ? 'selected' : 'connected and ready'}${!readyMats(sp).length && liveMats(sp).length ? ' (some are still preparing or need attention)' : ''}.\n\nAdd course documents, uploads or URLs with **Add Material**, and I’ll answer from them.` };
-    const words = t.split(/\W+/).filter(w => w.length > 3);
-    const scored = ready.map(m => ({ m, s: words.filter(w => matTitle(m).toLowerCase().includes(w)).length })).sort((a, b) => b.s - a.s);
-    const use = (scored[0].s ? scored.filter(x => x.s).map(x => x.m) : ready).slice(0, 3);
-    const names = use.map(matTitle), list = names.map(n => `**${n}**`).join(names.length > 2 ? ', ' : ' and ');
     const mm = q.match(/\b(?:on|about|for|from|of)\s+(.+)/i);
-    const topic = (mm ? mm[1] : '').replace(/[?.!\s]+$/, '').replace(/^(these|the|this) (materials?|notes|documents?)$/i, '');
-    const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-    const baseName = names[0].replace(/\.[a-z0-9]+$/i, '').replace(/^.*\//, '');
-    const reading = `Reading ${names.length} material${names.length === 1 ? '' : 's'}…`;
+    const topic = (mm ? mm[1] : '').replace(/[?.!\s]+$/, '').replace(/^(these|the|this|my) (materials?|notes|documents?|sources?)$/i, '');
+    const { hits, all, asked } = relevantFacts(topic || q, ready);
+    // which materials to draw on: the ones whose text matches, else every selected one with known text
+    const pool = hits.length ? hits : all;
+    const usedTitles = [...new Set(pool.map(f => f.from))];
+    const unknown = ready.filter(m => !factsOf(m).length).map(matTitle);
+    const names = usedTitles.length ? usedTitles.slice(0, 4) : ready.slice(0, 3).map(matTitle);
+    const list = names.map(n => `**${n}**`).join(names.length > 2 ? ', ' : ' and ');
+    const cap = (x) => x.charAt(0).toUpperCase() + x.slice(1);
+    const baseName = names[0].replace(/\.[a-z0-9]+$/i, '').replace(/^.*\//, '').replace(/ — .*/, '');
+    const reading = `Reading ${ready.length} source${ready.length === 1 ? '' : 's'}…`;
+    const cite = (f) => `_(${f.from}${f.where ? `, ${f.where}` : ''})_`;
+    const asks = topic || (/flash ?cards?|\bdeck\b|\bquiz|practice test|test me|summar|key concepts|key ideas|study guide|tutor me/.test(t) ? '' : topicFromQ(q));
+    const gap = asks && asked && !hits.length ? `Your selected sources don’t mention **${asks}**, so I can’t answer that from this Space. Here’s the closest material they do cover. To learn about it in general, ask in **Study**.\n\n` : '';
+    const unread = unknown.length ? `\n\n_I can’t read the text of ${unknown.map(u => `**${u}**`).join(', ')} in this prototype, so it isn’t used here._` : '';
+    if (!pool.length) return { status: reading, src: names,
+      md: `I couldn’t find text I can use in ${list}, so I won’t guess. Try selecting a course document, or add one with **Add source**.${unread}` };
     if (/flash ?cards?|\bdeck\b/.test(t)) {
-      const set = flashFor(topic);
+      const set = flashFromFacts(pool, `${cap(topic || baseName)} flashcards`);
       return { status: reading, status2: 'Preparing flashcards…', src: names,
-        md: `I prepared **${set.cards.length} flashcards** from ${list}. Review them first: nothing is added to the Space until you choose **Save to Space**.`,
-        aid: { kind: 'flash', topic, title: `${cap(topic || baseName)} flashcards`, count: set.cards.length, from: names.join(', ') } };
+        md: `${gap}I made **${set.cards.length} flashcards** from ${list}. Each card notes where its answer comes from. Review them first: nothing is added to the Space until you choose **Save to Space**.${unread}`,
+        aid: { kind: 'flash', topic, title: set.title, count: set.cards.length, from: names.join(', '), data: set } };
     }
     if (/\bquiz|practice test|test me/.test(t)) {
-      const qz = quizFor(topic);
+      const qz = quizFromFacts(pool, `${cap(topic || baseName)} practice quiz`);
       return { status: reading, status2: 'Preparing a practice quiz…', src: names,
-        md: `I prepared a **${qz.questions.length}-question practice quiz** from ${list}. Start practising here, then save it if you want to come back to it.`,
-        aid: { kind: 'quiz', topic, title: `${cap(topic || baseName)} practice quiz`, count: qz.questions.length, from: names.join(', ') } };
+        md: `${gap}I made a **${qz.questions.length}-question practice quiz** from ${list}. Every answer is checked against those sources. Start practising here, then save it to come back to it.${unread}`,
+        aid: { kind: 'quiz', topic, title: qz.title, count: qz.questions.length, from: names.join(', '), data: qz } };
     }
-    if (/tutor me|teach me|walk me through/.test(t)) return { status: 'Finding relevant passages…', status2: 'Planning a tutoring path…', src: names,
-      md: `Let’s work through **${topic || 'this topic'}** step by step, using ${list}.\n\n**Step 1: check what you already know.** In one or two sentences, how would you explain ${topic || 'the main idea'} to a classmate?\n\nReply in your own words and I’ll build on it. You can ask for something simpler, another example, or stop at any time.` };
-    const base = replyFor(q).md.replace(/\s*\[[^\]]+\]\(src:\d+\)/g, '').replace(/\s*·\s*$/gm, '').trim();
-    return { status: 'Finding relevant passages…', status2: reading, src: names,
-      md: `Based on ${list}:\n\n${base}\n\n_Where these materials don’t cover a point, I’ve said so rather than guessing._` };
+    if (/tutor me|teach me|walk me through/.test(t)) {
+      const f = pool[0];
+      return { status: 'Finding relevant passages…', status2: 'Planning a tutoring path…', src: [f.from],
+        md: `${gap}Let’s work through **${topic || baseName}** using **${f.from}**.\n\n**Step 1: check what you already know.** ${f.q}\n\nAnswer in your own words first. Then I’ll compare it with what ${f.from}${f.where ? ` (${f.where})` : ''} says and build on it. You can ask for something simpler or stop at any time.` };
+    }
+    if (/summar|key concepts|key ideas|study guide|main ideas/.test(t)) {
+      const byDoc = usedTitles.map(ti => `### ${ti}\n\n` + pool.filter(f => f.from === ti).map(f => `- **${f.q.replace(/\?$/, '')}:** ${f.a} ${cite(f)}`).join('\n')).join('\n\n');
+      return { status: reading, status2: 'Pulling out the key ideas…', src: names,
+        md: `${gap}${/study guide/.test(t) ? 'Here’s a study guide' : /key concepts|key ideas/.test(t) ? 'Here are the key concepts' : 'Here’s a summary'} built only from your selected sources.\n\n${byDoc}${unread}` };
+    }
+    const top = pool.slice(0, 4);
+    return { status: 'Finding relevant passages…', status2: reading, src: [...new Set(top.map(f => f.from))],
+      md: `${gap}Here’s what your sources say:\n\n${top.map(f => `- **${f.q.replace(/\?$/, '')}** ${f.a} ${cite(f)}`).join('\n')}\n\n_I’ve only used your selected sources. Where they don’t cover something, I say so rather than guessing._${unread}` };
   };
   const SEND_HTML = () => $('#spSend').dataset.sendHtml || ($('#spSend').dataset.sendHtml = $('#spSend').innerHTML);
   const setSpBusy = (b) => {
@@ -5470,8 +5670,9 @@ Want me to quiz you on this or turn it into flashcards?` };
     c.msgs.push({ r: 'me', t: q }); c.edited = t; sp.edited = t;
     persistChats(); persistSpaces();
     $('#spPrompt').value = ''; $('#spPrompt').style.height = '';
-    renderThreadSp();
     const el = $('#spThread'), ready = activeMats(sp), plan = spPlan(q, sp, ready);
+    if (c.msgs.length === 1 || !el.querySelector('.sp-msg')) renderThreadSp();
+    else { el.insertAdjacentHTML('beforeend', msgHtml(c.msgs[c.msgs.length - 1], c.msgs.length - 1, sp)); renderSessList(); }
     const holder = document.createElement('div');
     holder.className = 'sp-msg ai';
     holder.innerHTML = `${WORKING(plan.status)}<div class="body"></div>`;
@@ -5482,6 +5683,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     if (!sv.stop && plan.status2) { holder.querySelector('.shimmer').textContent = plan.status2; await wait(650); }
     holder.querySelector('.working')?.remove();
     const body = holder.querySelector('.body');
+    body.classList.add('live');
     let n = 0, done = false;
     if (!sv.stop) await new Promise(res => {
       const tick = () => {
@@ -5500,7 +5702,11 @@ Want me to quiz you on this or turn it into flashcards?` };
     c.msgs.push(msg); c.edited = Date.now(); persistChats();
     sv.busy = false; setSpBusy(false); el.removeAttribute('aria-busy');
     const stick = near();
-    holder.outerHTML = msgHtml(msg, c.msgs.length - 1, sp);
+    body.classList.remove('live');
+    if (!n) body.innerHTML = render(msg.t);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = msgHtml(msg, c.msgs.length - 1, sp);
+    [...tmp.firstElementChild.children].filter(x => !x.classList.contains('body')).forEach(x => holder.appendChild(x));
     mountAids(el, c);
     if (stick) el.scrollTop = el.scrollHeight;
     $('#spSessName').textContent = c.title; $('#spShare').disabled = false; renderSessList();
@@ -5514,7 +5720,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   const saveAid = (sp, c, i) => {
     const a = c.msgs[i].aid, flash = a.kind === 'flash';
     const { item } = saveItem({ type: flash ? 'flashcards' : 'quiz', title: a.title, body: '', source: 'Aurora response', session: c.title, space: sp.name,
-      payload: flash ? { kind: 'flash', data: flashFor(a.topic), topic: a.topic } : { kind: 'quiz', data: quizFor(a.topic) } });
+      payload: flash ? { kind: 'flash', data: a.data || flashFor(a.topic), topic: a.topic } : { kind: 'quiz', data: a.data || quizFor(a.topic) } });
     a.libId = item.id;
     if (!sp.mats.some(m => m.ref === item.id)) sp.mats.push(mkMat(flash ? 'flash' : 'quiz', item.title, flash ? 'Flashcard deck · from this Space' : 'Practice quiz · from this Space', item.id));
     sp.edited = Date.now(); persistSpaces(); persistChats(); renderLibrary(); renderMats(); renderCtx();
@@ -5641,10 +5847,18 @@ Want me to quiz you on this or turn it into flashcards?` };
     btn.setAttribute('aria-label', `${open ? 'Collapse' : 'Expand'} ${btn.previousElementSibling.textContent}`);
   }));
   $('#spOutList').addEventListener('click', (e) => {
+    const op = e.target.closest('[data-aidopen]');
+    if (op) {
+      const it = getItem(op.dataset.aidopen); if (!it || !it.payload) return;
+      const flash = it.payload.kind === 'flash', d = it.payload.data;
+      openAidPopup({ kind: flash ? 'flash' : 'quiz', title: it.title, topic: it.payload.topic, data: d,
+        sub: `${flash ? `${d.cards.length} flashcards` : `${d.questions.length}-question practice quiz`} · saved in this Space` });
+      return;
+    }
     const mo = e.target.closest('[data-matmore]'); if (!mo) return;
     e.stopPropagation();
     const sp = curSp(), m = sp && sp.mats.find(x => x.id === mo.dataset.matmore); if (!m) return;
-    openMenuFor(mo, [['open', 'Open in Library'], ['remove', 'Remove from Space']], (act) => { if (act === 'remove') removeMat(sp, m); else openItem(m.ref); });
+    openMenuFor(mo, [['open', 'Open in Library'], ['remove', 'Remove from Space']], (act) => { if (act === 'remove') removeMat(sp, m); else { showView('library'); openItem(m.ref); } });
   });
   $('.sp-studio').addEventListener('click', (e) => {
     const t = e.target.closest('[data-studio]');
@@ -5659,6 +5873,31 @@ Want me to quiz you on this or turn it into flashcards?` };
   $('#spShare').addEventListener('click', openShare);
   $('#spComposer').addEventListener('submit', (e) => { e.preventDefault(); if (sv.busy) { sv.stop = true; return; } spSend($('#spPrompt').value); });
   $('#spPrompt').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#spComposer').requestSubmit(); } });
+  // Voice input in Spaces: speak a question; words appear in the input to review before sending.
+  let spRec = null;
+  const spMicBtn = $('#spMic');
+  const stopSpMic = () => { if (spRec) { try { spRec.stop(); } catch { /* already stopped */ } } };
+  const setSpMic = (on) => {
+    spMicBtn.classList.toggle('on', on); spMicBtn.setAttribute('aria-pressed', String(on));
+    spMicBtn.setAttribute('aria-label', on ? 'Stop voice input' : 'Speak your question');
+    $('#spPrompt').placeholder = on ? 'Listening…' : 'Ask a question or create something';
+  };
+  spMicBtn.addEventListener('click', () => {
+    if (spRec) { stopSpMic(); return; }
+    if (!SR) { toast('Voice input isn’t supported in this browser. Try Chrome or Edge.'); return; }
+    if (sv.busy) return;
+    const ta = $('#spPrompt'), base = ta.value ? ta.value.replace(/\s*$/, ' ') : '';
+    spRec = new SR(); spRec.lang = 'en-US'; spRec.interimResults = true; spRec.continuous = true;
+    spRec.onresult = (ev) => {
+      let txt = '';
+      for (let i = 0; i < ev.results.length; i++) txt += ev.results[i][0].transcript;
+      ta.value = base + txt.trim(); ta.dispatchEvent(new Event('input'));
+    };
+    spRec.onerror = (ev) => { if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') toast('Allow microphone access to use voice input'); else if (ev.error !== 'aborted' && ev.error !== 'no-speech') toast('Voice input stopped. Try again.'); };
+    spRec.onend = () => { spRec = null; setSpMic(false); spLive('Voice input stopped. Review your question, then send.'); ta.focus(); };
+    try { spRec.start(); setSpMic(true); spLive('Listening. Speak your question.'); } catch { spRec = null; toast('Couldn’t start voice input'); }
+  });
+  $('#spComposer').addEventListener('submit', stopSpMic, true);
   $('#spPrompt').addEventListener('input', (e) => { e.target.style.height = 'auto'; e.target.style.height = Math.min(180, e.target.scrollHeight) + 'px'; });
   $('#spThread').addEventListener('click', async (e) => {
     const b = e.target.closest('[data-spact]'); if (!b) return;
@@ -5671,9 +5910,16 @@ Want me to quiz you on this or turn it into flashcards?` };
       renderLibrary(); b.classList.add('ok'); b.innerHTML = `${ICON.check}<span>Saved to notes</span>`; toast('Saved to your Library');
     }
     if (b.dataset.spact === 'saveaid') saveAid(sp, c, i);
+    if (b.dataset.spact === 'expand') {
+      const a = m.aid, flash = a.kind === 'flash', saved = a.libId && getItem(a.libId);
+      openAidPopup({ kind: a.kind, title: a.title, topic: a.topic,
+        sub: `${flash ? `${a.count} flashcards` : `${a.count}-question practice quiz`} · from ${a.from}${flash ? '' : ' · Practice only: doesn’t change grades'}`,
+        data: a.data || (flash ? flashFor(a.topic) : quizFor(a.topic)), onSave: saved ? null : () => saveAid(sp, c, i) });
+      return;
+    }
     if (b.dataset.spact === 'review') {
       const w = b.closest('.sp-aid').querySelector('.aid-widget'), open = w.hidden;
-      if (open && !w.firstChild) w.appendChild(m.aid.kind === 'flash' ? buildFlash(flashFor(m.aid.topic), m.aid.topic) : buildQuiz(quizFor(m.aid.topic)));
+      if (open && !w.firstChild) w.appendChild(m.aid.kind === 'flash' ? buildFlash(m.aid.data || flashFor(m.aid.topic), m.aid.topic) : buildQuiz(m.aid.data || quizFor(m.aid.topic)));
       w.hidden = !open; b.setAttribute('aria-expanded', String(open));
     }
   });
@@ -5801,5 +6047,6 @@ Want me to quiz you on this or turn it into flashcards?` };
   routeShare();
 })();
 </script>
+<script src="aurora-motion.js" defer></script>
 </body>
 </html>
