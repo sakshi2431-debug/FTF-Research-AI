@@ -2269,6 +2269,17 @@
   .fu-reveal { animation: fuIn 720ms cubic-bezier(.22,.61,.36,1) both; }
   @keyframes fuIn { from { opacity: 0; filter: blur(6px); transform: translateY(12px); } to { opacity: 1; filter: blur(0); transform: none; } }
   @media (prefers-reduced-motion: reduce) { .fu-reveal { animation: none; } .qz-scrim, .qz-hero, .qz-pills { transition: none !important; } }
+
+  /* Space card ⋯ menu (overview) */
+  .nb-cwrap { position: relative; }
+  .nb-cmore { position: absolute; top: 14.4px; right: 14.4px; z-index: 2; }
+  .nb-cmenu { width: 40.8px; height: 40.8px; display: grid; place-items: center; border-radius: 50%; color: var(--gray-700);
+    background: rgba(255,255,255,.7); opacity: 0; transition: opacity .2s, background .2s; }
+  .nb-cmenu svg { width: 21.6px; height: 21.6px; }
+  .nb-cwrap:hover .nb-cmenu, .nb-cmenu:focus-visible, .nb-cmenu[aria-expanded="true"] { opacity: 1; }
+  .nb-cmenu:hover { background: var(--white); }
+  @media (hover: none) { .nb-cmenu { opacity: 1; } }
+  .nb-cmore .lib-menu { right: 0; left: auto; min-width: 288px; }
 </style>
 </head>
 <body>
@@ -5388,7 +5399,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   const renderSpOverview = () => {
     const cards = spaces.slice().sort((a, b) => b.edited - a.edited).map(sp => {
       const n = readyMats(sp).length, s = spSessions(sp).length;
-      return `<div role="listitem"><button type="button" class="nb-card sp-card ${toneOf(sp)}" data-open="${sp.id}">
+      return `<div role="listitem" class="nb-cwrap"><div class="lib-more nb-cmore"><button type="button" class="nb-cmenu" data-spmenu="${sp.id}" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for ${esc(sp.name)}">${L_ICON.dots}</button></div><button type="button" class="nb-card sp-card ${toneOf(sp)}" data-open="${sp.id}">
         <span class="nb-cic" aria-hidden="true">${L_ICON.space}</span>
         <b>${esc(sp.name)}</b>
         <span class="nb-cdesc">${esc(sp.desc || '')}</span>
@@ -5433,6 +5444,33 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
       } }] });
   };
   // ---------- SP14 settings: edit details ----------
+  // ---------- Delete a Space ----------
+  // Removes the Space, its sessions and their share links. Course documents and Library items are not deleted:
+  // flashcards and quizzes saved in the Space stay in the Library.
+  const deleteSpace = (sp) => {
+    if (!sp) return;
+    const sess = spSessions(sp), saved = lib.filter(x => x.space === sp.name);
+    const nS = sess.length, nL = saved.length;
+    openModal({ title: `Delete “${clip(sp.name, 40)}”?`,
+      sub: `This removes the Space${nS ? ` and its ${nS} session${nS === 1 ? '' : 's'}` : ''}, and turns off any shared links. This can’t be undone.`,
+      body: `<ul class="sh-facts">
+          <li><b>Deleted:</b> the Space, its conversations with Aurora${nS ? ` (${nS})` : ''} and its list of connected sources.</li>
+          <li><b>Kept:</b> your course documents and uploads elsewhere${nL ? `, and the ${nL} item${nL === 1 ? '' : 's'} you saved here, which stay in your Library` : ''}.</li></ul>`,
+      buttons: [{ label: 'Cancel' }, { label: 'Delete Space', kind: 'danger', onClick: () => {
+        const ids = new Set(sess.map(c => c.id));
+        Object.keys(shares).forEach(k => { if (ids.has(shares[k].chatId)) shares[k].active = false; });
+        chats = chats.filter(c => !ids.has(c.id));
+        saved.forEach(x => { x.space = ''; });
+        spaces = spaces.filter(x => x !== sp); SPACES = spaces.map(x => x.name);
+        if (curSpace === sp.name) curSpace = null;
+        if (sv.open === sp.id) { if (sv.busy) sv.stop = true; sv.open = null; sv.chatId = null; }
+        persistChats(); persistShares(); persistSpaces(); persist();
+        renderSpaces(); renderLibrary(); renderChatCount(); fit();
+        toast(`Deleted “${clip(sp.name, 40)}”`);
+        spLive(`Deleted the Space ${sp.name}.`);
+        setTimeout(() => $('#spNew')?.focus(), 0);
+      } }] });
+  };
   const editSpace = () => {
     const sp = curSp(); if (!sp) return;
     openModal({ title: 'Edit Space details', body: spaceForm(sp),
@@ -5990,6 +6028,17 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   // ---------- wiring ----------
   $('#spNew').addEventListener('click', createSpace);
   $('#spGrid').addEventListener('click', (e) => {
+    const mb = e.target.closest('[data-spmenu]');
+    if (mb) {
+      e.stopPropagation();
+      const sp = spaces.find(x => x.id === mb.dataset.spmenu); if (!sp) return;
+      openMenuFor(mb, [['open', 'Open'], ['rename', 'Edit name and description'], ['delete', 'Delete Space']], (a) => {
+        if (a === 'delete') deleteSpace(sp);
+        else if (a === 'rename') { sv.open = sp.id; editSpace(); sv.open = null; }
+        else openSpace(sp.id);
+      });
+      return;
+    }
     const o = e.target.closest('[data-open]'); if (o) { openSpace(o.dataset.open); return; }
     if (e.target.closest('[data-spnew]')) createSpace();
   });
@@ -6000,7 +6049,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   });
   $('#spSettings').addEventListener('click', (e) => {
     e.stopPropagation();
-    openMenuFor(e.currentTarget, [['rename', 'Edit name and description']], () => editSpace());
+    openMenuFor(e.currentTarget, [['rename', 'Edit name and description'], ['delete', 'Delete Space']], (a) => { if (a === 'delete') deleteSpace(curSp()); else editSpace(); });
   });
   $('#spMatList').addEventListener('change', (e) => {
     const sp = curSp(); if (!sp) return;
