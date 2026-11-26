@@ -2218,6 +2218,10 @@
   .lt-ic.t-code       { background: var(--indigo-50);  color: var(--indigo-600);  border-color: var(--indigo-100); }
   .lt-ic.t-tutorme    { background: var(--orange-50);  color: var(--orange-600);  border-color: #F9DBAF; }
   [data-theme="dark"] .lt-ic { border-color: transparent; }
+
+  /* "Quiz me on these" outside the Study chat: the quiz follows the cards */
+  .w-followup { margin-top: 19.2px; scroll-margin-top: 24px; }
+  .w-followup-intro { margin: 0 0 12px; font-size: var(--fs-16); line-height: var(--lh-16); color: var(--gray-700); }
 </style>
 </head>
 <body>
@@ -3207,6 +3211,48 @@
     return el;
   };
 
+  // "Quiz me on these": one multiple choice question per card; the distractors are the next three cards' answers.
+  const quizFromCards = (set) => {
+    const cs = set.cards, n = cs.length;
+    const title = /flashcards/i.test(set.title) ? set.title.replace(/flashcards/i, 'Quiz') : `${set.title} Quiz`;
+    return { title, questions: cs.map((c, i) => {
+      const distract = [...new Set([1, 2, 3].map(k => cs[(i + k) % n].a))].filter(a => a !== c.a);
+      const pos = i % (distract.length + 1);          // the correct answer moves from question to question
+      const options = [...distract]; options.splice(pos, 0, c.a);
+      return { type: 'mc', q: c.q, options, answer: [pos], why: c.ex ? `${c.a} Example: ${c.ex}` : c.a };
+    }) };
+  };
+  const quizMeOn = (set, widgetEl) => {
+    const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const quiz = quizFromCards(set), N = set.cards.length;
+    const intro = `Here's a ${quiz.questions.length}-question quiz built from your ${set.title}. Answer from memory first, then check your answers.`;
+    // Study chat: a new turn in the same conversation, answered with this quiz.
+    if (widgetEl.closest('#thread')) {
+      if (busy) return;
+      presetReply = { quick: true, quickLabel: 'Turning your cards into questions…', sources: [], md: intro,
+        widget: () => buildQuiz(quiz), widgetLabel: 'Building quiz', outro: 'Missed one? Go back to that card, then retake the quiz.' };
+      const text = `Quiz me on these ${N} cards`;
+      if (reduced) { prompt.value = text; autosize(); send(); return; }
+      prompt.value = ''; prompt.focus();
+      let k = 0;
+      const type = () => {
+        k++; prompt.value = text.slice(0, k); autosize();
+        if (k < text.length) setTimeout(type, 45); else setTimeout(() => send(), 450);
+      };
+      type();
+      return;
+    }
+    // Spaces, Library items, popups: the quiz appears right under the cards (one at a time).
+    const box = document.createElement('div');
+    box.className = 'w-followup';
+    box.innerHTML = `<p class="w-followup-intro">${esc(intro)}</p>`;
+    box.appendChild(buildQuiz(quiz));
+    const prevF = widgetEl.nextElementSibling && widgetEl.nextElementSibling.classList.contains('w-followup') ? widgetEl.nextElementSibling : null;
+    if (prevF) prevF.replaceWith(box); else widgetEl.after(box);
+    box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    box.querySelector('input, button')?.focus({ preventScroll: true });
+  };
+
   // Flashcards widget
   const buildFlash = (set, topic) => {
     const n = set.cards.length;
@@ -3267,7 +3313,7 @@
       done.innerHTML = `<h4>Nice work!</h4><p>You reviewed all ${n} cards and revealed ${revealed.size}.</p>
         <div class="row-btns"><button type="button" class="nav-btn fc-again">${W_ICON.flip}<span>Review again</span></button><button type="button" class="nav-btn primary fc-quiz"><span>Quiz me on these</span></button></div>`;
       $('.fc-again', done).addEventListener('click', () => { i = 0; revealed.clear(); show(true); card.focus(); });
-      $('.fc-quiz', done).addEventListener('click', () => fill(`Quiz me on ${isUX(topic) ? 'UX & Product Design' : topic}`));
+      $('.fc-quiz', done).addEventListener('click', () => quizMeOn(set, el));
     };
     card.addEventListener('click', flip);
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });
@@ -3511,9 +3557,12 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
 
   // Working indicator: the Aurora orb plus a plain-language status for what's happening now.
   const WORKING = (label) => `<div class="working" role="status"><img class="w-orb" src="assets/aurora-orb.png" alt=""><span class="shimmer">${esc(label)}</span></div>`;
+  let presetReply = null;   // a reply the app already knows (e.g. "Quiz me on these"), used instead of replyFor()
   const respond = async (ai) => {
     const q = ai.dataset.q;
-    const { md, sources, widget, widgetLabel, outro } = replyFor(q);
+    if (presetReply) { ai._preset = presetReply; presetReply = null; }   // kept on the message so Regenerate gives the same quiz
+    const reply = ai._preset || replyFor(q);
+    const { md, sources, widget, widgetLabel, outro } = reply;
     ai.classList.remove('done');
     ai.innerHTML = `<div class="body"></div><div class="widget-slot"></div><div class="body body2"></div>${WORKING('Thinking…')}`;
     const sh = ai.querySelector('.working .shimmer'), body = ai.querySelector('.body');
@@ -3522,8 +3571,12 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const src = $('#sourceLabel').textContent.toLowerCase();
     const steps = [];
     await wait(500);
-    if (!stopFlag) { sh.textContent = src === 'academic' ? 'Searching academic sources…' : src === 'videos' ? 'Searching video explainers…' : 'Searching the web…'; await wait(1000); }
-    if (!stopFlag) { sh.textContent = `Reading ${sources.length} sources…`; setSources(sources); await wait(900); }
+    if (reply.quick) {
+      if (!stopFlag) { sh.textContent = reply.quickLabel || 'Working…'; await wait(1100); }
+    } else {
+      if (!stopFlag) { sh.textContent = src === 'academic' ? 'Searching academic sources…' : src === 'videos' ? 'Searching video explainers…' : 'Searching the web…'; await wait(1000); }
+      if (!stopFlag) { sh.textContent = `Reading ${sources.length} sources…`; setSources(sources); await wait(900); }
+    }
     if (!stopFlag) { sh.textContent = 'Writing answer…'; ai.classList.add('streaming'); await stream(body, md); }
     if (!stopFlag && widget) {
       sh.textContent = `${widgetLabel || 'Building'}…`;
