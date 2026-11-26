@@ -23,7 +23,8 @@ http.createServer((req, res) => {
   if (urlPath.endsWith('/')) file = path.join(file, 'index.html');
   fs.readFile(file, (err, data) => {
     if (err) { res.writeHead(404); return res.end('Not found'); }
-    res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream' });
+    // no-store: a prototype under active change should never be served from the browser cache.
+    res.writeHead(200, { 'Content-Type': types[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
     res.end(data);
   });
 }).listen(port, () => console.log(`Assistiv running at http://localhost:${port}`));
