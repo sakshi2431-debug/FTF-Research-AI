@@ -2222,6 +2222,53 @@
   /* "Quiz me on these" outside the Study chat: the quiz follows the cards */
   .w-followup { margin-top: 19.2px; scroll-margin-top: 24px; }
   .w-followup-intro { margin: 0 0 12px; font-size: var(--fs-16); line-height: var(--lh-16); color: var(--gray-700); }
+
+  /* ---------- "Quiz me on these" in Spaces: deck popup and flight (fixed on body, outside the scaled canvas) ---------- */
+  .qz-pop { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; font-family: var(--font); }
+  .qz-scrim { position: absolute; inset: 0; background: rgba(250,250,250,.72); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+    opacity: 0; transition: opacity 450ms cubic-bezier(.22,.61,.36,1); }
+  [data-theme="dark"] .qz-scrim { background: rgba(12,14,18,.72); }
+  .qz-pop.in .qz-scrim { opacity: 1; }
+  .qz-pop.out .qz-scrim { opacity: 0; }
+  .qz-center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  .qz-hero { position: relative; opacity: 0; filter: blur(8px); transform: translateY(16px) scale(.96);
+    transition: opacity 650ms cubic-bezier(.22,.61,.36,1), filter 650ms cubic-bezier(.22,.61,.36,1), transform 650ms cubic-bezier(.22,.61,.36,1); }
+  .qz-pop.in .qz-hero { opacity: 1; filter: blur(0); transform: none; }
+  .qz-pop.out .qz-hero, .qz-pop.out .qz-pills, .qz-pop.out .qz-close { opacity: 0; transition-duration: 300ms; transition-delay: 0ms; }
+  .qz-close { position: absolute; top: -18px; right: -18px; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
+    background: var(--white); border: 1px solid var(--gray-200); box-shadow: var(--shadow-md); font-size: 20px; line-height: 1; color: var(--gray-700); z-index: 2; }
+  .qz-close:hover { background: var(--gray-50); }
+  .qz-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; opacity: 0; transform: translateY(8px);
+    transition: opacity 500ms cubic-bezier(.22,.61,.36,1) 250ms, transform 500ms cubic-bezier(.22,.61,.36,1) 250ms; }
+  .qz-pop.in .qz-pills { opacity: 1; transform: none; }
+  .qz-pill { height: 40px; padding: 0 18px; border-radius: 9999px; border: 1px solid var(--gray-300); background: var(--white); box-shadow: var(--shadow-xs);
+    font: 600 14px/1 var(--font); color: var(--gray-800); cursor: pointer; white-space: nowrap; }
+  .qz-pill:hover { background: var(--gray-50); }
+  .qz-pill.primary { background: var(--brand-600); border-color: var(--brand-600); color: var(--on-color); }
+  .qz-pill.primary:hover { background: var(--brand-700); }
+  .qz-pill:focus-visible, .qz-close:focus-visible { outline: none; box-shadow: var(--ring-brand); }
+  .qz-pop.rm .qz-scrim, .qz-pop.rm .qz-hero, .qz-pop.rm .qz-pills { transition: none; }
+  .qz-ghost { position: fixed; z-index: 401; margin: 0; transform-origin: 0 0; pointer-events: none; }
+
+  /* The deck: 3:2 front card with two behind it, rotated -4deg and 3deg. Text scales with --qd-w. */
+  .qd-deck { position: relative; width: var(--qd-w, 420px); aspect-ratio: 3 / 2; font-size: calc(var(--qd-w, 420px) / 21); font-family: var(--font); }
+  .qd-card { position: absolute; inset: 0; border-radius: .9em; background: var(--white); border: 1px solid var(--gray-200); box-shadow: 0 .5em 1.5em rgba(16,24,40,.10); }
+  .qd-b1 { transform: rotate(-4deg); background: var(--pink-50); }
+  .qd-b2 { transform: rotate(3deg); background: var(--brand-50); }
+  .qd-front { display: flex; flex-direction: column; gap: .25em; padding: 1.1em 1.2em; text-align: left; overflow: hidden; }
+  .qd-kick { font-size: .7em; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--pink-600); }
+  .qd-title { font-size: 1.15em; font-weight: 600; line-height: 1.25; color: var(--gray-900); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .qd-n { font-size: .75em; color: var(--gray-600); }
+  .qd-q { margin-top: auto; font-size: .8em; line-height: 1.35; color: var(--gray-700); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  /* Follow-up under the cards: your message (deck thumbnail above the bubble, right-aligned), then the quiz */
+  .fu-me { display: flex; flex-direction: column; align-items: flex-end; gap: 9.6px; margin-bottom: 19.2px; }
+  .fu-thumb { padding: 4.8px 7.2px 2.4px 0; }
+  .fu-bubble { max-width: 72%; padding: 14.4px 26.4px; border-radius: 28.8px; background: var(--gray-100); color: var(--gray-900); font-size: var(--fs-16); line-height: var(--lh-16); }
+  .w-followup-outro { margin: 14.4px 0 0; font-size: var(--fs-16); line-height: var(--lh-16); color: var(--gray-700); }
+  .fu-reveal { animation: fuIn 720ms cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes fuIn { from { opacity: 0; filter: blur(6px); transform: translateY(12px); } to { opacity: 1; filter: blur(0); transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .fu-reveal { animation: none; } .qz-scrim, .qz-hero, .qz-pills { transition: none !important; } }
 </style>
 </head>
 <body>
@@ -3222,6 +3269,116 @@
       return { type: 'mc', q: c.q, options, answer: [pos], why: c.ex ? `${c.a} Example: ${c.ex}` : c.a };
     }) };
   };
+  // ---------- "Quiz me on these": shared reply ----------
+  const QZ_STATUS = 'Turning your cards into questions…', QZ_OUTRO = 'Missed one? Go back to that card, then retake the quiz.';
+  const qzIntro = (quiz, set) => `Here's a ${quiz.questions.length}-question quiz built from your ${set.title}. Answer from memory first, then check your answers.`;
+  const quizReply = (set) => { const quiz = quizFromCards(set);
+    return { quick: true, quickLabel: QZ_STATUS, sources: [], md: qzIntro(quiz, set), widget: () => buildQuiz(quiz), widgetLabel: 'Building quiz', outro: QZ_OUTRO }; };
+  const reducedMotion = () => !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  // A 3:2 deck: a front card with two cards behind it. Sized by --qd-w; text scales with it.
+  const deckHTML = (set, w) => `<div class="qd-deck" style="--qd-w:${w}" aria-hidden="true"><span class="qd-card qd-b1"></span><span class="qd-card qd-b2"></span>
+    <span class="qd-card qd-front"><span class="qd-kick">Flashcards</span><b class="qd-title">${esc(set.title)}</b><span class="qd-n">${set.cards.length} cards</span><span class="qd-q">${esc(set.cards[0] ? set.cards[0].q : '')}</span></span></div>`;
+  // The follow-up under the cards: your message (optionally with the deck thumbnail), then the intro, quiz and outro.
+  const followUpBlock = (set, text, withThumb) => {
+    const quiz = quizFromCards(set);
+    const box = document.createElement('div');
+    box.className = 'w-followup';
+    box.innerHTML = `<div class="fu-me">${withThumb ? `<div class="fu-thumb">${deckHTML(set, '201.6px')}</div>` : ''}<div class="bubble fu-bubble">${esc(text)}</div></div>
+      <div class="fu-ai"><p class="w-followup-intro">${esc(qzIntro(quiz, set))}</p><div class="fu-quiz"></div><p class="w-followup-outro">${esc(QZ_OUTRO)}</p></div>`;
+    $('.fu-quiz', box).appendChild(buildQuiz(quiz));
+    return box;
+  };
+  const placeFollowUp = (widgetEl, box) => {
+    const prevF = widgetEl.nextElementSibling && widgetEl.nextElementSibling.classList.contains('w-followup') ? widgetEl.nextElementSibling : null;
+    if (prevF) prevF.replaceWith(box); else widgetEl.after(box);
+  };
+
+  // ---------- Spaces only: popup with the deck, then the deck flies into the chat ----------
+  const openQuizPopup = (set, widgetEl, revealed, opener) => {
+    document.querySelector('.qz-pop')?.remove();
+    const reduced = reducedMotion(), N = set.cards.length;
+    const missed = set.cards.filter((c, i) => !revealed.has(i));
+    const pop = document.createElement('div');
+    pop.className = 'qz-pop' + (reduced ? ' rm' : '');
+    pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-modal', 'true'); pop.setAttribute('aria-label', `Quiz on ${set.title}`);
+    pop.innerHTML = `<div class="qz-scrim"></div>
+      <div class="qz-center">
+        <div class="qz-hero">${deckHTML(set, 'min(420px, 78vw)')}<button type="button" class="qz-close" aria-label="Close">×</button></div>
+        <div class="qz-pills">
+          <button type="button" class="qz-pill primary" data-qz="all">Quiz me on these ${N} cards</button>
+          ${missed.length && missed.length < N ? `<button type="button" class="qz-pill" data-qz="missed">Only the ${missed.length} I didn’t flip</button>` : ''}
+        </div>
+      </div>`;
+    document.body.appendChild(pop);
+    requestAnimationFrame(() => pop.classList.add('in'));
+    const focusables = () => $$('button', pop);
+    let closing = false;
+    const close = (andThen) => {
+      if (closing) return; closing = true;
+      document.removeEventListener('keydown', onKey, true);
+      const done = () => { pop.remove(); if (!andThen) opener?.focus(); };
+      if (reduced) done(); else { pop.classList.add('out'); setTimeout(done, 450); }
+    };
+    const onKey = (e) => {
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
+      if (e.key === 'Tab') {
+        const f = focusables(), i = f.indexOf(document.activeElement);
+        if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+        else if (i === -1) { e.preventDefault(); f[0].focus(); }
+      }
+    };
+    document.addEventListener('keydown', onKey, true);
+    $('.qz-scrim', pop).addEventListener('click', () => close());
+    $('.qz-close', pop).addEventListener('click', () => close());
+    $('.qz-pill', pop).focus();
+    $$('.qz-pill', pop).forEach(pill => pill.addEventListener('click', () => {
+      if (closing) return;
+      const sub = pill.dataset.qz === 'missed' ? { title: set.title, cards: missed } : set;
+      const text = pill.dataset.qz === 'missed' ? `Quiz me on the ${missed.length} cards I didn’t flip` : `Quiz me on these ${N} cards`;
+      const box = followUpBlock(sub, text, true);
+      const thumb = $('.fu-thumb', box), bubble = $('.fu-bubble', box), ai = $('.fu-ai', box);
+      const reveal = () => {
+        ai.hidden = false;
+        if (!reduced) ai.classList.add('fu-reveal');
+        ai.querySelector('.qz input, input, button')?.focus({ preventScroll: true });
+      };
+      if (reduced) {
+        placeFollowUp(widgetEl, box); close(true);
+        box.scrollIntoView({ block: 'nearest' }); reveal(); return;
+      }
+      ai.hidden = true; thumb.style.visibility = 'hidden'; bubble.style.visibility = 'hidden'; box.dataset.noanim = '1';
+      placeFollowUp(widgetEl, box);
+      // jump (not smooth) so the landing spot is final, then measure
+      const sc = box.closest('.ws-thread, #thread, .lib-detail') || document.scrollingElement;
+      const prevSB = sc.style.scrollBehavior; sc.style.scrollBehavior = 'auto';
+      $('.fu-me', box).scrollIntoView({ block: 'center', behavior: 'instant' });
+      sc.style.scrollBehavior = prevSB;
+      const hero = $('.qz-hero .qd-deck', pop), fromH = hero.getBoundingClientRect(), toH = $('.qd-deck', thumb).getBoundingClientRect();
+      const fromP = pill.getBoundingClientRect(), toP = bubble.getBoundingClientRect();
+      const ghost = (node, r) => { const g = node.cloneNode(true); g.classList.add('qz-ghost');
+        Object.assign(g.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` }); document.body.appendChild(g); return g; };
+      const gH = ghost(hero, fromH), gP = ghost(pill, fromP);
+      hero.style.visibility = 'hidden'; pill.style.visibility = 'hidden';
+      pop.classList.add('out');                                  // scrim fades while the deck flies
+      const flight = (g, a, b, ms) => g.animate([
+        { transform: 'translate(0,0) scale(1,1)', filter: 'blur(0)' },
+        { filter: 'blur(4px)', offset: 0.5 },
+        { transform: `translate(${b.left - a.left}px, ${b.top - a.top}px) scale(${b.width / a.width}, ${b.height / a.height})`, filter: 'blur(0)' },
+      ], { duration: ms, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished;
+      document.removeEventListener('keydown', onKey, true); closing = true;
+      Promise.all([flight(gH, fromH, toH, 950), flight(gP, fromP, toP, 850)]).then(() => {
+        thumb.style.visibility = ''; bubble.style.visibility = '';
+        gH.remove(); gP.remove(); pop.remove();
+        setTimeout(reveal, 500);
+      });
+    }));
+  };
+
+  const quizFollowUp = (set, widgetEl, revealed, opener) => {
+    if (widgetEl.closest('#spaces')) { openQuizPopup(set, widgetEl, revealed || new Set(), opener); return; }
+    quizMeOn(set, widgetEl);
+  };
   const quizMeOn = (set, widgetEl) => {
     const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     const quiz = quizFromCards(set), N = set.cards.length;
@@ -3313,7 +3470,7 @@
       done.innerHTML = `<h4>Nice work!</h4><p>You reviewed all ${n} cards and revealed ${revealed.size}.</p>
         <div class="row-btns"><button type="button" class="nav-btn fc-again">${W_ICON.flip}<span>Review again</span></button><button type="button" class="nav-btn primary fc-quiz"><span>Quiz me on these</span></button></div>`;
       $('.fc-again', done).addEventListener('click', () => { i = 0; revealed.clear(); show(true); card.focus(); });
-      $('.fc-quiz', done).addEventListener('click', () => quizMeOn(set, el));
+      $('.fc-quiz', done).addEventListener('click', (ev) => quizFollowUp(set, el, revealed, ev.currentTarget));
     };
     card.addEventListener('click', flip);
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); flip(); } });

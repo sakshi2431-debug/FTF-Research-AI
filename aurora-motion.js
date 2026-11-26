@@ -340,6 +340,7 @@
     }
     if (el.matches('.working')) { statusIn(el); return; }
     if (el.matches('.actions')) { once(el, 'am-acts', 800); return; }   // all together, after 200 ms
+    if (el.matches('.w-followup[data-noanim]')) return;          // Spaces: the deck flies in; the page itself handles this one
     if (el.matches('.widget, .widget-slot > *, .w-followup')) { once(el, 'am-pop', 820); return; }
     if (el.matches('.saved-row') && el.closest('#savedBody')) { queueMicrotask(onSavedRows); return; }
     // Spaces
