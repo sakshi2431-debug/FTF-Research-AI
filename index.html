@@ -314,8 +314,6 @@
   }
   .composer textarea::placeholder { color: var(--gray-500); }
   .composer .row { display: flex; align-items: center; justify-content: space-between; margin-top: 18px; }
-  .composer-scope { display: flex; align-items: center; gap: 8px; margin: 9px 0 0; padding: 8px 11px; border-radius: var(--radius-md); background: var(--indigo-50); color: var(--brand-700); font-size: var(--fs-13); line-height: 1.3; }
-  .composer-scope::before { content: "Scope"; flex: none; color: var(--gray-600); font-weight: 600; }
   .send {
     width: 44px; height: 44px; border-radius: var(--radius-lg);
     background: linear-gradient(135deg, var(--brand-500) 0%, var(--brand-600) 55%, var(--brand-700) 100%); color: var(--on-color); display: grid; place-items: center;
@@ -1126,8 +1124,8 @@
   .opt.sel .opt-sel { display: inline; }
   .opt-text { font-size: var(--fs-16); line-height: 1.5; color: var(--gray-700); }
   .opt .tag { margin-left: auto; align-self: center; font-size: var(--fs-14); font-weight: 600; white-space: nowrap; }
-  .opt.sel { background: var(--brand-25); border-color: var(--brand-300); }
-  .opt.sel .opt-name { color: var(--gray-900); }
+  .opt.sel { background: var(--success-50); border-color: var(--success-500); }
+  .opt.sel .opt-name { color: var(--success-700); }
   .opt.correct { background: var(--success-50); border-color: var(--success-500); }
   .opt.correct .opt-name, .opt.correct .tag { color: var(--success-700); }
   .opt.wrong { background: var(--error-50); border-color: var(--error-500); }
@@ -1179,7 +1177,6 @@
   .qz-mark { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; flex: none; }
   .qz-mark.ok { background: var(--success-50); color: var(--success-700); }
   .qz-mark.bad { background: var(--error-50); color: var(--error-700); }
-  .qz-mark.info { background: var(--indigo-50); color: var(--brand-700); }
   .qz-item .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--gray-800); }
   .qz-item small { font-size: var(--fs-13); color: var(--gray-600); white-space: nowrap; }
   .qz-results .row-btns { display: flex; justify-content: flex-end; gap: 14px; }
@@ -1999,7 +1996,6 @@
   #spShare.on { background: var(--success-50); color: var(--success-700); border: 0; }
   #spShare.on svg { color: var(--success-700); }
   .ws-intro .ws-tbtn, .ws-empty .link-inline { color: var(--brand-700); }
-  #spShare { display: none !important; }
 
   .ws-body { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 432px; gap: 24px; }
 
@@ -2129,39 +2125,6 @@
   .lt-filter span { max-width: 288px; overflow: hidden; text-overflow: ellipsis; }
   .lt-right .lib-menu { right: 0; left: auto; min-width: 312px; }
   #ovResults > h2 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-
-  /* Narrow screens reflow the product instead of shrinking the desktop canvas. */
-  @media (max-width: 720px) {
-    html, body { overflow-x: hidden; }
-    .stage { position: relative; width: 100%; min-height: 100vh; height: auto; transform: none !important; zoom: 1 !important; }
-    header { height: auto; min-height: 72px; padding: 18px 16px 12px; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-    header .brand { margin-right: auto; }
-    header .tabs { order: 3; width: 100%; overflow-x: auto; padding-bottom: 2px; }
-    header .tabs button { white-space: nowrap; }
-    header .util > button:not(.avatar) { display: none; }
-    main, body.chatting main, body.view-library main, body.view-dashboard main, body.view-spaces main { left: 0; width: 100%; padding: 16px; margin: 0; }
-    .chat-nav { position: relative; left: auto; top: auto; width: auto; height: auto; margin: 0 16px 12px; }
-    body.chatting .chat-nav { display: none; }
-    .page, body.view-library .library { width: 100%; height: auto; min-height: 0; margin: 0; padding: 16px; }
-    .ws-body { grid-template-columns: 1fr !important; }
-    .ws-chat { min-height: 520px; }
-    .sp-mats { min-height: 0; }
-    .lt-bar, .lt-right { align-items: stretch; flex-direction: column; }
-    .lt-right .lib-search { width: 100%; }
-    .lt-head { display: none; }
-    .lt-row { grid-template-columns: 40px minmax(0, 1fr) 48px; gap: 8px; padding: 12px 0; }
-    .lt-loc, .lt-date { display: none; }
-    .lt-check { width: 40px; }
-    .composer-scope { white-space: normal; }
-    body.chatting main { display: flex; flex-direction: column; min-height: calc(100vh - 72px); }
-    body.chatting .chat-top, body.chatting .thread, body.chatting .dock { width: 100%; }
-    body.chatting .thread { min-height: 0; padding: 24px 8px 36px; }
-    body.chatting .dock { margin-top: auto; padding: 0; }
-    body.chatting .panel { display: none; }
-    .source-wrap { max-width: 55%; }
-    .source-btn { max-width: 100%; }
-    .source-btn .dim { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  }
 
   /* table */
   .lt { width: 100%; }
@@ -2489,7 +2452,6 @@
     <form class="composer" id="composer">
       <textarea id="prompt" rows="1" placeholder="Ask Aurora anything..." aria-label="Ask Aurora anything"></textarea>
       <div class="attachments" id="attachments"></div>
-      <div class="composer-scope" id="composerScope">All courses · Aurora chooses sources</div>
       <div class="row home">
         <div class="row-left">
         <button type="button" class="attach-mat" id="uploadBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>Upload docs, images, or URLs</button>
@@ -2511,15 +2473,14 @@
         <div class="right-tools">
           <div class="source-wrap">
             <button type="button" class="source-btn" id="sourceBtn" aria-haspopup="menu" aria-expanded="false">
-              <span>Search</span><span class="dim" id="sourceLabel">All courses</span>
+              <span>Search</span><span class="dim" id="sourceLabel">All sources</span>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8a91a0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="menu" id="sourceMenu" role="menu" hidden>
-              <button type="button" role="menuitemradio" aria-checked="true">All courses</button>
-              <button type="button" role="menuitemradio" aria-checked="false">BIO 201 · Cell Biology</button>
-              <button type="button" role="menuitemradio" aria-checked="false">CS 101 · Intro to Python</button>
-              <button type="button" role="menuitemradio" aria-checked="false">UX 220 · Product Design</button>
-              <button type="button" role="menuitemcheckbox" aria-checked="false">Include my Library</button>
+              <button type="button" role="menuitemradio" aria-checked="true">All sources</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Course materials</button>
+              <button type="button" role="menuitemradio" aria-checked="false">My notes</button>
+              <button type="button" role="menuitemradio" aria-checked="false">Library</button>
             </div>
           </div>
           <button type="button" class="icon-btn" id="micBtn" aria-label="Voice input" aria-pressed="false">
@@ -3068,7 +3029,7 @@
     const LABEL = { mc: 'Multiple choice', multi: 'Select all that apply', short: 'Short answer', long: 'Long answer' };
     const HINT = { mc: 'Select one answer.', multi: 'Select every answer that applies.', short: 'Type a short answer.', long: 'Write a few sentences in your own words.' };
     const LETTERS = 'ABCDEFGH';
-    let cur = 0, checked = false, results = [], states = [];
+    let cur = 0, checked = false, results = [];
     const el = document.createElement('div');
     el.className = 'widget quiz';
     el.innerHTML = `
@@ -3096,8 +3057,7 @@
         <span class="w-status"></span>
         <button type="button" class="nav-btn primary qz-next"><span>Next Question</span>${W_ICON.next}</button>
       </div>`;
-    const saveDestination = () => session.ctx.kind === 'space' ? session.ctx.name : (session.course || 'detected course');
-    $('.w-head-r', el).appendChild(saveButton(`Save to ${saveDestination()}`, `Saved to ${saveDestination()}`, `Saved “${quiz.title}”`, () => ({ type: 'quiz', title: quiz.title, source: 'Aurora response', session: sessionTitle(), course: session.course || '', space: session.ctx.kind === 'space' ? session.ctx.name : '', tags: ['quiz'], body: quiz.questions.map((q, i) => `${i + 1}. ${q.q}`).join('\n'), payload: { kind: 'quiz', data: quiz } })));
+    $('.w-head-r', el).appendChild(saveButton('Save quiz', 'Saved to Library', `Saved “${quiz.title}”`, () => ({ type: 'quiz', title: quiz.title, source: 'Aurora response', session: sessionTitle(), tags: ['quiz'], body: quiz.questions.map((q, i) => `${i + 1}. ${q.q}`).join('\n'), payload: { kind: 'quiz', data: quiz } })));
 
     const sections = $$('.q', el), resultsEl = $('.qz-results', el), foot = $('.qz-foot', el);
     const prev = $('.qz-prev', el), next = $('.qz-next', el), status = $('.w-status', el);
@@ -3134,17 +3094,14 @@
             if (isAns) { lab.classList.add('correct'); $('.tag', lab).textContent = isPicked ? '✓ Correct' : 'Correct answer'; }
             else if (isPicked) { lab.classList.add('wrong'); $('.tag', lab).textContent = '✕ Your answer'; }
           });
-          states[i] = picked.length ? (ok ? 'correct' : 'wrong') : 'unanswered';
           html = `<b>${ok ? 'Correct.' : picked.length ? 'Not quite.' : 'Not answered.'}</b> ${inline(q.why)}`;
         } else if (q.type === 'short') {
           const v = $('.ans-input', sec).value.trim().toLowerCase();
           if (q.keywords.length) {
             ok = !!v && q.keywords.every(k => v.includes(k));
-            states[i] = v ? (ok ? 'correct' : 'wrong') : 'unanswered';
             html = ok ? `<b>Correct.</b> ${esc(q.model)}.` : `<b>${v ? 'Not quite.' : 'Not answered.'}</b> The answer is “${esc(q.model)}”.`;
           } else {
             ok = !!v; info = true;
-            states[i] = v ? 'info' : 'unanswered';
             html = ok ? `<b>Submitted.</b> ${esc(q.model)}` : `<b>Not answered.</b> ${esc(q.model)}`;
           }
         } else {
@@ -3152,7 +3109,6 @@
           const hits = q.rubric.map(r => r.kw.some(k => v.includes(k)));
           const count = hits.filter(Boolean).length;
           ok = count >= 3;
-          states[i] = v.trim() ? (ok ? 'correct' : 'wrong') : 'unanswered';
           html = `<b>${v.trim() ? `Rubric: ${count} of ${q.rubric.length}` : 'Not answered.'}</b>` +
             `<ul>${q.rubric.map((r, k) => `<li>${hits[k] ? '✓' : '○'} ${esc(r.label)}</li>`).join('')}</ul>`;
         }
@@ -3176,8 +3132,8 @@
       resultsEl.innerHTML = `
         <div class="qz-score"><div class="qz-big">${s}<span>/ ${n}</span></div><p>${msg}</p></div>
         <ol class="qz-list">${quiz.questions.map((q, i) => `<li><button type="button" class="qz-item" data-i="${i}">
-          <span class="qz-mark ${states[i] === 'unanswered' ? 'info' : results[i] ? 'ok' : 'bad'}" aria-hidden="true">${states[i] === 'unanswered' ? '—' : results[i] ? '✓' : '✕'}</span>
-          <span class="t">${esc(q.q)}</span><small>${states[i] === 'unanswered' ? 'Not answered' : results[i] ? 'Correct' : 'Review'} · Q${i + 1}</small></button></li>`).join('')}</ol>
+          <span class="qz-mark ${results[i] ? 'ok' : 'bad'}" aria-hidden="true">${results[i] ? '✓' : '✕'}</span>
+          <span class="t">${esc(q.q)}</span><small>${results[i] ? 'Correct' : 'Review'} · Q${i + 1}</small></button></li>`).join('')}</ol>
         <div class="row-btns"><button type="button" class="nav-btn qz-review">Review answers</button><button type="button" class="nav-btn primary qz-retake">Retake quiz</button></div>`;
       resultsEl.hidden = false;
       resultsEl.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -3186,27 +3142,15 @@
       $$('input, textarea', el).forEach(x => { x.disabled = false; if (x.type === 'radio' || x.type === 'checkbox') x.checked = false; else x.value = ''; });
       $$('.opt', el).forEach(l => { l.classList.remove('correct', 'wrong', 'sel'); $('.tag', l).textContent = ''; });
       $$('.feedback', el).forEach(f => { f.hidden = true; f.className = 'feedback'; f.innerHTML = ''; });
-      checked = false; results = []; states = [];
+      checked = false; results = [];
       el.classList.remove('checked');
       show(0, true);
     };
     prev.addEventListener('click', () => { if (cur > 0) show(cur - 1, true); });
-    const finishQuiz = () => {
-      if (sections.some(sec => !answered(sec))) {
-        openModal({
-          title: 'Some questions are unanswered',
-          sub: 'You can go back and answer them, or submit now.',
-          body: '<p>Unanswered questions will be marked <b>Not answered</b>, not incorrect.</p>',
-          buttons: [{ label: 'Go back' }, { label: 'Submit anyway', kind: 'primary', onClick: () => { grade(); showResults(); } }],
-        });
-        return;
-      }
-      grade(); showResults();
-    };
     next.addEventListener('click', () => {
       if (cur < n - 1) { show(cur + 1, true); return; }
-      if (!checked) finishQuiz();
-      else showResults();
+      if (!checked) grade();
+      showResults();
     });
     resultsEl.addEventListener('click', (e) => {
       const item = e.target.closest('.qz-item');
@@ -3240,8 +3184,7 @@
         <span class="fc-rev"></span>
         <button type="button" class="nav-btn primary fc-next"><span>Next Card</span>${W_ICON.next}</button>
       </div>`;
-    const saveDestination = () => session.ctx.kind === 'space' ? session.ctx.name : (session.course || 'detected course');
-    $('.w-head-r', el).appendChild(saveButton(`Save to ${saveDestination()}`, `Saved to ${saveDestination()}`, `Saved “${set.title}”`, () => ({ type: 'flashcards', title: set.title, source: 'Aurora response', session: sessionTitle(), course: session.course || '', space: session.ctx.kind === 'space' ? session.ctx.name : '', tags: ['flashcards'], body: set.cards.map(c => `- **${c.q}** ${c.a}`).join('\n'), payload: { kind: 'flash', data: set, topic } })));
+    $('.w-head-r', el).appendChild(saveButton('Save flashcards', 'Saved to Library', `Saved “${set.title}”`, () => ({ type: 'flashcards', title: set.title, source: 'Aurora response', session: sessionTitle(), tags: ['flashcards'], body: set.cards.map(c => `- **${c.q}** ${c.a}`).join('\n'), payload: { kind: 'flash', data: set, topic } })));
     const card = $('.fc-card', el), front = $('.fc-front', el), back = $('.fc-back', el), done = $('.fc-done', el);
     const prev = $('.fc-prev', el), next = $('.fc-next', el);
 
@@ -3398,9 +3341,7 @@ Want me to quiz you on this or turn it into flashcards?` };
 
   // ---------- Sources panel: where the answer's information comes from ----------
   const SOURCES_EMPTY = "Where Aurora's answers come from will appear here.";
-  let currentSources = [];
   const setSources = (list) => {
-    currentSources = list;
     const body = $('#sourcesBody');
     body.innerHTML = list.map((s, i) => `<button type="button" class="src" data-i="${i}" style="animation-delay:${i * 70}ms" title="Open ${esc(s.t)}">
         <span class="src-ic">${esc(s.ic)}</span>
@@ -3415,15 +3356,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   }
   $('#sourcesBody').addEventListener('click', (e) => {
     const row = e.target.closest('.src');
-    if (!row) return;
-    const source = currentSources[+row.dataset.i];
-    if (!source) return;
-    openModal({
-      title: source.t,
-      sub: 'Source preview',
-      body: `<div class="source-preview"><p>${esc(source.s)}</p><p class="help">This is the material Aurora used for the answer. In the full product, this action opens the source at the cited passage.</p></div>`,
-      buttons: [{ label: 'Done', kind: 'primary' }],
-    });
+    if (row) toast(`Opening ${row.querySelector('b').textContent}`);
   });
   const flashSource = (i) => {
     const row = $(`#sourcesBody .src[data-i="${i}"]`);
@@ -3443,11 +3376,6 @@ Want me to quiz you on this or turn it into flashcards?` };
   $$('button', sourceMenu).forEach(b => b.addEventListener('click', () => {
     $$('button', sourceMenu).forEach(x => x.setAttribute('aria-checked', String(x === b)));
     $('#sourceLabel').textContent = b.textContent;
-    if (b.textContent === 'All courses') session.course = '';
-    else if (b.textContent !== 'Include my Library') session.course = b.textContent;
-    $('#composerScope').textContent = b.textContent === 'Include my Library'
-      ? 'All courses + my Library · Aurora chooses sources'
-      : `${b.textContent} · Aurora chooses sources`;
     closeMenu();
   }));
   document.addEventListener('click', (e) => { if (!sourceMenu.hidden && !e.target.closest('.source-wrap')) closeMenu(); });
@@ -3557,13 +3485,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   };
   thread.addEventListener('click', async (e) => {
     const cite = e.target.closest('.cite');
-    if (cite) {
-      e.preventDefault();
-      const source = currentSources[+cite.dataset.src];
-      if (source) openModal({ title: source.t, sub: 'Source preview', body: `<div class="source-preview"><p>${esc(source.s)}</p><p class="help">In the full product, this citation opens the source at the cited passage.</p></div>`, buttons: [{ label: 'Done', kind: 'primary' }] });
-      flashSource(cite.dataset.src);
-      return;
-    }
+    if (cite) { e.preventDefault(); flashSource(cite.dataset.src); return; }
     const status = e.target.closest('.msg.ai.done .status');
     if (status) {
       const steps = status.nextElementSibling;
@@ -4246,8 +4168,8 @@ Want me to quiz you on this or turn it into flashcards?` };
     return d.toLocaleDateString([], { month: 'short', day: 'numeric' });
   };
   const fmtFull = (ts) => new Date(ts).toLocaleString([], { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
-  const assoc = (it) => [it.course, it.space ? `Space · ${it.space}` : ''].filter(Boolean).join(' · ') || 'No course';
-  const destLabel = (d) => !d || d.kind === 'library' ? 'No course' : `${{ space: 'Space', course: 'Course', lesson: 'Lesson', folder: 'Folder' }[d.kind]} · ${d.name}`;
+  const assoc = (it) => [it.course, it.space ? `Space · ${it.space}` : ''].filter(Boolean).join(' · ') || 'Personal Library';
+  const destLabel = (d) => !d || d.kind === 'library' ? 'Personal Library' : `${{ space: 'Space', course: 'Course', lesson: 'Lesson', folder: 'Folder' }[d.kind]} · ${d.name}`;
   const applyDest = (item, dest) => {
     item.dest = dest;
     if (dest.kind === 'course') item.course = dest.name;
@@ -4721,12 +4643,12 @@ Want me to quiz you on this or turn it into flashcards?` };
   const WHERE_C = { course: 'var(--warning-500)', space: 'var(--purple-500)', library: 'var(--gray-400)' };
   const where = (it) => {
     const k = it.space ? 'space' : it.course ? 'course' : 'library';
-    return `<i style="background:${WHERE_C[k]}"></i>${esc(it.space ? `Space · ${it.space}` : it.course || 'No course')}`;
+    return `<i style="background:${WHERE_C[k]}"></i>${esc(it.space ? `Space · ${it.space}` : it.course || 'Personal Library')}`;
   };
   // One row component, reused by Library, Dashboard and Spaces.
   // Plain row on the page: document thumbnail, title, type · time, context; select / pin / ⋯ appear on hover.
   const PIN_ICON = svgI('<path d="M15 4.5l4.5 4.5-3 1.5-3.5 3.5.5 4-1.5 1.5-3.5-3.5L4 20l4.5-4.5L5 12l1.5-1.5 4 .5L14 7.5z"/>');
-  const ctxOf = (it) => it.space ? ['space', it.space] : it.course ? ['course', it.course] : ['library', 'No course'];
+  const ctxOf = (it) => it.space ? ['space', it.space] : it.course ? ['course', it.course] : ['library', 'Personal Library'];
   const itemRow = (it) => {
     const [k, name] = ctxOf(it);
     const checked = lv.sel && lv.sel.has(it.id);
@@ -4753,7 +4675,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     const w = String(it.body || '').split(/\s+/).filter(Boolean).length;
     return w ? `${w.toLocaleString()} words` : (it.source || 'Saved');
   };
-  const KIND_L = { course: 'Course', space: 'Space', library: 'No course' };
+  const KIND_L = { course: 'Course', space: 'Space', library: 'Personal' };
   const tableRow = (it) => {
     const [k, name] = ctxOf(it);
     const checked = lv.sel && lv.sel.has(it.id);
@@ -4803,7 +4725,7 @@ Want me to quiz you on this or turn it into flashcards?` };
         (!q || [it.title, it.body, it.course, it.space, it.source, typeOne(it.type)].join(' ').toLowerCase().includes(q)))
         .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || lastAct(b).t - lastAct(a).t);
       lv.visible = items.map(it => it.id);
-      $('#libFilterLbl').textContent = lv.loc ? (lv.loc === 'p:' ? 'No course' : lv.loc.slice(2)) : 'Filters';
+      $('#libFilterLbl').textContent = lv.loc ? (lv.loc === 'p:' ? 'Personal' : lv.loc.slice(2)) : 'Filters';
       $('#libFilter').classList.toggle('on', !!lv.loc);
       const label = TABS.find(([k]) => k === lv.cat)[1];
       $('#hResults').textContent = q ? `${items.length} result${items.length === 1 ? '' : 's'} for “${lv.q.trim()}”${lv.cat !== 'recent' ? ` in ${label}` : ''}` : `${label} · ${items.length}`;
@@ -4854,7 +4776,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     det.innerHTML = `
       <div class="d-top"><button type="button" class="link-btn d-back" data-act="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Back to Library</button>${moreBtn}</div>
       <div class="d-read-head">${typeTag}<h2 class="d-title" tabindex="-1">${esc(it.title)}</h2>
-        <p class="lib-count">${esc(it.source)} · ${esc(it.space || it.course || 'No course')} · Edited ${esc(fmtAgo(it.edited))}</p></div>
+        <p class="lib-count">${esc(it.source)} · ${esc(it.space || it.course || 'Personal Library')} · Edited ${esc(fmtAgo(it.edited))}</p></div>
       <div class="d-body"></div>`;
     const body = $('.d-body', det);
     if (it.payload?.kind === 'quiz') body.appendChild(buildQuiz(it.payload.data));
@@ -4863,10 +4785,10 @@ Want me to quiz you on this or turn it into flashcards?` };
     else body.innerHTML = `<div class="body">${it.body ? render(it.body) : '<p style="color:var(--gray-600)">This note is empty. Open the ⋯ menu and choose Edit note.</p>'}</div>`;
     $('#library').scrollTop = 0;
   };
-  // Breadcrumb: Student / Library (/ item when one is open)
+  // Breadcrumb: Student / Courses / Library (/ item when one is open)
   const renderCrumbs = () => {
     const it = lv.open && getItem(lv.open);
-    const parts = [['Student', 'dashboard'], ['Library', it ? 'library' : null]];
+    const parts = [['Student', 'dashboard'], ['Courses', 'courses'], ['Library', it ? 'library' : null]];
     if (it) parts.push([clip(it.title, 48), null]);
     $('#libCrumbs').innerHTML = parts.map(([label, go], i) => {
       const last = i === parts.length - 1;
@@ -5023,7 +4945,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     const opts = [['loc:', 'All locations'],
       ...COURSES.filter(c => used(x => x.course === c && !x.space)).map(c => ['loc:c:' + c, c]),
       ...SPACES.filter(sp => used(x => x.space === sp)).map(sp => ['loc:s:' + sp, `Space · ${sp}`]),
-      ...(used(x => !x.course && !x.space) ? [['loc:p:', 'No course']] : [])];
+      ...(used(x => !x.course && !x.space) ? [['loc:p:', 'Personal Library']] : [])];
     openMenuFor(e.currentTarget, opts, (a) => { lv.loc = a.slice(4); renderOverview(); $('#libFilter').focus(); });
     $$('#libFilter + .lib-menu button').forEach(b => { b.setAttribute('role', 'menuitemradio'); b.setAttribute('aria-checked', String(b.dataset.act === 'loc:' + (lv.loc || ''))); });
   });
@@ -5138,7 +5060,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     return [
       { id: 's1', name: 'Advanced React Development', desc: 'Master modern React patterns, hooks and performance optimisation.', created: t - 6 * DAY, edited: t - 2 * 3600000,
         mats: [doc('cd-fe-cp'), doc('cd-fe-hk'), mkMat('upload', 'react-hooks-notes.pdf', 'Uploaded file · 1.2 MB'), mkMat('flash', deck.title, 'Flashcard deck', deck.id), mkMat('url', 'react.dev/reference/react/hooks', 'Web page')] },
-      { id: 's2', name: 'Bio study group', desc: 'Private BIO 201 study space. Course materials are inherited, not copied.', linkedCourse: COURSES[0], created: t - 12 * DAY, edited: t - DAY, mats: [doc('cd-bio-l4'), doc('cd-bio-sg')] },
+      { id: 's2', name: 'Bio study group', desc: 'BIO 201 revision with the Lecture 4 materials.', created: t - 12 * DAY, edited: t - DAY, mats: [doc('cd-bio-l4'), doc('cd-bio-sg')] },
       { id: 's3', name: 'Capstone team', desc: 'Research questions and reading for the capstone project.', created: t - 14 * DAY, edited: t - 4 * DAY,
         mats: [doc('cd-ux-w3'), mkMat('upload', 'Capstone brief.pdf', 'Uploaded file · 640 KB')] },
       { id: 's4', name: 'Python practice', desc: 'Short exercises for CS 101.', created: t - 9 * DAY, edited: t - 2 * DAY, mats: [doc('cd-py-l1'), doc('cd-py-cs')] },
@@ -5196,8 +5118,8 @@ Want me to quiz you on this or turn it into flashcards?` };
     $('#spaces').setAttribute('aria-labelledby', sp ? 'spTitle' : 'spacesTitle');
     if (!sp) { renderSpOverview(); return; }
     $('#spTitle').textContent = sp.name;
-    $('#spDesc').textContent = [sp.desc, 'Private Space', sp.linkedCourse ? `Linked to ${sp.linkedCourse}` : ''].filter(Boolean).join(' · ');
-    $('#spDesc').hidden = !sp.desc && !sp.linkedCourse;
+    $('#spDesc').textContent = sp.desc || '';
+    $('#spDesc').hidden = !sp.desc;
     renderMats(); renderCtx(); renderThreadSp();
   }
   const openSpace = (id, chatId) => {
@@ -5244,15 +5166,11 @@ Want me to quiz you on this or turn it into flashcards?` };
 
   // ---------- SP09 materials panel ----------
   const STATUS_TXT = { connecting: 'Connecting…', preparing: 'Preparing for Aurora…' };
-  const activeMats = (sp) => {
-    const off = curSess()?.sourceOff || {};
-    return readyMats(sp).filter(m => !(off[m.id] ?? m.off) && !['flash', 'quiz'].includes(m.cat));
-  };   // session choices override Space defaults
+  const activeMats = (sp) => readyMats(sp).filter(m => !m.off && !['flash', 'quiz'].includes(m.cat));   // study aids are outputs, not sources
   const AID_CATS = ['flash', 'quiz'];
   const matRow = (m, withCheck) => {
     const [, label, icon] = catOf(m.cat);
-    const currentOff = (curSess()?.sourceOff || {})[m.id] ?? m.off;
-    const side = m.status === 'ready' ? (withCheck ? `<input type="checkbox" data-use="${m.id}"${currentOff ? '' : ' checked'} aria-label="Use ${esc(matTitle(m))} in this session">` : '')
+    const side = m.status === 'ready' ? (withCheck ? `<input type="checkbox" data-use="${m.id}"${m.off ? '' : ' checked'} aria-label="Use ${esc(matTitle(m))}">` : '')
       : m.status === 'failed' ? `<button type="button" class="link-btn mat-retry" data-retry="${m.id}">Retry</button>`
       : `<span class="nb-spin" role="img" aria-label="${STATUS_TXT[m.status]}"></span>`;
     const it = AID_CATS.includes(m.cat) ? getItem(m.ref) : null;
@@ -5271,14 +5189,13 @@ Want me to quiz you on this or turn it into flashcards?` };
     const order = MAT_CATS.map(c => c[0]);
     const live = liveMats(sp).slice().sort((a, b) => order.indexOf(a.cat) - order.indexOf(b.cat));
     const src = live.filter(m => !AID_CATS.includes(m.cat)), outs = live.filter(m => AID_CATS.includes(m.cat));
-    $('#spOutList').innerHTML = outs.map(m => matRow(m, false)).join('') || '<li class="ws-empty">Study aids created here appear as a filtered view from Library.</li>';
+    $('#spOutList').innerHTML = outs.map(m => matRow(m, false)).join('') || '<li class="ws-empty">Flashcards and quizzes you save appear here.</li>';
     if (!src.length) {
       $('#spMatList').innerHTML = `<div class="ws-empty">No sources yet. <button type="button" class="link-inline" data-addcat="course">Add course documents, uploads or links</button> so Aurora can answer from them.</div>`;
       return;
     }
-    const off = curSess()?.sourceOff || {};
-    const ready = src.filter(m => m.status === 'ready'), on = ready.filter(m => !(off[m.id] ?? m.off)).length;
-    const head = ready.length > 1 ? `<label class="ws-row ws-all"><span class="ws-rt"><span>${on} of ${ready.length} selected for this session</span></span><input type="checkbox" data-useall="1"${on === ready.length ? ' checked' : ''} aria-label="Select all sources for this session"></label>` : '';
+    const ready = src.filter(m => m.status === 'ready'), on = ready.filter(m => !m.off).length;
+    const head = ready.length > 1 ? `<label class="ws-row ws-all"><span class="ws-rt"><span>${on} of ${ready.length} selected for Aurora</span></span><input type="checkbox" data-useall="1"${on === ready.length ? ' checked' : ''} aria-label="Select all sources"></label>` : '';
     $('#spMatList').innerHTML = head + `<ul class="ws-list" role="list">${src.map(m => matRow(m, true)).join('')}</ul>`;
   };
   const renderCtx = () => {
@@ -5469,7 +5386,7 @@ Want me to quiz you on this or turn it into flashcards?` };
     return `<div class="aid-card"><span class="lib-ic t-${flash ? 'flashcards' : 'quiz'}" aria-hidden="true">${flash ? L_ICON.flashcards : L_ICON.quiz}</span>
       <span class="aid-txt"><b>${esc(a.title)}</b><span>${flash ? `${a.count} flashcards` : `${a.count}-question practice quiz`} · from ${esc(pub ? a.from.split(', ').map(t => srcText(t, curSp(), true)).join(', ') : a.from)}</span>${flash ? '' : '<span>Practice only: doesn’t change grades, course progress or instructor assessments.</span>'}</span>
       ${pub ? '<span class="aid-note">Not interactive in a shared view</span>' : `<button type="button" class="nav-btn sm" data-spact="review" data-i="${i}" aria-expanded="false">${flash ? 'Review cards' : 'Start practice'}</button>
-      ${saved ? `<span class="aid-saved">${ICON.check} Saved to Library · ${esc(curSp()?.name || 'this Space')}</span>` : `<button type="button" class="nav-btn sm primary" data-spact="saveaid" data-i="${i}">Save to ${esc(curSp()?.name || 'this Space')}</button>`}`}</div>
+      ${saved ? `<span class="aid-saved">${ICON.check} Saved to ${flash ? 'Flashcards' : 'Quizzes'}</span>` : `<button type="button" class="nav-btn sm primary" data-spact="saveaid" data-i="${i}">Save to Space</button>`}`}</div>
       <div class="aid-widget" hidden></div>`;
   };
   const mountAids = (root, c, pub) => root.querySelectorAll('.sp-aid:empty').forEach(el => { el.innerHTML = aidCard(c, +el.dataset.aid, pub); });
@@ -5591,7 +5508,7 @@ Want me to quiz you on this or turn it into flashcards?` };
   };
   const newSession = () => {
     if (sv.busy) return;
-    sv.chatId = null; renderMats(); renderCtx(); renderThreadSp(); $('#spPrompt').focus();
+    sv.chatId = null; renderThreadSp(); $('#spPrompt').focus();
     spLive('New session. This Space’s materials stay connected.');
   };
   const saveAid = (sp, c, i) => {
@@ -5683,20 +5600,11 @@ Want me to quiz you on this or turn it into flashcards?` };
     const sp = curSp(); if (!sp) return;
     const u = e.target.closest('[data-use]'), all = e.target.closest('[data-useall]');
     if (!u && !all) return;
-    const c = curSess();
-    if (c) {
-      c.sourceOff = c.sourceOff || {};
-      if (u) c.sourceOff[u.dataset.use] = !u.checked;
-      else readyMats(sp).filter(m => !AID_CATS.includes(m.cat)).forEach(m => { c.sourceOff[m.id] = !all.checked; });
-      c.edited = Date.now(); persistChats();
-    } else {
-      if (u) { const m = sp.mats.find(x => x.id === u.dataset.use); if (m) m.off = !u.checked; }
-      else readyMats(sp).filter(m => !AID_CATS.includes(m.cat)).forEach(m => { m.off = !all.checked; });
-      persistSpaces();
-    }
-    renderMats(); renderCtx(); if (!c?.msgs.length) renderThreadSp();
+    if (u) { const m = sp.mats.find(x => x.id === u.dataset.use); if (m) m.off = !u.checked; }
+    else readyMats(sp).filter(m => !AID_CATS.includes(m.cat)).forEach(m => { m.off = !all.checked; });
+    persistSpaces(); renderMats(); renderCtx(); if (!curSess()?.msgs.length) renderThreadSp();
     const again = u ? $(`#spMatList [data-use="${u.dataset.use}"]`) : $('#spMatList [data-useall]'); again?.focus();
-    const n = activeMats(sp).length; spLive(`${n} source${n === 1 ? '' : 's'} selected for this session`);
+    const n = activeMats(sp).length; spLive(`${n} source${n === 1 ? '' : 's'} selected for Aurora`);
   });
   $('#spMatList').addEventListener('click', (e) => {
     const sp = curSp(); if (!sp) return;
