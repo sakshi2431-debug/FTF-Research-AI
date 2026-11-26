@@ -347,7 +347,11 @@
     if (el.closest('#spOutList')) { if (!spOutQueued) { spOutQueued = true; queueMicrotask(() => { spOutQueued = false; onSpOut(); }); } return; }
     if (el.matches('.sp-msg') && el.closest('#spThread')) {
       if (spBatch > 2) return;                                     // a whole session rendered at once: the thread fades instead
-      if (el.matches('.sp-msg.me')) { lastSend = performance.now(); once(el, 'am-send', 700); return; }
+      if (el.matches('.sp-msg.me')) {
+        lastSend = performance.now();
+        if (/^Quiz me on these \d+ cards$/.test(el.textContent.trim())) return;   // the deck flies onto this one (spaces-quiz-flight.js)
+        once(el, 'am-send', 700); return;
+      }
       const w = el.querySelector('.working'); if (w) statusIn(w);
       return;
     }

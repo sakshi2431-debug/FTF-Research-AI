@@ -2686,7 +2686,7 @@
   <div id="spOverview">
     <div class="nb-ovhead">
       <div><h1 id="spacesTitle">Spaces</h1><p>Private workspaces for a course, topic or project. Add sources, then learn from them with Aurora.</p></div>
-      <button type="button" class="nb-pill dark" id="spNew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Create new</span></button>
+      <button type="button" class="nav-btn primary" id="spNew"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>Create new</span></button>
     </div>
     <div class="nb-grid" id="spGrid" role="list" aria-label="Your Spaces"></div>
   </div>
@@ -5490,8 +5490,11 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
 
   // ---------- SP09 materials panel ----------
   const STATUS_TXT = { connecting: 'Connecting…', preparing: 'Preparing for Aurora…' };
-  const activeMats = (sp) => readyMats(sp).filter(m => !m.off && !['flash', 'quiz'].includes(m.cat));   // study aids are outputs, not sources
   const AID_CATS = ['flash', 'quiz'];
+  // Made by Aurora in this Space and saved here (shown under Studio). Older saves are recognised by their label.
+  const isOutput = (m) => !!m.gen || /from this Space/.test(m.meta || '');
+  // Everything added with Add source (documents, uploads, links, flashcards, quizzes) is a source Aurora can use.
+  const activeMats = (sp) => readyMats(sp).filter(m => !m.off && !isOutput(m));
   const matRow = (m, withCheck) => {
     const [, label, icon] = catOf(m.cat);
     const side = m.status === 'ready' ? (withCheck ? `<input type="checkbox" data-use="${m.id}"${m.off ? '' : ' checked'} aria-label="Use ${esc(matTitle(m))}">` : '')
@@ -5512,7 +5515,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const sp = curSp(); if (!sp) return;
     const order = MAT_CATS.map(c => c[0]);
     const live = liveMats(sp).slice().sort((a, b) => order.indexOf(a.cat) - order.indexOf(b.cat));
-    const src = live.filter(m => !AID_CATS.includes(m.cat)), outs = live.filter(m => AID_CATS.includes(m.cat));
+    const src = live.filter(m => !isOutput(m)), outs = live.filter(isOutput);
     $('#spOutList').innerHTML = outs.map(m => matRow(m, false)).join('') || '<li class="ws-empty">Flashcards and quizzes you save appear here.</li>';
     if (!src.length) {
       $('#spMatList').innerHTML = `<div class="ws-empty">No sources yet. <button type="button" class="link-inline" data-addcat="course">Add course documents, uploads or links</button> so Aurora can answer from them.</div>`;
@@ -5814,6 +5817,11 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
   ];
   // Facts for one material; anything without known text is described honestly instead of invented.
   const factsOf = (m) => {
+    if (m.cat === 'flash' || m.cat === 'quiz') {
+      const it = getItem(m.ref), d = it && it.payload && it.payload.data, t = matTitle(m);
+      if (d && d.cards) return d.cards.map((c, i) => ({ q: c.q, a: c.a, where: `card ${i + 1}`, from: t }));
+      if (d && d.questions) return d.questions.filter(x => x.options && x.answer).map((x, i) => ({ q: x.q, a: x.answer.map(j => x.options[j]).join('; '), where: `question ${i + 1}`, from: t }));
+    }
     const t = matTitle(m);
     const kb = MAT_KB[m.ref] || (KB_BY_TITLE.find(([re]) => re.test(t)) || [])[1];
     return kb ? kb.map(f => ({ ...f, from: t })) : [];
@@ -5837,8 +5845,35 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     });
     return { title, questions: qs };
   };
+  // The deck a "Quiz me on these N cards" message refers to: the deck it was sent from (remembered by
+  // spaces-quiz-flight.js), else the most recent flashcards in this session.
+  const deckForQuiz = (q, sp) => {
+    let title = null;
+    try { title = (JSON.parse(localStorage.getItem('assistiv.deckThumbs') || '{}'))[q] || null; } catch { /* storage off */ }
+    const saved = sp.mats.filter(m => m.cat === 'flash').map(m => getItem(m.ref)).filter(it => it && it.payload?.data?.cards);
+    const fromLib = title && saved.find(it => it.title === title);
+    if (fromLib) return { set: fromLib.payload.data, from: fromLib.title };
+    const c = curSess();
+    const aids = c ? c.msgs.filter(m => m.aid && m.aid.kind === 'flash') : [];
+    const a = (title && aids.filter(m => m.aid.title === title).pop()) || aids.pop();
+    if (a) return { set: a.aid.data || flashFor(a.aid.topic), from: a.aid.from || a.aid.title };
+    if (saved.length) return { set: saved[saved.length - 1].payload.data, from: saved[saved.length - 1].title };
+    return null;
+  };
   const spPlan = (q, sp, ready) => {
     const t = q.toLowerCase();
+    const deckQ = q.trim().match(/^Quiz me on these (\d+) cards$/);
+    if (deckQ) {
+      const d = deckForQuiz(q.trim(), sp);
+      if (d && d.set.cards.length) {
+        const quiz = quizFromCards(d.set);
+        const base = String(d.set.title || 'Flashcards').replace(/\s*flashcards$/i, '');
+        quiz.title = `${base} practice quiz`;
+        return { status: 'Turning your cards into questions…', src: String(d.from).split(', ').filter(Boolean),
+          md: `Here's a ${quiz.questions.length}-question quiz built from your ${d.set.title}. Answer from memory first, then check your answers.`,
+          aid: { kind: 'quiz', topic: base, title: quiz.title, count: quiz.questions.length, from: d.from, data: quiz } };
+      }
+    }
     if (!ready.length) return { status: 'Checking this Space’s materials…', src: [],
       md: `I can’t answer this **from ${sp.name}’s sources** yet, because none are ${readyMats(sp).length ? 'selected' : 'connected and ready'}${!readyMats(sp).length && liveMats(sp).length ? ' (some are still preparing or need attention)' : ''}.\n\nAdd course documents, uploads or URLs with **Add Material**, and I’ll answer from them.` };
     const mm = q.match(/\b(?:on|about|for|from|of)\s+(.+)/i);
@@ -5960,7 +5995,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const { item } = saveItem({ type: flash ? 'flashcards' : 'quiz', title: a.title, body: '', source: 'Aurora response', session: c.title, space: sp.name,
       payload: flash ? { kind: 'flash', data: a.data || flashFor(a.topic), topic: a.topic } : { kind: 'quiz', data: a.data || quizFor(a.topic) } });
     a.libId = item.id;
-    if (!sp.mats.some(m => m.ref === item.id)) sp.mats.push(mkMat(flash ? 'flash' : 'quiz', item.title, flash ? 'Flashcard deck · from this Space' : 'Practice quiz · from this Space', item.id));
+    if (!sp.mats.some(m => m.ref === item.id)) sp.mats.push({ ...mkMat(flash ? 'flash' : 'quiz', item.title, flash ? 'Flashcard deck · from this Space' : 'Practice quiz · from this Space', item.id), gen: true });
     sp.edited = Date.now(); persistSpaces(); persistChats(); renderLibrary(); renderMats(); renderCtx();
     const host = $(`#spThread .sp-aid[data-aid="${i}"]`);
     if (host) { host.innerHTML = aidCard(c, i); host.querySelector('[data-spact="review"]')?.focus(); }
@@ -6056,7 +6091,7 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     const u = e.target.closest('[data-use]'), all = e.target.closest('[data-useall]');
     if (!u && !all) return;
     if (u) { const m = sp.mats.find(x => x.id === u.dataset.use); if (m) m.off = !u.checked; }
-    else readyMats(sp).filter(m => !AID_CATS.includes(m.cat)).forEach(m => { m.off = !all.checked; });
+    else readyMats(sp).filter(m => !isOutput(m)).forEach(m => { m.off = !all.checked; });
     persistSpaces(); renderMats(); renderCtx(); if (!curSess()?.msgs.length) renderThreadSp();
     const again = u ? $(`#spMatList [data-use="${u.dataset.use}"]`) : $('#spMatList [data-useall]'); again?.focus();
     const n = activeMats(sp).length; spLive(`${n} source${n === 1 ? '' : 's'} selected for Aurora`);
@@ -6297,5 +6332,6 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
 })();
 </script>
 <script src="aurora-motion.js" defer></script>
+<script src="spaces-quiz-flight.js" defer></script>
 </body>
 </html>
