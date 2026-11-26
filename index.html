@@ -3380,34 +3380,24 @@
     quizMeOn(set, widgetEl);
   };
   const quizMeOn = (set, widgetEl) => {
-    const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const quiz = quizFromCards(set), N = set.cards.length;
-    const intro = `Here's a ${quiz.questions.length}-question quiz built from your ${set.title}. Answer from memory first, then check your answers.`;
-    // Study chat: a new turn in the same conversation, answered with this quiz.
+    const N = set.cards.length, text = `Quiz me on these ${N} cards`;
+    // Study chat: no popup. A plain message joins the same thread, then Aurora answers with this quiz.
     if (widgetEl.closest('#thread')) {
       if (busy) return;
-      presetReply = { quick: true, quickLabel: 'Turning your cards into questions…', sources: [], md: intro,
-        widget: () => buildQuiz(quiz), widgetLabel: 'Building quiz', outro: 'Missed one? Go back to that card, then retake the quiz.' };
-      const text = `Quiz me on these ${N} cards`;
-      if (reduced) { prompt.value = text; autosize(); send(); return; }
-      prompt.value = ''; prompt.focus();
-      let k = 0;
-      const type = () => {
-        k++; prompt.value = text.slice(0, k); autosize();
-        if (k < text.length) setTimeout(type, 45); else setTimeout(() => send(), 450);
-      };
-      type();
+      const row = addMsg('me-row', `<div class="bubble">${esc(text)}</div><button type="button" class="act me-copy" data-act="copy-me" aria-label="Copy message" title="Copy">${ICON.copy}</button>`);
+      row.querySelector('.bubble').dataset.q = text;
+      presetReply = quizReply(set);
+      const ai = addMsg('ai', '');
+      ai.dataset.q = text;
+      thread.scrollTop = thread.scrollHeight;
+      respond(ai);
       return;
     }
-    // Spaces, Library items, popups: the quiz appears right under the cards (one at a time).
-    const box = document.createElement('div');
-    box.className = 'w-followup';
-    box.innerHTML = `<p class="w-followup-intro">${esc(intro)}</p>`;
-    box.appendChild(buildQuiz(quiz));
-    const prevF = widgetEl.nextElementSibling && widgetEl.nextElementSibling.classList.contains('w-followup') ? widgetEl.nextElementSibling : null;
-    if (prevF) prevF.replaceWith(box); else widgetEl.after(box);
-    box.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-    box.querySelector('input, button')?.focus({ preventScroll: true });
+    // Library items (and anywhere else outside Spaces): no popup. The follow-up appears inline under the cards.
+    const box = followUpBlock(set, text, false);
+    placeFollowUp(widgetEl, box);
+    box.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'start' });
+    box.querySelector('.fu-ai input, .fu-ai button')?.focus({ preventScroll: true });
   };
 
   // Flashcards widget
