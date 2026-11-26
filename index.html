@@ -1192,7 +1192,7 @@
     transition: transform .6s cubic-bezier(.2, .8, .2, 1); border-radius: var(--radius-4xl);
   }
   .fc-card.flipped { transform: rotateY(180deg); }
-  .fc-card.enter { animation: cardIn .35s ease; }
+  .fc-card.enter { animation: none; }   /* the motion layer slides the next card in */
   @keyframes cardIn { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
   .fc-card:focus-visible { outline: 3px solid rgba(31, 111, 229, .5); outline-offset: 4px; }
   .fc-face {
@@ -3545,12 +3545,12 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     el.classList.add('live');
     const tick = () => {
       if (stopFlag) { el.classList.remove('live'); return res(false); }
-      n = Math.min(md.length, n + 3 + Math.floor(Math.random() * 6));
+      n = Math.min(md.length, n + 2 + Math.floor(Math.random() * 3));
       const stick = nearBottom();
       el.innerHTML = render(md.slice(0, n).replace(/`{1,2}$/, ''));
       if (stick) thread.scrollTop = thread.scrollHeight;
       updateScrollBtn();
-      if (n < md.length) setTimeout(tick, 16); else { el.classList.remove('live'); res(true); }
+      if (n < md.length) setTimeout(tick, 40); else { el.classList.remove('live'); res(true); }
     };
     tick();
   });
@@ -3580,13 +3580,13 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     if (!stopFlag) { sh.textContent = 'Writing answer…'; ai.classList.add('streaming'); await stream(body, md); }
     if (!stopFlag && widget) {
       sh.textContent = `${widgetLabel || 'Building'}…`;
-      await wait(500);
+      await wait(900);
       if (!stopFlag) {
         const stick = nearBottom();
         ai.querySelector('.widget-slot').appendChild(widget());
         steps.push(widgetLabel === 'Building quiz' ? 'Built an interactive quiz' : 'Built a flashcard set');
         if (stick) thread.scrollTop = thread.scrollHeight;
-        if (outro) { await wait(250); await stream(ai.querySelector('.body2'), outro); }
+        if (outro) { await wait(700); await stream(ai.querySelector('.body2'), outro); }
       }
     }
     if (!stopFlag) steps.push('Wrote answer');
@@ -5741,11 +5741,11 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     if (!sv.stop) await new Promise(res => {
       const tick = () => {
         if (sv.stop) return res();
-        n = Math.min(plan.md.length, n + 4 + Math.floor(Math.random() * 6));
+        n = Math.min(plan.md.length, n + 2 + Math.floor(Math.random() * 3));
         const stick = near();
         body.innerHTML = render(plan.md.slice(0, n));
         if (stick) el.scrollTop = el.scrollHeight;   // never pull someone who scrolled up to read
-        if (n < plan.md.length) setTimeout(tick, 16); else { done = true; res(); }
+        if (n < plan.md.length) setTimeout(tick, 40); else { done = true; res(); }
       };
       tick();
     });
@@ -6034,10 +6034,10 @@ Want a quick quiz or a set of flashcards on ${topic}?` };
     let n = 0;
     const th = $('#icThread');
     const tick = () => {
-      n = Math.min(md.length, n + 4 + Math.floor(Math.random() * 6));
+      n = Math.min(md.length, n + 2 + Math.floor(Math.random() * 3));
       el.innerHTML = render(md.slice(0, n));
       th.scrollTop = th.scrollHeight;
-      if (n < md.length) setTimeout(tick, 16); else res();
+      if (n < md.length) setTimeout(tick, 40); else res();
     };
     tick();
   });
